@@ -20,5 +20,6 @@ yarn start
 
 ## External APIs/Libraries
 
-![File Manager](https://github.com/OpusCapita/filemanager)
-![Voice Recorder](https://www.npmjs.com/package/react-voice-recorder)
+[File Manager](https://github.com/OpusCapita/filemanager)
+
+[Voice Recorder](https://www.npmjs.com/package/react-voice-recorder)
