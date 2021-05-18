@@ -13,4 +13,11 @@ module.exports = {
   },
   plugins: ["react"],
   rules: {},
+  settings: {
+    "import/resolver": {
+      node: {
+        paths: ["src"],
+      },
+    },
+  },
 };
