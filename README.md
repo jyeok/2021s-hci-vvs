@@ -2,12 +2,10 @@
 
 ## Running our Project
 
-Our project currently has no backend server, so We used temporary file server in `server/root`.
-
-To run temporary local file server, run:
+To run local (temporary) file server in your computer, run:
 
 ```bash
-# in server/
+# in server/fileserver
 node fileserver.js
 ```
 
@@ -16,6 +14,13 @@ To run our frontend server, run:
 ```bash
 # in project root
 yarn start
+```
+
+To run our GraphQL server, run:
+
+```bash
+# in server/gqlserver
+npm start
 ```
 
 ## External APIs/Libraries
