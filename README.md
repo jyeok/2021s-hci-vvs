@@ -4,15 +4,11 @@
 
 To run local (temporary) file server in your computer, run:
 
-```bash
-# in server/fileserver
-node fileserver.js
-```
-
 To run our frontend server, run:
 
 ```bash
 # in project root
+yarn
 yarn start
 ```
 
@@ -20,7 +16,13 @@ To run our GraphQL server, run:
 
 ```bash
 # in server/gqlserver
+npm install
 npm start
+```
+
+```bash
+# in server/fileserver
+node fileserver.js
 ```
 
 ## External APIs/Libraries
