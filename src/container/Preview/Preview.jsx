@@ -1,15 +1,49 @@
 import React from "react";
-import PropTypes from "prop-types";
+import PropType from "prop-types";
+import Button from "@material-ui/core/Button";
+import PreviewText from "container/PreviewText/PreviewText";
 
-const Preview = (props) => {
-  const { isLocked, name } = props;
-
-  return isLocked ? <div> 잠금 </div> : <div> {name} 열림 </div>;
-};
-
+function Preview(prop) {
+  const { name } = prop;
+  return (
+    <div>
+      {name}
+      <PreviewText name={name} />
+      <div>
+        <Button type="button">편집</Button>
+      </div>
+      <div>
+        <Button type="button">재생</Button>
+      </div>
+      <div>
+        <Button type="button">잠금</Button>
+      </div>
+    </div>
+  );
+}
 export default Preview;
+// const Preview = (prop) => {
+//   const { name } = prop;
 
-Preview.propTypes = {
-  isLocked: PropTypes.bool.isRequired,
-  name: PropTypes.string.isRequired,
+//   return (
+//     <div>
+//       {name}
+//       <PreviewText name="대화 미리보기" />
+//       <div>
+//         <Button type="button">편집</Button>
+//       </div>
+//       <div>
+//         <Button type="button">재생</Button>
+//       </div>
+//       <div>
+//         <Button type="button">잠금</Button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Preview;
+
+Preview.propType = {
+  name: PropType.string.isRequired,
 };

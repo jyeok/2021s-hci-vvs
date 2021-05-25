@@ -2,12 +2,10 @@ import React from "react";
 import { FileManager, FileNavigator } from "@opuscapita/react-filemanager";
 import connectorNodeV1 from "@opuscapita/react-filemanager-connector-node-v1";
 import { Grid } from "@material-ui/core";
+// eslint-disable-next-line no-unused-vars
+import { padding } from "@material-ui/system";
 
 import Preview from "container/Preview/Preview";
-import PreviewText from "container/PreviewText/PreviewText";
-import ButtonEdit from "container/Buttons/ButtonEdit";
-import ButtonPlay from "container/Buttons/ButtonPlay";
-import ButtonLock from "container/Buttons/ButtonLock";
 
 const apiOptions = {
   ...connectorNodeV1.apiOptions,
@@ -15,9 +13,9 @@ const apiOptions = {
 };
 
 const fileManager = () => (
-  <Grid container>
-    <Grid item xs={7}>
-      <FileManager style={{ height: "600px" }}>
+  <Grid container padding={15}>
+    <Grid item xs={8}>
+      <FileManager style={({ height: "600px" }, { border: "1px solid" })}>
         <FileNavigator
           id="filemanager-1"
           api={connectorNodeV1.api}
@@ -28,12 +26,8 @@ const fileManager = () => (
         />
       </FileManager>
     </Grid>
-    <Grid item xs={5}>
+    <Grid item xs={4} style={({ height: "600px" }, { border: "1px solid" })}>
       <Preview name="미리보기" />
-      <PreviewText name="여기가 대화의 내용" />
-      <ButtonEdit name="편집" />
-      <ButtonPlay name="재생" />
-      <ButtonLock name="잠금" />
     </Grid>
   </Grid>
 );
