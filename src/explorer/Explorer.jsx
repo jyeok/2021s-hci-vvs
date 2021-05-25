@@ -3,6 +3,12 @@ import { FileManager, FileNavigator } from "@opuscapita/react-filemanager";
 import connectorNodeV1 from "@opuscapita/react-filemanager-connector-node-v1";
 import { Grid } from "@material-ui/core";
 
+import Preview from "container/Preview/Preview";
+import PreviewText from "container/PreviewText/PreviewText";
+import ButtonEdit from "container/Buttons/ButtonEdit";
+import ButtonPlay from "container/Buttons/ButtonPlay";
+import ButtonLock from "container/Buttons/ButtonLock";
+
 const apiOptions = {
   ...connectorNodeV1.apiOptions,
   apiRoot: "http://localhost:3020",
@@ -23,7 +29,11 @@ const fileManager = () => (
       </FileManager>
     </Grid>
     <Grid item xs={5}>
-      <div>오노</div>
+      <Preview name="미리보기" />
+      <PreviewText name="여기가 대화의 내용" />
+      <ButtonEdit name="편집" />
+      <ButtonPlay name="재생" />
+      <ButtonLock name="잠금" />
     </Grid>
   </Grid>
 );
