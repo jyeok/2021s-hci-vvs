@@ -1,22 +1,28 @@
 import React from "react";
 import PropType from "prop-types";
-import Button from "@material-ui/core/Button";
+import { Button } from "@material-ui/core";
 import PreviewText from "container/PreviewText/PreviewText";
 
 function Preview(prop) {
   const { name } = prop;
   return (
     <div>
-      {name}
+      <div style={{ margin: "3px" }}>Preview</div>
       <PreviewText name={name} />
-      <div>
-        <Button type="button">편집</Button>
+      <div style={{ marginLeft: "12px", marginBottom: "8px" }}>
+        <Button type="button" style={{ border: "0.5px solid" }}>
+          편집
+        </Button>
       </div>
-      <div>
-        <Button type="button">재생</Button>
+      <div style={{ marginLeft: "12px", marginBottom: "8px" }}>
+        <Button type="button" style={{ border: "0.5px solid" }}>
+          재생
+        </Button>
       </div>
-      <div>
-        <Button type="button">잠금</Button>
+      <div style={{ marginLeft: "12px", marginBottom: "8px" }}>
+        <Button type="button" style={{ border: "0.5px solid" }}>
+          잠금
+        </Button>
       </div>
     </div>
   );

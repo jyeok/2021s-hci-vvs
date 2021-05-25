@@ -3,6 +3,9 @@ import ReactDOM from "react-dom";
 
 import App from "App";
 import reportWebVitals from "reportWebVitals";
+import "./index.css";
+
+import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 import {
   ApolloClient,
@@ -20,23 +23,20 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: "Noto Sans CJK KR",
+  },
+});
+
 ReactDOM.render(
   <React.StrictMode>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    />
-    <meta
-      name="viewport"
-      content="minimum-scale=1, initial-scale=1, width=device-width"
-    />
     <ApolloProvider client={client}>
-      <App />
+      <MuiThemeProvider theme={theme}>
+        <App />
+      </MuiThemeProvider>
     </ApolloProvider>
+    ,
   </React.StrictMode>,
   document.getElementById("root")
 );

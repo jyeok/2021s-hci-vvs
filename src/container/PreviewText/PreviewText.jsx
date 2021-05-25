@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import "@material-ui/system";
 import {
   MainContainer,
   ChatContainer,
@@ -8,11 +9,17 @@ import {
   Message,
 } from "@chatscope/chat-ui-kit-react";
 
-console.log(styles);
 const PreviewText = (prop) => {
   const { name, arrivalTime } = prop;
   return (
-    <div style={{ position: "relative", height: "400px" }}>
+    <div
+      style={{
+        position: "relative",
+        height: "300px",
+        margin: "12px",
+        border: "1px solid",
+      }}
+    >
       <MainContainer>
         <ChatContainer>
           <MessageList>
