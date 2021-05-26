@@ -1,56 +1,53 @@
-import React, { PureComponent } from "react";
-import { Recorder } from "react-voice-recorder";
-import "react-voice-recorder/dist/index.css";
+import React, { Component } from "react";
 
-class RecordingTop extends PureComponent {
+import AudioReactRecorder, { RecordState } from "audio-react-recorder";
+
+class RecordingTop extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      audioDetails: {
-        url: null,
-        blob: null,
-        chunks: null,
-        duration: {
-          h: null,
-          m: null,
-          s: null,
-        },
-      },
+      recordState: null,
     };
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
   }
 
-  handleAudioStop(data) {
-    console.log(data);
-    this.setState({ audioDetails: data });
+  // eslint-disable-next-line class-methods-use-this
+  onStop(audioData) {
+    console.log("audioData", audioData);
   }
 
-  handleReset() {
-    const reset = {
-      url: null,
-      blob: null,
-      chunks: null,
-      duration: {
-        h: 0,
-        m: 0,
-        s: 0,
-      },
-    };
-    this.setState({ audioDetails: reset });
+  start() {
+    this.setState({
+      recordState: RecordState.START,
+    });
+  }
+
+  stop() {
+    this.setState({
+      recordState: RecordState.STOP,
+    });
   }
 
   render() {
+    const { recordState } = this.state;
+
     return (
-      <div className="RecordingTop">
-        <Recorder
-          record
-          title="New recording"
-          // eslint-disable-next-line react/destructuring-assignment
-          audioURL={this.state.audioDetails.url}
-          showUIAudio
-          handleAudioStop={(data) => this.handleAudioStop(data)}
-          handleAudioUpload={(data) => this.handleAudioUpload(data)}
-          handleReset={() => this.handleReset()}
+      <div>
+        <AudioReactRecorder
+          state={recordState}
+          onStop={this.onStop}
+          canvasWidth={0}
+          canvasHeight={0}
         />
+
+        <button type="button" onClick={this.start}>
+          Start
+        </button>
+        <button type="button" onClick={this.stop}>
+          Stop
+        </button>
       </div>
     );
   }
