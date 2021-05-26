@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { Grid } from "@material-ui/core";
 import RecordingKeyword from "container/RecordingKeyword/RecordingKeyword";
 import RecordingMemo from "../component/RecordingMemo/RecordingMemo";
+import RecordingTop from "../component/RecordingTop/RecordingTop";
 
 class WhileRecording extends PureComponent {
   render() {
@@ -19,7 +20,7 @@ class WhileRecording extends PureComponent {
             })
           }
         >
-          여기는 맨 위에 돌아가기 맨 오른쪽에 일시정지
+          <RecordingTop />
         </Grid>
         <Grid
           item
@@ -33,7 +34,7 @@ class WhileRecording extends PureComponent {
             })
           }
         >
-          <Grid style={{ borderBottom: "1px solid" }}>여기는 메세지함</Grid>
+          <Grid style={{ borderBottom: "1px solid" }}>여기는 메세지</Grid>
           <Grid>여기는 삭제+저장 함</Grid>
         </Grid>
         <Grid

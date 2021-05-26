@@ -2,8 +2,7 @@ import React from "react";
 import { FileManager, FileNavigator } from "@opuscapita/react-filemanager";
 import connectorNodeV1 from "@opuscapita/react-filemanager-connector-node-v1";
 import { Grid } from "@material-ui/core";
-// eslint-disable-next-line no-unused-vars
-import { padding } from "@material-ui/system";
+import "@material-ui/system";
 
 import Preview from "container/Preview/Preview";
 
