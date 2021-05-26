@@ -8,38 +8,72 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Mutation {
-  createDraft(authorEmail: String!, data: PostCreateInput!): Post
-  deletePost(id: Int!): Post
-  incrementPostViewCount(id: Int!): Post
-  signupUser(data: UserCreateInput!): User!
-  togglePublishPost(id: Int!): Post
+  hellow: String!
 }
 
-type Post {
-  author: User
-  content: String
-  createdAt: DateTime!
+type Preview {
+  excerpt: [TextBlock!]!
   id: Int!
-  published: Boolean!
-  title: String!
-  updatedAt: DateTime!
-  viewCount: Int!
+  record: Record
+  voice: String!
 }
 
-input PostCreateInput {
-  content: String
-  title: String!
-}
-
-input PostOrderByUpdatedAtInput {
-  updatedAt: SortOrder!
+input PreviewCreateInput {
+  id: Int!
+  voice: String!
 }
 
 type Query {
-  allUsers: [User!]!
-  draftsByUser(userUniqueInput: UserUniqueInput!): [Post]
-  feed(orderBy: PostOrderByUpdatedAtInput, searchString: String, skip: Int, take: Int): [Post!]!
-  postById(id: Int): Post
+  allPreviews: [Preview!]
+  allRecords: [Record!]
+  allSchedules: [Schedule!]
+  allTextBlocks: [TextBlock!]
+  previewById(id: Int!): Preview
+  previewByRecord(id: Int!): [Preview!]
+  recordById(id: Int!): Record
+  recordByPath(path: String!): Record
+  scheduleByDate(date: String): [Schedule!]
+  scheduleById(id: Int!): Schedule
+  textBlockById(id: Int!): TextBlock
+  textBlocksByRecord(id: Int!): [TextBlock!]
+}
+
+type Record {
+  content: [TextBlock!]!
+  createdAt: DateTime
+  id: Int!
+  isLocked: Int
+  memo: String
+  path: String!
+  preview: Preview
+  size: String!
+  tag: String
+  title: String!
+  updatedAt: DateTime
+  voice: String!
+}
+
+input RecordCreateInput {
+  content: [TextBlockCreateInput!]!
+  id: Int!
+  memo: String
+  path: String!
+  preview: PreviewCreateInput!
+  size: String!
+  tag: String
+  title: String!
+  voice: String!
+}
+
+type Schedule {
+  date: String!
+  id: Int!
+  source: TextBlock
+}
+
+input ScheduleCreateInput {
+  date: String!
+  id: Int!
 }
 
 enum SortOrder {
@@ -47,20 +81,26 @@ enum SortOrder {
   desc
 }
 
-type User {
-  email: String!
+type TextBlock {
+  content: String!
+  end: String!
   id: Int!
-  name: String
-  posts: [Post!]!
+  isHighlighted: Int
+  isMine: Int
+  isModified: Int
+  preview: Preview
+  record: Record
+  reliability: Float!
+  start: String!
 }
 
-input UserCreateInput {
-  email: String!
-  name: String
-  posts: [PostCreateInput!]
-}
-
-input UserUniqueInput {
-  email: String
-  id: Int
+input TextBlockCreateInput {
+  content: String!
+  end: String!
+  id: Int!
+  isHighlighted: Int!
+  isMine: Int!
+  isModified: Int!
+  reliability: Float!
+  start: String!
 }

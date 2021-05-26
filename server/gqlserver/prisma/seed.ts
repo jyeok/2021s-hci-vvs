@@ -1,62 +1,80 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 
+var crypto = require('crypto')
+
+const flag = () => Math.floor(Math.random() * 10) % 2
+const cond = () => flag() == 0
+
+const randomPhrase = (len: number = 20) =>
+  crypto.randomBytes(len).toString('hex')
+
 const prisma = new PrismaClient()
 
-const userData: Prisma.UserCreateInput[] = [
-  {
-    name: 'Alice',
-    email: 'alice@prisma.io',
-    posts: {
-      create: [
-        {
-          title: 'Join the Prisma Slack',
-          content: 'https://slack.prisma.io',
-          published: true,
-        },
-      ],
-    },
-  },
-  {
-    name: 'Nilu',
-    email: 'nilu@prisma.io',
-    posts: {
-      create: [
-        {
-          title: 'Follow Prisma on Twitter',
-          content: 'https://www.twitter.com/prisma',
-          published: true,
-          viewCount: 42,
-        },
-      ],
-    },
-  },
-  {
-    name: 'Mahmoud',
-    email: 'mahmoud@prisma.io',
-    posts: {
-      create: [
-        {
-          title: 'Ask a question about Prisma on GitHub',
-          content: 'https://www.github.com/prisma/prisma/discussions',
-          published: true,
-          viewCount: 128,
-        },
-        {
-          title: 'Prisma on YouTube',
-          content: 'https://pris.ly/youtube',
-        },
-      ],
-    },
-  },
-]
+const randomRecordData = () => {
+  let res: Prisma.RecordCreateInput = {
+    path: randomPhrase(),
+    title: randomPhrase(),
+    size: randomPhrase(),
+    tag: cond() ? randomPhrase() : undefined,
+    memo: cond() ? randomPhrase() : undefined,
+    voice: randomPhrase(),
+  }
+
+  return res
+}
+
+const randomTextBlockData = () => {
+  let res: Prisma.TextBlockCreateInput = {
+    content: randomPhrase(),
+    isMine: flag(),
+    isHighlighted: flag(),
+    isModified: flag(),
+    reliability: Math.random(),
+    start: randomPhrase(),
+    end: randomPhrase(),
+  }
+
+  return res
+}
+
+const randomPreviewData = () => {
+  let res: Prisma.PreviewCreateInput = {
+    voice: randomPhrase(),
+  }
+
+  return res
+}
+
+const randomScheduleData = () => {
+  let res: Prisma.ScheduleCreateInput = {
+    date: new Date().toISOString().split('T')[0],
+  }
+
+  return res
+}
 
 async function main() {
   console.log(`Start seeding ...`)
-  for (const u of userData) {
-    const user = await prisma.user.create({
-      data: u,
+  for (let i = 0; i < 20; i++) {
+    const record = await prisma.record.create({
+      data: randomRecordData(),
     })
-    console.log(`Created user with id: ${user.id}`)
+    console.log(`Created record with id: ${record.id}`)
+
+    const textBlock = await prisma.textBlock.create({
+      data: randomTextBlockData(),
+    })
+    console.log(`Created textblock with id: ${textBlock.id}`)
+
+    const preview = await prisma.preview.create({
+      data: randomPreviewData(),
+    })
+    console.log(`Created preview with id: ${preview.id}`)
+
+    const schedule = await prisma.schedule.create({
+      data: randomScheduleData(),
+    })
+    console.log(`Created schedule with id: ${schedule.id}`)
   }
   console.log(`Seeding finished.`)
 }
