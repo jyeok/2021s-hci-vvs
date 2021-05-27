@@ -1,8 +1,9 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
+import { ArrowBack } from "@material-ui/icons/";
 import AudioReactRecorder, { RecordState } from "audio-react-recorder";
 
-class RecordingTop extends Component {
+class RecordingTop extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -35,6 +36,7 @@ class RecordingTop extends Component {
 
     return (
       <div>
+        <ArrowBack />
         <AudioReactRecorder
           state={recordState}
           onStop={this.onStop}
