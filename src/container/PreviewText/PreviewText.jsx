@@ -10,7 +10,7 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 
 const PreviewText = (prop) => {
-  const { name, arrivalTime } = prop;
+  const { name, arrivalTime, messageDisplayed } = prop;
   return (
     <div
       style={{
@@ -25,7 +25,7 @@ const PreviewText = (prop) => {
           <MessageList>
             <Message
               model={{
-                message: "Hello my friend",
+                message: messageDisplayed,
                 sentTime: arrivalTime,
                 sender: name,
                 direction: "incoming",
@@ -53,4 +53,11 @@ export default PreviewText;
 PreviewText.PropType = {
   name: PropTypes.string.isRequired,
   arrivalTime: PropTypes.string,
+  messageDisplayed: PropTypes.string.isRequired,
+};
+
+PreviewText.defaultProps = {
+  name: "Susan",
+  arrivalTime: "2020/05/04",
+  messageDisplayed: "This is sample message.",
 };

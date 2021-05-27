@@ -8,7 +8,7 @@ function Preview(prop) {
   return (
     <div>
       <div style={{ margin: "3px" }}>Preview</div>
-      <PreviewText name={name} />
+      <PreviewText name={name} style={{ height: "300px", margin: "10px" }} />
       <div style={{ marginLeft: "12px", marginBottom: "8px" }}>
         <Button type="button" style={{ border: "0.5px solid" }}>
           편집
