@@ -15,8 +15,8 @@ const randomRecordData = () => {
     path: randomPhrase(),
     title: randomPhrase(),
     size: randomPhrase(),
-    tag: cond() ? randomPhrase() : undefined,
-    memo: cond() ? randomPhrase() : undefined,
+    tag: cond() ? randomPhrase() : '',
+    memo: cond() ? randomPhrase() : '',
     voice: randomPhrase(),
   }
 
@@ -48,6 +48,7 @@ const randomPreviewData = () => {
 const randomScheduleData = () => {
   let res: Prisma.ScheduleCreateInput = {
     date: new Date().toISOString().split('T')[0],
+    memo: randomPhrase(),
   }
 
   return res

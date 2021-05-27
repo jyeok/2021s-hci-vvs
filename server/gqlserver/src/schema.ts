@@ -18,14 +18,14 @@ const Query = objectType({
   name: 'Query',
   definition(t) {
     t.nullable.list.nonNull.field('allRecords', {
-      type: 'Record',
+      type: Record,
       resolve: (_p, _a, context: Context) => {
         return context.prisma.record.findMany()
       },
     })
 
     t.nullable.field('recordById', {
-      type: 'Record',
+      type: Record,
       args: {
         id: nonNull(intArg()),
       },
@@ -39,7 +39,7 @@ const Query = objectType({
     })
 
     t.nullable.field('recordByPath', {
-      type: 'Record',
+      type: Record,
       args: {
         path: nonNull(stringArg()),
       },
@@ -53,14 +53,14 @@ const Query = objectType({
     })
 
     t.nullable.list.nonNull.field('allTextBlocks', {
-      type: 'TextBlock',
+      type: TextBlock,
       resolve: (parent, args, context: Context) => {
         return context.prisma.textBlock.findMany()
       },
     })
 
     t.nullable.field('textBlockById', {
-      type: 'TextBlock',
+      type: TextBlock,
       args: {
         id: nonNull(intArg()),
       },
@@ -74,7 +74,7 @@ const Query = objectType({
     })
 
     t.nullable.list.nonNull.field('textBlocksByRecord', {
-      type: 'TextBlock',
+      type: TextBlock,
       args: {
         id: nonNull(intArg()),
       },
@@ -88,14 +88,14 @@ const Query = objectType({
     }) // TODO: test it
 
     t.nullable.list.nonNull.field('allPreviews', {
-      type: 'Preview',
+      type: Preview,
       resolve: (parent, args, context: Context) => {
         return context.prisma.preview.findMany()
       },
     })
 
     t.nullable.field('previewById', {
-      type: 'Preview',
+      type: Preview,
       args: {
         id: nonNull(intArg()),
       },
@@ -109,7 +109,7 @@ const Query = objectType({
     })
 
     t.nullable.list.nonNull.field('previewByRecord', {
-      type: 'Preview',
+      type: Preview,
       args: {
         id: nonNull(intArg()),
       },
@@ -123,14 +123,14 @@ const Query = objectType({
     }) // TODO: test it
 
     t.nullable.list.nonNull.field('allSchedules', {
-      type: 'Schedule',
+      type: Schedule,
       resolve: (parent, args, context: Context) => {
         return context.prisma.schedule.findMany()
       },
     })
 
     t.nullable.field('scheduleById', {
-      type: 'Schedule',
+      type: Schedule,
       args: {
         id: nonNull(intArg()),
       },
@@ -144,7 +144,7 @@ const Query = objectType({
     })
 
     t.nullable.list.nonNull.field('scheduleByDate', {
-      type: 'Schedule',
+      type: Schedule,
       args: {
         date: stringArg(),
       },
@@ -160,108 +160,201 @@ const Query = objectType({
 const Mutation = objectType({
   name: 'Mutation',
   definition(t) {
-    t.nonNull.string('hellow', {
-      resolve: (parent, _, context: Context) => {
-        return 'hello!'
+    t.field('addRecord', {
+      type: Record,
+      args: {
+        data: arg({ type: nonNull(RecordCreateInput) }),
+      },
+      resolve: (_, args, context: Context) => {
+        const { content, ...rest } = args.data
+
+        return context.prisma.record.create({
+          data: {
+            ...rest,
+            content: {
+              create: content || undefined,
+            },
+          },
+        })
       },
     })
-    // t.nonNull.field('signupUser', {
-    //   type: 'User',
+
+    t.field('deleteRecordById', {
+      type: Record,
+      args: {
+        id: nonNull(intArg()),
+      },
+      resolve: (_, args, context: Context) => {
+        return context.prisma.record.delete({
+          where: {
+            id: args.id,
+          },
+        })
+      },
+    })
+
+    t.field('deleteRecordByPath', {
+      type: Record,
+      args: {
+        path: nonNull(stringArg()),
+      },
+      resolve: (_, args, context: Context) => {
+        return context.prisma.record.delete({
+          where: {
+            path: args.path,
+          },
+        })
+      },
+    })
+
+    t.field('updateRecord', {
+      type: Record,
+      args: {
+        id: nonNull(intArg()),
+        data: arg({ type: RecordUpdateInput }),
+      },
+      resolve: (_, args, context: Context) => {
+        return context.prisma.record.update({
+          where: { id: args.id },
+          data: {
+            path: args.data?.path || undefined,
+            title: args.data?.title || undefined,
+            size: args.data?.size || undefined,
+            tag: args.data?.tag || undefined,
+            memo: args.data?.memo || undefined,
+            isLocked: args.data?.isLocked || undefined,
+            voice: args.data?.voice || undefined,
+          },
+        })
+      },
+    })
+
+    t.field('addTextBlock', {
+      type: TextBlock,
+      args: {
+        data: arg({ type: nonNull(TextBlockCreateInput) }),
+      },
+      resolve: (_, args, context: Context) => {
+        return context.prisma.textBlock.create({
+          data: args.data,
+        })
+      },
+    })
+
+    t.field('updateTextBlock', {
+      type: TextBlock,
+      args: {
+        id: nonNull(intArg()),
+        data: arg({ type: nonNull(TextBlockUpdateInput) }),
+      },
+      resolve: (parent, args, context: Context) => {
+        return context.prisma.textBlock.update({
+          where: { id: args.id },
+          data: {
+            content: args.data.content || undefined,
+            isMine: args.data.isMine || undefined,
+            isHighlighted: args.data.isHighlighted || undefined,
+            isModified: 1,
+            reliability: args.data.reliability || undefined,
+            start: args.data.start || undefined,
+            end: args.data.end || undefined,
+          },
+        })
+      },
+    })
+
+    t.field('deleteTextBlockById', {
+      type: TextBlock,
+      args: {
+        id: nonNull(intArg()),
+      },
+      resolve: (_, args, context: Context) => {
+        return context.prisma.textBlock.delete({
+          where: {
+            id: args.id,
+          },
+        })
+      },
+    })
+
+    // t.field('generateTextBlock', {
+    //   type: Record,
     //   args: {
-    //     data: nonNull(
-    //       arg({
-    //         type: 'UserCreateInput',
-    //       }),
-    //     ),
+    //     recordId: nonNull(intArg()),
     //   },
-    //   resolve: (_, args, context: Context) => {
-    //     const postData = args.data.posts?.map((post) => {
-    //       return { title: post.title, content: post.content || undefined }
-    //     })
-    //     return context.prisma.user.create({
-    //       data: {
-    //         name: args.data.name,
-    //         email: args.data.email,
-    //         posts: {
-    //           create: postData,
-    //         },
-    //       },
-    //     })
-    //   },
-    // })
-    // t.field('createDraft', {
-    //   type: 'Post',
-    //   args: {
-    //     data: nonNull(
-    //       arg({
-    //         type: 'PostCreateInput',
-    //       }),
-    //     ),
-    //     authorEmail: nonNull(stringArg()),
-    //   },
-    //   resolve: (_, args, context: Context) => {
-    //     return context.prisma.post.create({
-    //       data: {
-    //         title: args.data.title,
-    //         content: args.data.content,
-    //         author: {
-    //           connect: { email: args.authorEmail },
-    //         },
-    //       },
-    //     })
-    //   },
-    // })
-    // t.field('togglePublishPost', {
-    //   type: 'Post',
-    //   args: {
-    //     id: nonNull(intArg()),
-    //   },
-    //   resolve: async (_, args, context: Context) => {
-    //     try {
-    //       const post = await context.prisma.post.findUnique({
-    //         where: { id: args.id || undefined },
-    //         select: {
-    //           published: true,
+    //   resolve: (parent, args, context: Context) => {
+    //     return context.prisma.record
+    //       .findUnique({
+    //         where: {
+    //           id: args.recordId,
     //         },
     //       })
-    //       return context.prisma.post.update({
-    //         where: { id: args.id || undefined },
-    //         data: { published: !post?.published },
+    //       .then((e) => {
+    //         console.log(e)
+    //         //TODO: generate....
     //       })
-    //     } catch (e) {
-    //       throw new Error(
-    //         `Post with ID ${args.id} does not exist in the database.`,
-    //       )
-    //     }
     //   },
     // })
-    // t.field('incrementPostViewCount', {
-    //   type: 'Post',
+
+    t.field('addPreview', {
+      type: Preview,
+      args: {
+        data: arg({ type: nonNull(PreviewCreateInput) }),
+      },
+      resolve: (parent, args, context: Context) => {
+        return context.prisma.preview.create({
+          data: args.data,
+        })
+      },
+    })
+
+    // t.field('generatePreview', {
+    //   type: Preview,
     //   args: {
-    //     id: nonNull(intArg()),
+    //     recordId: nonNull(intArg()),
     //   },
-    //   resolve: (_, args, context: Context) => {
-    //     return context.prisma.post.update({
-    //       where: { id: args.id || undefined },
-    //       data: {
-    //         viewCount: {
-    //           increment: 1,
+    //   resolve: (parent, args, context: Context) => {
+    //     return context.prisma.record
+    //       .findUnique({
+    //         where: {
+    //           id: args.recordId,
     //         },
-    //       },
-    //     })
+    //       })
+    //       .then((e) => {
+    //         console.log(e)
+    //         // TODO: Generate....
+    //       })
     //   },
     // })
-    // t.field('deletePost', {
-    //   type: 'Post',
-    //   args: {
-    //     id: nonNull(intArg()),
-    //   },
-    //   resolve: (_, args, context: Context) => {
-    //     return context.prisma.post.delete({
-    //       where: { id: args.id },
-    //     })
-    //   },
-    // })
+
+    t.field('deleteScheduleById', {
+      type: Schedule,
+      args: {
+        id: nonNull(intArg()),
+      },
+      resolve: (parent, args, context: Context) => {
+        return context.prisma.schedule.delete({
+          where: {
+            id: args.id,
+          },
+        })
+      },
+    })
+
+    t.field('addSchedule', {
+      type: Schedule,
+      args: {
+        data: arg({ type: nonNull(ScheduleCreateInput) }),
+      },
+      resolve: (_, args, context: Context) => {
+        return context.prisma.schedule.create({
+          data: {
+            date: args.data.date,
+            memo: args.data.memo,
+          },
+        })
+      },
+    })
   },
 })
 
@@ -279,11 +372,11 @@ const Record = objectType({
     t.int('isLocked')
 
     t.field('preview', {
-      type: 'Preview',
+      type: Preview,
       resolve: (parent, args, context: Context) => {
         return context.prisma.record
           .findUnique({
-            where: { id: parent.id || undefined },
+            where: { id: parent.id },
           })
           .preview()
       },
@@ -291,11 +384,11 @@ const Record = objectType({
 
     t.nonNull.string('voice')
     t.nonNull.list.nonNull.field('content', {
-      type: 'TextBlock',
+      type: TextBlock,
       resolve: (parent, _, context: Context) => {
         return context.prisma.record
           .findUnique({
-            where: { id: parent.id || undefined },
+            where: { id: parent.id },
           })
           .content()
       },
@@ -309,17 +402,28 @@ const TextBlock = objectType({
     t.nonNull.int('id')
     t.nonNull.string('content')
 
-    t.int('isMine')
-    t.int('isHighlighted') // FIXME: Integer?
-    t.int('isModified')
+    t.nonNull.int('isMine')
+    t.nonNull.int('isHighlighted') // FIXME: Integer?
+    t.nonNull.int('isModified')
 
     t.nonNull.float('reliability')
 
     t.nonNull.string('start')
     t.nonNull.string('end')
 
+    t.list.nonNull.field('schedule', {
+      type: Schedule,
+      resolve: (parent, _, context: Context) => {
+        return context.prisma.schedule.findMany({
+          where: {
+            textBlockId: parent.id,
+          },
+        })
+      },
+    })
+
     t.field('record', {
-      type: 'Record',
+      type: Record,
       resolve: (parent, args, context: Context) => {
         return context.prisma.textBlock
           .findUnique({
@@ -332,7 +436,7 @@ const TextBlock = objectType({
     })
 
     t.field('preview', {
-      type: 'Preview',
+      type: Preview,
       resolve: (parent, args, context: Context) => {
         return context.prisma.textBlock
           .findUnique({
@@ -350,17 +454,21 @@ const Preview = objectType({
     t.nonNull.int('id')
     t.nonNull.string('voice')
 
-    t.nonNull.list.nonNull.field('excerpt', {
-      type: 'TextBlock',
+    t.field('excerpt', {
+      type: TextBlock,
       resolve: (parent, args, context: Context) => {
-        return context.prisma.textBlock.findMany({
-          where: { id: parent.id },
-        })
+        return context.prisma.preview
+          .findUnique({
+            where: {
+              id: parent.id,
+            },
+          })
+          .excerpt()
       },
     })
 
     t.field('record', {
-      type: 'Record',
+      type: Record,
       resolve: (parent, args, context: Context) => {
         return context.prisma.preview
           .findUnique({
@@ -379,9 +487,10 @@ const Schedule = objectType({
   definition(t) {
     t.nonNull.int('id')
     t.nonNull.string('date')
+    t.nonNull.string('memo')
 
     t.field('source', {
-      type: 'TextBlock',
+      type: TextBlock,
       resolve: (parent, args, context: Context) => {
         return context.prisma.schedule
           .findUnique({
@@ -401,24 +510,20 @@ const SortOrder = enumType({
 const RecordCreateInput = inputObjectType({
   name: 'RecordCreateInput',
   definition(t) {
-    t.nonNull.int('id')
     t.nonNull.string('path')
     t.nonNull.string('title')
     t.nonNull.string('size')
-    t.string('tag')
-    t.string('memo')
-
+    t.nonNull.string('tag')
+    t.nonNull.string('memo')
     t.nonNull.string('voice')
 
-    t.nonNull.field('preview', { type: 'PreviewCreateInput' })
-    t.nonNull.list.nonNull.field('content', { type: 'TextBlockCreateInput' })
+    t.list.nonNull.field('content', { type: TextBlockCreateInput })
   },
 })
 
 const TextBlockCreateInput = inputObjectType({
   name: 'TextBlockCreateInput',
   definition(t) {
-    t.nonNull.int('id')
     t.nonNull.string('content')
     t.nonNull.int('isMine')
     t.nonNull.int('isHighlighted')
@@ -432,7 +537,6 @@ const TextBlockCreateInput = inputObjectType({
 const PreviewCreateInput = inputObjectType({
   name: 'PreviewCreateInput',
   definition(t) {
-    t.nonNull.int('id')
     t.nonNull.string('voice')
   },
 })
@@ -440,8 +544,41 @@ const PreviewCreateInput = inputObjectType({
 const ScheduleCreateInput = inputObjectType({
   name: 'ScheduleCreateInput',
   definition(t) {
-    t.nonNull.int('id')
     t.nonNull.string('date')
+    t.nonNull.string('memo')
+  },
+})
+
+const RecordUpdateInput = inputObjectType({
+  name: 'RecordUpdateInput',
+  definition(t) {
+    t.string('path')
+    t.string('title')
+    t.string('size')
+    t.string('tag')
+    t.string('memo')
+    t.int('isLocked')
+    t.string('voice')
+  },
+})
+
+const TextBlockUpdateInput = inputObjectType({
+  name: 'TextBlockUpdateInput',
+  definition(t) {
+    t.string('content')
+    t.int('isMine')
+    t.int('isHighlighted')
+    t.float('reliability')
+    t.string('start')
+    t.string('end')
+  },
+})
+
+const ScheduleUpdateInput = inputObjectType({
+  name: 'ScheduleUpdateInput',
+  definition(t) {
+    t.string('date')
+    t.string('memo')
   },
 })
 
@@ -459,6 +596,9 @@ export const schema = makeSchema({
     RecordCreateInput,
     PreviewCreateInput,
     ScheduleCreateInput,
+    RecordUpdateInput,
+    TextBlockUpdateInput,
+    ScheduleUpdateInput,
   ],
   outputs: {
     schema: __dirname + '/../schema.graphql',

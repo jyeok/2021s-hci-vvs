@@ -12,7 +12,7 @@ datasource db {
 
 model Record {
   id        Int      @id @default(autoincrement())
-  path      String
+  path      String   @unique
   title     String
   size      String
   createdAt DateTime @default(now())
@@ -28,9 +28,9 @@ model Record {
 }
 
 model Preview {
-  id      Int         @id @default(autoincrement())
-  excerpt TextBlock[]
+  id      Int        @id @default(autoincrement())
   voice   String // TODO: store path? base64-encoded data?
+  excerpt TextBlock?
 
   record   Record? @relation(fields: [recordId], references: [id])
   recordId Int?
@@ -46,7 +46,7 @@ model TextBlock {
   start         String
   end           String
 
-  Schedule Schedule?
+  schedule Schedule?
 
   record   Record? @relation("content", fields: [recordId], references: [id])
   recordId Int?
@@ -58,6 +58,7 @@ model TextBlock {
 model Schedule {
   id   Int    @id @default(autoincrement())
   date String
+  memo String
 
   source      TextBlock? @relation(fields: [textBlockId], references: [id])
   textBlockId Int?

@@ -8,18 +8,26 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Mutation {
-  hellow: String!
+  addPreview(data: PreviewCreateInput!): Preview
+  addRecord(data: RecordCreateInput!): Record
+  addSchedule(data: ScheduleCreateInput!): Schedule
+  addTextBlock(data: TextBlockCreateInput!): TextBlock
+  deleteRecordById(id: Int!): Record
+  deleteRecordByPath(path: String!): Record
+  deleteScheduleById(id: Int!): Schedule
+  deleteTextBlockById(id: Int!): TextBlock
+  updateRecord(data: RecordUpdateInput, id: Int!): Record
+  updateTextBlock(data: TextBlockUpdateInput!, id: Int!): TextBlock
 }
 
 type Preview {
-  excerpt: [TextBlock!]!
+  excerpt: TextBlock
   id: Int!
   record: Record
   voice: String!
 }
 
 input PreviewCreateInput {
-  id: Int!
   voice: String!
 }
 
@@ -54,26 +62,40 @@ type Record {
 }
 
 input RecordCreateInput {
-  content: [TextBlockCreateInput!]!
-  id: Int!
-  memo: String
+  content: [TextBlockCreateInput!]
+  memo: String!
   path: String!
-  preview: PreviewCreateInput!
   size: String!
-  tag: String
+  tag: String!
   title: String!
   voice: String!
+}
+
+input RecordUpdateInput {
+  isLocked: Int
+  memo: String
+  path: String
+  size: String
+  tag: String
+  title: String
+  voice: String
 }
 
 type Schedule {
   date: String!
   id: Int!
+  memo: String!
   source: TextBlock
 }
 
 input ScheduleCreateInput {
   date: String!
-  id: Int!
+  memo: String!
+}
+
+input ScheduleUpdateInput {
+  date: String
+  memo: String
 }
 
 enum SortOrder {
@@ -85,22 +107,31 @@ type TextBlock {
   content: String!
   end: String!
   id: Int!
-  isHighlighted: Int
-  isMine: Int
-  isModified: Int
+  isHighlighted: Int!
+  isMine: Int!
+  isModified: Int!
   preview: Preview
   record: Record
   reliability: Float!
+  schedule: [Schedule!]
   start: String!
 }
 
 input TextBlockCreateInput {
   content: String!
   end: String!
-  id: Int!
   isHighlighted: Int!
   isMine: Int!
   isModified: Int!
   reliability: Float!
   start: String!
+}
+
+input TextBlockUpdateInput {
+  content: String
+  end: String
+  isHighlighted: Int
+  isMine: Int
+  reliability: Float
+  start: String
 }
