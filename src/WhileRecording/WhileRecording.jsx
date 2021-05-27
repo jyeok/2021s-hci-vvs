@@ -2,10 +2,10 @@ import React, { PureComponent } from "react";
 import { Grid } from "@material-ui/core";
 import { Delete, SaveAlt } from "@material-ui/icons";
 
-import RecordingKeyword from "container/RecordingKeyword/RecordingKeyword";
+import RecordingKeyword from "component/RecordingKeyword/RecordingKeyword";
 import RecordingMemo from "../component/RecordingMemo/RecordingMemo";
 import RecordingTop from "../component/RecordingTop/RecordingTop";
-import RecordingMessage from "../component/RecordingMessage/RecordingMessage";
+import RecordingMessage from "../container/RecordingMessage/RecordingMessage";
 
 class WhileRecording extends PureComponent {
   render() {
@@ -38,7 +38,7 @@ class WhileRecording extends PureComponent {
           }
         >
           <Grid style={{ borderBottom: "1px solid", height: "500px" }}>
-            <RecordingMessage />
+            <RecordingMessage name="당신" messageTalk="아아아" />
           </Grid>
           <Grid>
             <div>

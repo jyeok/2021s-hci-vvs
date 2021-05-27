@@ -26,8 +26,8 @@ const PreviewText = (prop) => {
             <Message
               model={{
                 message: "Hello my friend",
-                sentTime: { arrivalTime },
-                sender: { name },
+                sentTime: arrivalTime,
+                sender: name,
                 direction: "incoming",
                 position: "single",
               }}

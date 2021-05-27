@@ -40,8 +40,8 @@ class RecordingTop extends PureComponent {
         <AudioReactRecorder
           state={recordState}
           onStop={this.onStop}
-          canvasWidth={0}
-          canvasHeight={0}
+          canvasWidth={10}
+          canvasHeight={10}
         />
 
         <button type="button" onClick={this.start}>

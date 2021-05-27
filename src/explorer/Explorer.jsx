@@ -28,14 +28,11 @@ const fileManager = () => (
     <Grid
       item
       xs={4}
-      style={{
-        height: "600px",
-        borderTop: "1px solid",
-        borderRight: "1px solid",
-        borderBottom: "1px solid",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+      style={
+        ({ height: "600px" },
+        { border: "1px solid" },
+        { borderLeft: "0px solid" })
+      }
     >
       <Preview name="미리보기" />
     </Grid>
