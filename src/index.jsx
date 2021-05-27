@@ -3,9 +3,6 @@ import ReactDOM from "react-dom";
 import reportWebVitals from "reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 
-import "index.css";
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-
 import {
   ApolloClient,
   InMemoryCache,
@@ -24,20 +21,12 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const theme = createMuiTheme({
-  typography: {
-    fontFamily: "Noto Sans CJK KR",
-  },
-});
-
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <MuiThemeProvider theme={theme}>
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      </MuiThemeProvider>
     </ApolloProvider>
     ,
   </React.StrictMode>,
