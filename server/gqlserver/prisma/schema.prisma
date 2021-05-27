@@ -7,21 +7,59 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
-}
+// Since SQlite doesn't support primitive array, we should serialize string to convert list of strings.
+// Define serialize string in frontend
 
-model Post {
+model Record {
   id        Int      @id @default(autoincrement())
+  path      String   @unique
+  title     String
+  size      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  viewCount Int      @default(0)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+  tag       String   @default("")
+  memo      String   @default("")
+  isLocked  Int      @default(0)
+
+  preview Preview?
+
+  voice   String // TODO: store path? base64-encoded data?
+  content TextBlock[] @relation("content")
+}
+
+model Preview {
+  id      Int        @id @default(autoincrement())
+  voice   String // TODO: store path? base64-encoded data?
+  excerpt TextBlock?
+
+  record   Record? @relation(fields: [recordId], references: [id])
+  recordId Int?
+}
+
+model TextBlock {
+  id            Int    @id @default(autoincrement())
+  content       String
+  isMine        Int    @default(0)
+  isHighlighted Int
+  isModified    Int
+  reliability   Float
+  start         String
+  end           String
+
+  schedule Schedule?
+
+  record   Record? @relation("content", fields: [recordId], references: [id])
+  recordId Int?
+
+  preview   Preview? @relation(fields: [previewId], references: [id])
+  previewId Int?
+}
+
+model Schedule {
+  id   Int    @id @default(autoincrement())
+  date String
+  memo String
+
+  source      TextBlock? @relation(fields: [textBlockId], references: [id])
+  textBlockId Int?
 }
