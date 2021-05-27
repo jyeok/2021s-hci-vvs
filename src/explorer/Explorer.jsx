@@ -2,6 +2,9 @@ import React from "react";
 import { FileManager, FileNavigator } from "@opuscapita/react-filemanager";
 import connectorNodeV1 from "@opuscapita/react-filemanager-connector-node-v1";
 import { Grid } from "@material-ui/core";
+import "@material-ui/system";
+
+import Preview from "container/Preview/Preview";
 
 const apiOptions = {
   ...connectorNodeV1.apiOptions,
@@ -9,9 +12,9 @@ const apiOptions = {
 };
 
 const fileManager = () => (
-  <Grid container>
-    <Grid item xs={7}>
-      <FileManager style={{ height: "600px" }}>
+  <Grid container padding={15} style={{ border: "1px solid" }}>
+    <Grid item xs={8}>
+      <FileManager style={({ height: "600px" }, { borderRight: "1px solid" })}>
         <FileNavigator
           id="filemanager-1"
           api={connectorNodeV1.api}
@@ -22,8 +25,8 @@ const fileManager = () => (
         />
       </FileManager>
     </Grid>
-    <Grid item xs={5}>
-      <div>오노</div>
+    <Grid item xs={4} style={{ height: "600px" }}>
+      <Preview name="미리보기" />
     </Grid>
   </Grid>
 );
