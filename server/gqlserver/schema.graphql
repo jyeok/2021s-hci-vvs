@@ -98,11 +98,6 @@ input ScheduleUpdateInput {
   memo: String
 }
 
-enum SortOrder {
-  asc
-  desc
-}
-
 type TextBlock {
   content: String!
   end: String!
