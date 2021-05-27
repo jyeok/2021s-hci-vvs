@@ -3,9 +3,6 @@ import ReactDOM from "react-dom";
 
 import App from "App";
 import reportWebVitals from "reportWebVitals";
-import "index.css";
-
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 import {
   ApolloClient,
@@ -23,18 +20,10 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const theme = createMuiTheme({
-  typography: {
-    fontFamily: "Noto Sans CJK KR",
-  },
-});
-
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <MuiThemeProvider theme={theme}>
-        <App />
-      </MuiThemeProvider>
+      <App />
     </ApolloProvider>
     ,
   </React.StrictMode>,
