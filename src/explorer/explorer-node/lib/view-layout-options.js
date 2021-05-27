@@ -1,16 +1,16 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+  value: true,
 });
 
-var _icons = require('./icons');
+var _icons = require("./icons");
 
 exports.default = {
-  locale: 'en',
-  initialSortBy: 'name',
-  initialSortDirection: 'ASC',
-  dateTimePattern: 'YYYY-MM-DD HH:mm:ss',
+  locale: "kr",
+  initialSortBy: "name",
+  initialSortDirection: "ASC",
+  dateTimePattern: "YYYY-MM-DD HH:mm:ss",
   humanReadableSize: true,
-  getIcon: _icons.getIcon
+  getIcon: _icons.getIcon,
 };

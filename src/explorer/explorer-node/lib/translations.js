@@ -366,11 +366,11 @@ var translations = {
       "폴더 이름에 허용되지 않은 문자가 있습니다.",
     title: "제목",
     fileSize: "파일 크기",
-    lastModified: "마지막 수정 시간",
+    lastModified: "수정 시간",
     reallyRemove: "{files} 항목들이 삭제됩니다. 계속하시겠습니까?",
     unableReadDir: "디렉토리를 불러올 수 없습니다.",
     memo: "메모",
-    tag: "태그",
+    keyword: "키워드",
   },
 };
 
