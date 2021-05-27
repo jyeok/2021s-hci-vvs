@@ -1,14 +1,15 @@
 import React from "react";
 import { FileManager, FileNavigator } from "@opuscapita/react-filemanager";
-import connectorNodeV1 from "@opuscapita/react-filemanager-connector-node-v1";
 import { Grid } from "@material-ui/core";
 import "@material-ui/system";
 
 import Preview from "container/Preview/Preview";
+import connectorNodeV1 from "./explorer-node/lib/index";
 
 const apiOptions = {
   ...connectorNodeV1.apiOptions,
   apiRoot: "http://localhost:3020",
+  locale: "kr",
 };
 
 const fileManager = () => (
