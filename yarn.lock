@@ -1591,19 +1591,6 @@
     textextensions "2.2.0"
     winston "3.1.0"
 
-"@opuscapita/react-filemanager-connector-node-v1@^1.1.7":
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/@opuscapita/react-filemanager-connector-node-v1/-/react-filemanager-connector-node-v1-1.1.7.tgz#dc27aaa092bad9aa9817cc8c94669d42b1c19ae7"
-  integrity sha512-X/dIOGIpBz2TeptvNl9ekiFBauabLHHte/Abx5UyJ0L8PHkPW6ARPQubWbO6d9O0873KMSC00pvNxmqa9d4+OQ==
-  dependencies:
-    fecha "2.3.1"
-    file-saver "1.3.3"
-    filesize "3.5.11"
-    nanoid "1.0.0"
-    range-parser "1.2.0"
-    sanitize-filename "1.6.1"
-    superagent "3.8.3"
-
 "@opuscapita/react-filemanager@^1.1.7":
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/@opuscapita/react-filemanager/-/react-filemanager-1.1.7.tgz#8b4ca63b38d0f6f3ff4f9a8422692abf20271311"
@@ -5584,11 +5571,6 @@ fbjs@^0.8.16:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
 
-fecha@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/fecha/-/fecha-2.3.1.tgz#921b4e5a9d331aaa9b65c1634b26fc45945f6421"
-  integrity sha1-khtOWp0zGqqbZcFjSyb8RZRfZCE=
-
 fecha@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/fecha/-/fecha-2.3.3.tgz#948e74157df1a32fd1b12c3a3c3cdcb6ec9d96cd"
@@ -5621,20 +5603,10 @@ file-loader@6.1.1:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
-file-saver@1.3.3:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-1.3.3.tgz#cdd4c44d3aa264eac2f68ec165bc791c34af1232"
-  integrity sha1-zdTETTqiZOrC9o7BZbx5HDSvEjI=
-
 file-uri-to-path@1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz"
   integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
-
-filesize@3.5.11:
-  version "3.5.11"
-  resolved "https://registry.yarnpkg.com/filesize/-/filesize-3.5.11.tgz#1919326749433bb3cf77368bd158caabcc19e9ee"
-  integrity sha512-ZH7loueKBoDb7yG9esn1U+fgq7BzlzW6NRi5/rMdxIZ05dj7GFD/Xc5rq2CDt5Yq86CyfSYVyx4242QQNZbx1g==
 
 filesize@6.1.0:
   version "6.1.0"
