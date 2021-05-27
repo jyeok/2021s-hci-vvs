@@ -12,9 +12,9 @@ const apiOptions = {
 };
 
 const fileManager = () => (
-  <Grid container padding={15}>
+  <Grid container padding={15} style={{ border: "1px solid" }}>
     <Grid item xs={8}>
-      <FileManager style={({ height: "600px" }, { border: "1px solid" })}>
+      <FileManager style={({ height: "600px" }, { borderRight: "1px solid" })}>
         <FileNavigator
           id="filemanager-1"
           api={connectorNodeV1.api}
@@ -25,15 +25,7 @@ const fileManager = () => (
         />
       </FileManager>
     </Grid>
-    <Grid
-      item
-      xs={4}
-      style={
-        ({ height: "600px" },
-        { border: "1px solid" },
-        { borderLeft: "0px solid" })
-      }
-    >
+    <Grid item xs={4} style={{ height: "600px" }}>
       <Preview name="미리보기" />
     </Grid>
   </Grid>

@@ -11,7 +11,7 @@ import {
 const RecordingMessage = (props) => {
   const { name, messageTalk } = props;
   return (
-    <div style={{ position: "relative", height: "500px" }}>
+    <div style={({ position: "relative" }, { height: "550px" })}>
       <MainContainer>
         <ChatContainer>
           <MessageList>

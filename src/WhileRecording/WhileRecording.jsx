@@ -10,48 +10,22 @@ import RecordingMessage from "../container/RecordingMessage/RecordingMessage";
 class WhileRecording extends PureComponent {
   render() {
     return (
-      <Grid container padding={15}>
-        <Grid
-          item
-          xs={12}
-          style={
-            ({ height: "600px" },
-            {
-              borderTop: "1px solid",
-              borderRight: "1px solid",
-              borderLeft: "1px solid",
-            })
-          }
-        >
+      <Grid container padding={15} style={{ border: "1px solid" }}>
+        <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
           <RecordingTop />
         </Grid>
         <Grid
           item
           xs={8}
-          style={
-            ({ height: "600px" },
-            {
-              borderTop: "1px solid",
-              borderBottom: "1px solid",
-              borderLeft: "1px solid",
-            })
-          }
+          style={({ height: "600px" }, { borderRight: "0.5px solid" })}
         >
-          <Grid style={{ borderBottom: "1px solid", height: "500px" }}>
-            <RecordingMessage name="당신" messageTalk="아아아" />
-          </Grid>
-          <Grid>
-            <div>
-              <Delete />
-              <SaveAlt />
-            </div>
+          <Grid style={{ height: "600px" }}>
+            <RecordingMessage messageTalk="아아아" />
+            <Delete />
+            <SaveAlt />
           </Grid>
         </Grid>
-        <Grid
-          item
-          xs={4}
-          style={({ height: "600px" }, { border: "1px solid" })}
-        >
+        <Grid item xs={4} style={{ height: "600px" }}>
           <div>
             <RecordingMemo
               style={{
