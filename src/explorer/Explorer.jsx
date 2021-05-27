@@ -9,6 +9,7 @@ import connectorNodeV1 from "./explorer-node/lib/index";
 const apiOptions = {
   ...connectorNodeV1.apiOptions,
   apiRoot: "http://localhost:3020",
+  locale: "kr",
 };
 
 const fileManager = () => (
