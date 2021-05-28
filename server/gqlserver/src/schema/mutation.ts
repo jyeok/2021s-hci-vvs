@@ -163,6 +163,24 @@ export const Mutation = objectType({
       },
     })
 
+    t.field('connectPreview', {
+      type: Preview,
+      args: {
+        recordId: nonNull(intArg()),
+        previewId: nonNull(intArg()),
+      },
+      resolve: (parent, args, context: Context) => {
+        return context.prisma.preview.update({
+          where: { id: args.previewId },
+          data: {
+            record: {
+              connect: { id: args.recordId },
+            },
+          },
+        })
+      },
+    })
+
     // t.field('generatePreview', {
     //   type: Preview,
     //   args: {
