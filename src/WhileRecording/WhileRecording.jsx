@@ -44,6 +44,7 @@ class WhileRecording extends PureComponent {
             onStop={this.onStop}
             onData={this.onData}
             strokeColor="#000000"
+            visualSetting="False"
           />
           <button onClick={this.startRecording} type="button">
             Start
@@ -55,7 +56,7 @@ class WhileRecording extends PureComponent {
         <Grid
           item
           xs={8}
-          style={({ height: "600px" }, { borderRight: "0.5px solid" })}
+          style={({ height: "500px" }, { borderRight: "0.5px solid" })}
         >
           <Grid style={{ height: "600px" }}>
             <RecordingMessage />
@@ -63,7 +64,7 @@ class WhileRecording extends PureComponent {
             <SaveAlt />
           </Grid>
         </Grid>
-        <Grid item xs={4} style={{ height: "600px" }}>
+        <Grid item xs={4} style={{ height: "500px" }}>
           <div>메모</div>
           <TextField
             variant="outlined"
