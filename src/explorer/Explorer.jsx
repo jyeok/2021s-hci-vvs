@@ -15,8 +15,14 @@ const fileManager = () => {
     {
       allRecords {
         id
-        title
         path
+        title
+        size
+        createdAt
+        updatedAt
+        tag
+        memo
+        isLocked
       }
     }
   `;

@@ -1,12 +1,13 @@
 import { React } from "react";
 import { FullFileBrowser } from "chonky";
-
 import PropTypes from "prop-types";
 
-export const MyFileBrowser = (props) => {
-  const data = { ...props };
+import { Record } from "proptypes/ModelPropTypes";
 
-  const files = data.data.allRecords.map((e) => ({
+export const MyFileBrowser = (props) => {
+  const { data } = props;
+
+  const files = data.allRecords.map((e) => ({
     id: e.id,
     name: e.title,
     isDir: false,
@@ -22,8 +23,10 @@ export const MyFileBrowser = (props) => {
 
 export default MyFileBrowser;
 
+const { preview, voice, content, ...recordShape } = Record;
+
 MyFileBrowser.propTypes = {
   data: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    allRecords: PropTypes.arrayOf(PropTypes.shape(recordShape)),
   }).isRequired,
 };
