@@ -3,6 +3,7 @@ import { Route } from "react-router-dom";
 
 import Explorer from "explorer/Explorer";
 import WhileRecording from "WhileRecording/WhileRecording";
+import PlayingRecord from "container/PlayingRecord/PlayingRecord";
 
 import { ApolloProvider } from "react-apollo";
 
@@ -21,6 +22,10 @@ function App(props) {
         <Route path="/recording" exact>
           <WhileRecording client={client} />
         </Route>
+        <Route path="/playing" exact>
+         <PlayingRecord client={client} />
+        </Route>
+
       </div>
     </ApolloProvider>
   );

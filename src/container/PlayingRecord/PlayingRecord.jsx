@@ -1,80 +1,42 @@
 import React from "react";
-import { Grid } from "@material-ui/core";
+import { Grid, TextField } from "@material-ui/core";
 import { ArrowBack } from "@material-ui/icons";
-import { PropTypes } from "prop-types";
+import HelpIcon from "@material-ui/icons/Help";
+import AudioPlayer from "react-h5-audio-player";
 
+import "react-h5-audio-player/lib/styles.css";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  Message,
-} from "@chatscope/chat-ui-kit-react";
 
-import { Media, Player, controls } from "react-media-player";
+import MessageHolder from "../MessageHolder/MessageHolder";
+
+// Render a YouTube video player
 
 const PlayingRecord = (prop) => {
-  const { name, createdAt, messageDisplayed, record } = prop;
-  const { PlayPause, MuteUnmute } = controls;
+  const { voice } = prop;
   return (
     <div>
       <Grid container padding={15} style={{ border: "1px solid" }}>
         <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
           <ArrowBack />
-          {name} {createdAt}
           <button type="button">전체 요약</button>
           <button type="button">선택 요약</button>
         </Grid>
         <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
-          <div>
-            <MainContainer style={{ height: "550px" }}>
-              <ChatContainer>
-                <MessageList>
-                  <Message
-                    model={{
-                      message: messageDisplayed,
-                      sentTime: "2020/05/04",
-                      sender: "Susan",
-                      direction: "incoming",
-                      position: "single",
-                    }}
-                  />
-                  <Message
-                    model={{
-                      message: "ㄴㅏ는 배가 고프다",
-                      sentTime: "just now",
-                      sender: "me",
-                      direction: "outgoing",
-                      position: "single",
-                    }}
-                  />
-                </MessageList>
-              </ChatContainer>
-            </MainContainer>
-          </div>
+          <MessageHolder />
         </Grid>
         <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
-          <div>
-            <Media>
-              <div className="media">
-                <div className="media-player">
-                  <Player src={record} />
-                </div>
-                <div className="media-controls">
-                  <PlayPause />
-                  <MuteUnmute />
-                </div>
-              </div>
-            </Media>
-          </div>
+          <AudioPlayer src={voice} />
         </Grid>
-        <Grid>
-          <div>
-            질문하기
-            <textarea row="1" style={{ width: "180%" }}>
-              여기에 질문을 입력하시면 대답해 드립니다.
-            </textarea>
-          </div>
+        <Grid item xs={1}>
+          <HelpIcon fontSize="large" />
+        </Grid>
+        <Grid item xs={11}>
+          <TextField
+            id="Question"
+            row="1"
+            label="여기에 질문을 입력해보세요."
+            fullWidth
+          />
         </Grid>
       </Grid>
     </div>
@@ -84,15 +46,6 @@ const PlayingRecord = (prop) => {
 export default PlayingRecord;
 
 PlayingRecord.defaultProps = {
-  name: "녹음명",
-  createdAt: "녹음 날짜",
-  messageDisplayed: "can you play this sample message?",
-  record: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-};
-
-PlayingRecord.PropType = {
-  name: PropTypes.string.isRequired,
-  createdAt: PropTypes.string.isRequired,
-  messageDisplayed: PropTypes.string.isRequired,
-  record: PropTypes.string.isRequired,
+  voice:
+    "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_700KB.mp3",
 };

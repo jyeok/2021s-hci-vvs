@@ -1,26 +1,32 @@
 import React from "react";
 import PropType from "prop-types";
 import { Button } from "@material-ui/core";
-import PreviewText from "container/PreviewText/PreviewText";
+import MessageHolder from "../MessageHolder/MessageHolder";
 
-function Preview(prop) {
-  const { name } = prop;
+function Preview() {
+  const pstyle = {
+    marginLeft: "12px",
+    marginBottom: "8px",
+  };
+  const pborder = {
+    border: "0.5 px solid",
+  };
   return (
     <div>
       <div style={{ margin: "3px" }}>Preview</div>
-      <PreviewText name={name} style={{ height: "300px", margin: "10px" }} />
-      <div style={{ marginLeft: "12px", marginBottom: "8px" }}>
-        <Button type="button" style={{ border: "0.5px solid" }}>
+      <MessageHolder style={{ height: "400px" }} />
+      <div style={{ pstyle }}>
+        <Button type="button" style={{ pborder }}>
           편집
         </Button>
       </div>
-      <div style={{ marginLeft: "12px", marginBottom: "8px" }}>
-        <Button type="button" style={{ border: "0.5px solid" }}>
+      <div style={{ pstyle }}>
+        <Button type="button" style={{ pborder }}>
           재생
         </Button>
       </div>
-      <div style={{ marginLeft: "12px", marginBottom: "8px" }}>
-        <Button type="button" style={{ border: "0.5px solid" }}>
+      <div style={{ pstyle }}>
+        <Button type="button" style={{ pborder }}>
           잠금
         </Button>
       </div>
@@ -28,27 +34,6 @@ function Preview(prop) {
   );
 }
 export default Preview;
-// const Preview = (prop) => {
-//   const { name } = prop;
-
-//   return (
-//     <div>
-//       {name}
-//       <PreviewText name="대화 미리보기" />
-//       <div>
-//         <Button type="button">편집</Button>
-//       </div>
-//       <div>
-//         <Button type="button">재생</Button>
-//       </div>
-//       <div>
-//         <Button type="button">잠금</Button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Preview;
 
 Preview.propType = {
   name: PropType.string.isRequired,

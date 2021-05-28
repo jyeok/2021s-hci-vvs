@@ -1,37 +1,45 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  Message,
-} from "@chatscope/chat-ui-kit-react";
+import { MessageList, Message } from "@chatscope/chat-ui-kit-react";
 
-const RecordingMessage = (props) => {
-  const { name, messageTalk } = props;
+const RecordingMessage = (prop) => {
+  const { isMine, content, start } = prop;
   return (
     <div style={({ position: "relative" }, { height: "550px" })}>
-      <MainContainer>
-        <ChatContainer>
-          <MessageList>
-            <Message
-              model={{
-                message: messageTalk,
-                sentTime: "just now",
-                sender: name,
-              }}
-            />
-          </MessageList>
-        </ChatContainer>
-      </MainContainer>
+      <MessageList>
+        <Message
+          model={{
+            message: content,
+            sentTime: start,
+            sender: "Susan",
+            direction: isMine ? "incoming" : "outgoing",
+            position: "single",
+          }}
+        />
+      </MessageList>
     </div>
   );
 };
 
 export default RecordingMessage;
 
-RecordingMessage.propTypes = {
-  name: PropTypes.string.isRequired,
-  messageTalk: PropTypes.string.isRequired,
+RecordingMessage.PropType = {
+  PlayingRecord: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    content: PropTypes.string.isRequired,
+    isMine: PropTypes.number,
+    isHighlighted: PropTypes.bool.isRequired,
+    isModified: PropTypes.bool,
+    reliability: PropTypes.number,
+    start: PropTypes.string.isRequired,
+    end: PropTypes.string.isRequired,
+    voice: PropTypes.string.isRequired,
+  }),
+};
+
+RecordingMessage.defaultProps = {
+  content: "Does this work?",
+  isMine: 0,
+  start: "00:34",
 };
