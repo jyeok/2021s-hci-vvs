@@ -1,35 +1,55 @@
-import React from "react";
-import { FileManager, FileNavigator } from "@opuscapita/react-filemanager";
+import React, { useState, useEffect } from "react";
 import { Grid } from "@material-ui/core";
-import "@material-ui/system";
-
+import { useQuery } from "@apollo/client";
+import { FullFileBrowser } from "chonky";
 import Preview from "container/Preview/Preview";
-import connectorNodeV1 from "./explorer-node/lib/index";
 
-const apiOptions = {
-  ...connectorNodeV1.apiOptions,
-  apiRoot: "http://localhost:3020",
-  locale: "kr",
+import { queries } from "./api";
+import { fileToFilemap, getFolderChain } from "./Util";
+import { onFileAction, extraActions } from "./ChonkyOptions";
+
+export const Explorer = () => {
+  const { loading, error, data, refetch, networkStatus } = useQuery(
+    queries.allRecords
+  );
+
+  const [files, setFiles] = useState(data);
+  const [netStat, setNetStat] = useState(networkStatus);
+
+  useEffect(() => {
+    setFiles(data);
+    setNetStat(networkStatus);
+  }, [data, networkStatus]);
+
+  if (loading) return <div> Loading... </div>;
+  if (error) return <div> error! {netStat.message}</div>;
+  if (!files) {
+    setFiles(data);
+    setNetStat(networkStatus);
+  }
+
+  const fileMap = files ? fileToFilemap(files.allRecords) : null;
+  const folderChain = getFolderChain();
+
+  return (
+    <Grid
+      container
+      padding={15}
+      style={{ border: "1px solid", height: "600px" }}
+    >
+      <Grid item xs={8}>
+        <FullFileBrowser
+          files={fileMap}
+          folderChain={folderChain}
+          fileActions={extraActions}
+          onFileAction={(e) => onFileAction(e, { refetch })}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <Preview name="미리보기" />
+      </Grid>
+    </Grid>
+  );
 };
 
-const fileManager = () => (
-  <Grid container padding={15} style={{ border: "1px solid" }}>
-    <Grid item xs={8}>
-      <FileManager style={({ height: "600px" }, { borderRight: "1px solid" })}>
-        <FileNavigator
-          id="filemanager-1"
-          api={connectorNodeV1.api}
-          apiOptions={apiOptions}
-          capabilities={connectorNodeV1.capabilities}
-          listViewLayout={connectorNodeV1.listViewLayout}
-          viewLayoutOptions={connectorNodeV1.viewLayoutOptions}
-        />
-      </FileManager>
-    </Grid>
-    <Grid item xs={4} style={{ height: "600px" }}>
-      <Preview name="미리보기" />
-    </Grid>
-  </Grid>
-);
-
-export default fileManager;
+export default Explorer;

@@ -4,13 +4,30 @@ import { Route } from "react-router-dom";
 import Explorer from "explorer/Explorer";
 import WhileRecording from "WhileRecording/WhileRecording";
 
-function App() {
+import { ApolloProvider } from "react-apollo";
+
+import PropTypes from "prop-types";
+import { ApolloClient } from "@apollo/client";
+
+function App(props) {
+  const { client } = props;
+
   return (
-    <div className="App">
-      <Route path="/" exact component={Explorer} />
-      <Route path="/recording" exact component={WhileRecording} />
-    </div>
+    <ApolloProvider client={client}>
+      <div className="App">
+        <Route path="/" exact>
+          <Explorer client={client} />
+        </Route>
+        <Route path="/recording" exact>
+          <WhileRecording client={client} />
+        </Route>
+      </div>
+    </ApolloProvider>
   );
 }
 
 export default App;
+
+App.propTypes = {
+  client: PropTypes.instanceOf(ApolloClient).isRequired,
+};
