@@ -1,4 +1,4 @@
-import { intArg, nonNull, objectType, stringArg, arg } from 'nexus'
+import { intArg, list, nonNull, objectType, stringArg, arg } from 'nexus'
 
 import { Context } from '../context'
 import { Record, TextBlock, Preview, Schedule, DateTime } from './model'
@@ -132,6 +132,30 @@ export const Mutation = objectType({
       },
     })
 
+    t.field('connectTextBlocksToPreview', {
+      type: Preview,
+      args: {
+        textBlockId: nonNull(list(nonNull(intArg()))),
+        previewId: nonNull(intArg()),
+      },
+      resolve: (_, args, context: Context) => {
+        const connectData = args.textBlockId.map((e) => ({
+          id: e,
+        }))
+
+        return context.prisma.preview.update({
+          where: {
+            id: args.previewId,
+          },
+          data: {
+            excerpt: {
+              connect: connectData,
+            },
+          },
+        })
+      },
+    })
+
     // t.field('generateTextBlock', {
     //   type: Record,
     //   args: {
@@ -163,11 +187,11 @@ export const Mutation = objectType({
       },
     })
 
-    t.field('connectPreview', {
+    t.field('connectPreviewToRecord', {
       type: Preview,
       args: {
-        recordId: nonNull(intArg()),
         previewId: nonNull(intArg()),
+        recordId: nonNull(intArg()),
       },
       resolve: (parent, args, context: Context) => {
         return context.prisma.preview.update({

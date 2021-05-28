@@ -15,6 +15,12 @@ export const Explorer = () => {
 
   const [files, setFiles] = useState(data);
   const [netStat, setNetStat] = useState(networkStatus);
+  const [currSelect, setCurrSelect] = useState({
+    id: 0,
+    memo: "",
+    tag: "",
+    content: [],
+  });
 
   useEffect(() => {
     setFiles(data);
@@ -29,6 +35,7 @@ export const Explorer = () => {
   }
 
   const fileMap = files ? fileToFilemap(files.allRecords) : null;
+  const { id, memo, tag, content } = currSelect;
   const folderChain = getFolderChain();
 
   return (
@@ -42,11 +49,11 @@ export const Explorer = () => {
           files={fileMap}
           folderChain={folderChain}
           fileActions={extraActions}
-          onFileAction={(e) => onFileAction(e, { refetch })}
+          onFileAction={(e) => onFileAction(e, { refetch, setCurrSelect })}
         />
       </Grid>
       <Grid item xs={4}>
-        <Preview name="미리보기" />
+        <Preview id={id} memo={memo} tag={tag} content={content} />
       </Grid>
     </Grid>
   );

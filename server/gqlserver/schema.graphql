@@ -12,7 +12,8 @@ type Mutation {
   addRecord(data: RecordCreateInput!): Record
   addSchedule(data: ScheduleCreateInput!): Schedule
   addTextBlock(data: TextBlockCreateInput!): TextBlock
-  connectPreview(previewId: Int!, recordId: Int!): Preview
+  connectPreviewToRecord(previewId: Int!, recordId: Int!): Preview
+  connectTextBlocksToPreview(previewId: Int!, textBlockId: [Int!]!): Preview
   deleteRecordById(id: Int!): Record
   deleteRecordByPath(path: String!): Record
   deleteScheduleById(id: Int!): Schedule
@@ -22,7 +23,7 @@ type Mutation {
 }
 
 type Preview {
-  excerpt: TextBlock
+  excerpt: [TextBlock!]
   id: Int!
   record: Record
   voice: String!

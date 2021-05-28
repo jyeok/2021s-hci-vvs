@@ -9,6 +9,7 @@ export const fileToFilemap = (files) =>
         createDate: e.createdAt,
         tag: e.tag,
         memo: e.memo,
+        preview: e.preview,
       }))
     : [];
 

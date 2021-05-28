@@ -21,16 +21,23 @@ const onEdit = (e) => {
   console.log("onEdit :>> ", e);
 };
 function Preview(props) {
-  // eslint-disable-next-line
   const { id, memo, tag, content } = props;
-
-  // TODO: implement content
 
   return (
     <div style={{ margin: "5px" }}>
       Preview
       <div style={{ border: "1px solid", margin: "5px", height: "450px" }}>
-        <MessageHolder />
+        {content.map((e, i) => (
+          <MessageHolder
+            key={`${id}${i * 2}`}
+            id={id}
+            content={e.content}
+            isMine={e.isMine}
+            isHighlighted={e.isHighlighted}
+            isModified={e.isModified}
+            reliability={e.reliability}
+          />
+        ))}
       </div>
       <TextField
         label="태그"
@@ -96,7 +103,7 @@ Preview.propTypes = {
   id: PropTypes.number,
   memo: PropTypes.string,
   tag: PropTypes.string,
-  content: PropTypes.shape(messageTemplate).isRequired,
+  content: PropTypes.arrayOf(PropTypes.shape(messageTemplate)).isRequired,
 };
 
 Preview.defaultProps = {

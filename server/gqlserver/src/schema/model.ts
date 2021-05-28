@@ -101,7 +101,7 @@ export const Preview = objectType({
     t.nonNull.int('id')
     t.nonNull.string('voice')
 
-    t.field('excerpt', {
+    t.list.nonNull.field('excerpt', {
       type: TextBlock,
       resolve: (parent, args, context: Context) => {
         return context.prisma.preview

@@ -1,22 +1,21 @@
 import React from "react";
 import { PropTypes } from "prop-types";
-import { MessageList, Message } from "@chatscope/chat-ui-kit-react";
+import { Message } from "@chatscope/chat-ui-kit-react";
 
 // Render a YouTube video player
 
 const MessageHolder = (prop) => {
   const { content, isMine, start } = prop;
   return (
-    <MessageList height="400px">
-      <Message
-        model={{
-          message: content,
-          sentTime: start,
-          direction: isMine ? "incoming" : "outgoing",
-          position: "single",
-        }}
-      />
-    </MessageList>
+    <Message
+      style={{ margin: "10px" }}
+      model={{
+        message: content,
+        sentTime: start,
+        direction: isMine ? "incoming" : "outgoing",
+        position: "single",
+      }}
+    />
   );
 };
 

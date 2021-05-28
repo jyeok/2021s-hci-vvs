@@ -4,18 +4,35 @@ export const onFileAction = (e, f) => {
   // eslint-disable-next-line
   console.log("event, function :>> ", e, f); // development purpose
 
-  switch (e.id) {
-    case ChonkyActions.EnableGridView.id:
-    case ChonkyActions.EnableListView.id:
-      f.refetch();
-      break;
+  const { id: eventId } = e;
 
-    case ChonkyActions.MouseClickFile.id:
-      console.log("file :>> ", e.payload.file);
-      break;
+  if (
+    eventId === ChonkyActions.EnableGridView.id ||
+    eventId === ChonkyActions.EnableListView.id
+  ) {
+    f.refetch();
+  } else if (eventId === ChonkyActions.MouseClickFile.id) {
+    const {
+      payload: { file },
+    } = e;
 
-    default:
-      break;
+    const content = file.preview
+      ? file.preview.excerpt.map((el) => ({
+          content: el.content,
+          isMine: el.isMine,
+          isHighlighted: el.isHighlighted,
+          isModified: el.isModified,
+          reliability: el.reliability,
+          start: el.start,
+        }))
+      : [];
+
+    f.setCurrSelect({
+      id: file.id,
+      memo: file.memo,
+      tag: file.tag,
+      content,
+    });
   }
 };
 
