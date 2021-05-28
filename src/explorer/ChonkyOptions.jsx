@@ -10,6 +10,10 @@ export const onFileAction = (e, f) => {
       f.refetch();
       break;
 
+    case ChonkyActions.MouseClickFile.id:
+      console.log("file :>> ", e.payload.file);
+      break;
+
     default:
       break;
   }

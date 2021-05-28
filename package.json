@@ -17,7 +17,7 @@
     "audio-react-recorder": "^1.0.4",
     "chonky": "^2.1.0",
     "chonky-icon-fontawesome": "^2.1.0",
-    "dotenv": "^9.0.2",
+    "dotenv": "^10.0.0",
     "graphql": "^15.5.0",
     "graphql-tag": "^2.12.4",
     "prop-types": "^15.7.2",

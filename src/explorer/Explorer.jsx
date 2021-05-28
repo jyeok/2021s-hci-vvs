@@ -35,7 +35,7 @@ export const Explorer = () => {
     <Grid
       container
       padding={15}
-      style={{ border: "1px solid", height: "600px" }}
+      style={{ border: "1px solid", height: "800px" }}
     >
       <Grid item xs={8}>
         <FullFileBrowser
