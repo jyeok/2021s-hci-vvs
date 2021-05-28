@@ -37,7 +37,11 @@ class WhileRecording extends PureComponent {
     const { record } = this.state;
     return (
       <Grid container padding={15} style={{ border: "1px solid" }}>
-        <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
+        <Grid
+          item
+          xs={12}
+          style={({ borderBottom: "0.5px solid" }, { height: "50px" })}
+        >
           <ReactMic
             record={record}
             className="sound-wave"

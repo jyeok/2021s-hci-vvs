@@ -34,7 +34,7 @@ node fileserver.js
 
 ## External APIs/Libraries
 
-[File Manager](https://github.com/OpusCapita/filemanager)
+[Chonky] (https://chonky.io/docs/2.x/)
 
 [Voice Recorder](https://www.npmjs.com/package/react-voice-recorder)
 
@@ -42,9 +42,9 @@ node fileserver.js
 
 [prisma GraphQL Sevrer Example](https://github.com/prisma/prisma-examples/tree/latest/typescript/graphql)
 
-[audio-react-recorder] (https://github.com/hackingbeauty/react-mic)
-
 [react-h5-audio-player] (https://github.com/lhz516/react-h5-audio-player)
+
+[react-mic] (https://github.com/hackingbeauty/react-mic)
 
 ## Documentation (TBC)
 
