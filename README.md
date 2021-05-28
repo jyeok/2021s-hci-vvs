@@ -42,7 +42,9 @@ node fileserver.js
 
 [prisma GraphQL Sevrer Example](https://github.com/prisma/prisma-examples/tree/latest/typescript/graphql)
 
-[audio-react-recorder] (github.com/doppelgunner/audio-react-recorder)
+[audio-react-recorder] (https://github.com/hackingbeauty/react-mic)
+
+[react-h5-audio-player] (https://github.com/lhz516/react-h5-audio-player)
 
 ## Documentation (TBC)
 

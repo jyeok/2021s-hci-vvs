@@ -15,8 +15,6 @@ const PreviewText = (prop) => {
     <div
       style={{
         position: "relative",
-        height: "300px",
-        margin: "10px",
         border: "1px solid",
       }}
     >
