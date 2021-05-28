@@ -13,7 +13,7 @@ import {
 import App from "App";
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:4000",
+  uri: "http://localhost:4000/",
 });
 
 const client = new ApolloClient({
@@ -23,11 +23,11 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <React.StrictMode>
-    <ApolloProvider client={client}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-    </ApolloProvider>
+    <BrowserRouter>
+      <ApolloProvider client={client}>
+        <App client={client} />
+      </ApolloProvider>
+    </BrowserRouter>
     ,
   </React.StrictMode>,
   document.getElementById("root")
