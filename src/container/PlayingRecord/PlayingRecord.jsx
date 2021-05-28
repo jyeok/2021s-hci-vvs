@@ -21,7 +21,11 @@ const PlayingRecord = (prop) => {
           <button type="button">전체 요약</button>
           <button type="button">선택 요약</button>
         </Grid>
-        <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
+        <Grid
+          item
+          xs={12}
+          style={{ borderBottom: "0.5px solid", height: "600px" }}
+        >
           <MessageHolder />
         </Grid>
         <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>

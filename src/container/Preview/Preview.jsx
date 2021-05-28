@@ -13,8 +13,10 @@ function Preview() {
   };
   return (
     <div>
-      <div style={{ margin: "3px" }}>Preview</div>
-      <MessageHolder style={{ height: "400px" }} />
+      <div style={{ margin: "3px", height: "400px" }}>
+        Preview
+        <MessageHolder />
+      </div>
       <div style={{ pstyle }}>
         <Button type="button" style={{ pborder }}>
           편집
