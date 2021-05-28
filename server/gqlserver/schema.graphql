@@ -12,6 +12,7 @@ type Mutation {
   addRecord(data: RecordCreateInput!): Record
   addSchedule(data: ScheduleCreateInput!): Schedule
   addTextBlock(data: TextBlockCreateInput!): TextBlock
+  connectPreview(previewId: Int!, recordId: Int!): Preview
   deleteRecordById(id: Int!): Record
   deleteRecordByPath(path: String!): Record
   deleteScheduleById(id: Int!): Schedule
