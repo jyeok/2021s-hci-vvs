@@ -28,7 +28,6 @@ ReactDOM.render(
         <App client={client} />
       </ApolloProvider>
     </BrowserRouter>
-    ,
   </React.StrictMode>,
   document.getElementById("root")
 );
