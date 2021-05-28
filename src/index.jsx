@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import reportWebVitals from "reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
+import { setChonkyDefaults } from "chonky";
+import { ChonkyIconFA } from "chonky-icon-fontawesome";
 
 import {
   ApolloClient,
@@ -20,6 +22,8 @@ const client = new ApolloClient({
   link: httpLink,
   cache: new InMemoryCache(),
 });
+
+setChonkyDefaults({ iconComponent: ChonkyIconFA });
 
 ReactDOM.render(
   <React.StrictMode>
