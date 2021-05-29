@@ -40,7 +40,7 @@ class WhileRecording extends PureComponent {
         <Grid
           item
           xs={12}
-          style={({ borderBottom: "0.5px solid" }, { height: "50px" })}
+          style={({ borderBottom: "0.5px solid" }, { height: "100px" })}
         >
           <ReactMic
             record={record}

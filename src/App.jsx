@@ -23,13 +23,9 @@ function App(props) {
         <Route path="/playing" exact>
           <PlayingRecord client={client} />
         </Route>
-        <Route
-          path="/playing/:id"
-          exact
-          render={(p) => (
-            <WhileRecording id={p.match.params.id} client={client} />
-          )}
-        />
+        <Route path="/playing/:id" exact>
+          <PlayingRecord client={client} />
+        </Route>
       </div>
     </ApolloProvider>
   );
