@@ -181,6 +181,29 @@ export const Mutation = objectType({
       },
     })
 
+    t.field('connectTextBlocksToRecord', {
+      type: Record,
+      args: {
+        recordId: nonNull(intArg()),
+        textBlockId: nonNull(list(nonNull(intArg()))),
+      },
+      resolve: (_, args, context: Context) => {
+        const connectData = args.textBlockId.map((e: number) => ({
+          id: e,
+        }))
+        return context.prisma.record.update({
+          where: {
+            id: args.recordId,
+          },
+          data: {
+            content: {
+              connect: connectData,
+            },
+          },
+        })
+      },
+    })
+
     // t.field('generateTextBlock', {
     //   type: Record,
     //   args: {

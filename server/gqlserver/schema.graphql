@@ -14,6 +14,7 @@ type Mutation {
   addTextBlock(data: TextBlockCreateInput!): TextBlock
   connectPreviewToRecord(previewId: Int!, recordId: Int!): Preview
   connectTextBlocksToPreview(previewId: Int!, textBlockId: [Int!]!): Preview
+  connectTextBlocksToRecord(recordId: Int!, textBlockId: [Int!]!): Record
   deleteRecordById(id: Int!): Record
   deleteRecordByPath(path: String!): Record
   deleteScheduleById(id: Int!): Schedule
