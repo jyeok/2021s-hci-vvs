@@ -16,9 +16,9 @@ export const Explorer = () => {
   const [files, setFiles] = useState(data);
   const [netStat, setNetStat] = useState(networkStatus);
   const [currSelect, setCurrSelect] = useState({
-    id: 0,
-    memo: "",
-    tag: "",
+    id: undefined,
+    memo: undefined,
+    tag: undefined,
     content: [],
   });
 
