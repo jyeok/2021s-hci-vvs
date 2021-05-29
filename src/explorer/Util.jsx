@@ -9,14 +9,13 @@ export const fileToFilemap = (files) =>
         createDate: e.createdAt,
         tag: e.tag,
         memo: e.memo,
+        preview: e.preview,
       }))
     : [];
 
-export const getFolderChain = () => [
-  { id: "xcv", name: "Demo", isDir: true },
-  { id: "abdd", name: "zzz", isDir: true },
-  { id: "asdfasdf", name: "ohno", isDir: true },
-];
+export const getFolderChain = () => [{ id: "xcv", name: "Root", isDir: true }];
+
+export const currentPath = () => "Root";
 
 export default {
   fileToFilemap,

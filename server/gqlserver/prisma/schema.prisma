@@ -14,7 +14,7 @@ model Record {
   id        Int      @id @default(autoincrement())
   path      String   @unique
   title     String
-  size      String
+  size      Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tag       String   @default("")
@@ -28,9 +28,9 @@ model Record {
 }
 
 model Preview {
-  id      Int        @id @default(autoincrement())
+  id      Int         @id @default(autoincrement())
   voice   String // TODO: store path? base64-encoded data?
-  excerpt TextBlock?
+  excerpt TextBlock[]
 
   record   Record? @relation(fields: [recordId], references: [id])
   recordId Int?

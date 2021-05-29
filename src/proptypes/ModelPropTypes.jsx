@@ -35,7 +35,7 @@ export const Preview = {
 export const TextBlock = {
   id: PropTypes.number,
   content: PropTypes.string,
-  idMine: PropTypes.number,
+  isMine: PropTypes.number,
   isHighlighted: PropTypes.number,
   isModified: PropTypes.number,
   reliability: PropTypes.number,

@@ -11,7 +11,7 @@ export const Record = objectType({
     t.nonNull.int('id')
     t.nonNull.string('path')
     t.nonNull.string('title')
-    t.nonNull.string('size')
+    t.nonNull.int('size')
     t.field('createdAt', { type: 'DateTime' })
     t.field('updatedAt', { type: 'DateTime' })
     t.string('tag')
@@ -101,7 +101,7 @@ export const Preview = objectType({
     t.nonNull.int('id')
     t.nonNull.string('voice')
 
-    t.field('excerpt', {
+    t.list.nonNull.field('excerpt', {
       type: TextBlock,
       resolve: (parent, args, context: Context) => {
         return context.prisma.preview

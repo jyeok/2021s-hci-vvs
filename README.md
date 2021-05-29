@@ -25,13 +25,6 @@ And run:
 npm run dev
 ```
 
-To run local (temporary) file server in your computer, run:
-
-```bash
-# in server/fileserver
-node fileserver.js
-```
-
 ## External APIs/Libraries
 
 [Chonky] (https://chonky.io/docs/2.x/)
@@ -46,12 +39,14 @@ node fileserver.js
 
 [react-mic] (https://github.com/hackingbeauty/react-mic)
 
-## Documentation (TBC)
+[material-ui-dropzone](https://yuvaleros.github.io/material-ui-dropzone/)
 
-[react-showroom](https://github.com/OpusCapita/react-showroom-client)
+[material-ui](https://material-ui.com/)
+
+[ML APIs](https://www.saltlux.ai)
+
+## Documentation (TBC)
 
 [storybook](https://storybook.js.org)
 
 [mockplus](https://www.mockplus.com)
-
-[ML APIs](https://www.saltlux.ai)

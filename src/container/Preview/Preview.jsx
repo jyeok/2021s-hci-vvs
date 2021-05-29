@@ -1,42 +1,115 @@
 import React from "react";
-import PropType from "prop-types";
-import { Button } from "@material-ui/core";
+import PropTypes from "prop-types";
+
+import { Link } from "react-router-dom";
+import { Button, Grid, TextField } from "@material-ui/core";
+
+import { TextBlock } from "proptypes/ModelPropTypes";
 import MessageHolder from "../MessageHolder/MessageHolder";
 
-function Preview() {
-  const pstyle = {
-    marginLeft: "12px",
-    marginBottom: "8px",
-  };
-  const pborder = {
-    border: "0.5 px solid",
-  };
+const pborder = {
+  border: "0.5px solid",
+};
+
+const onLock = (e) => {
+  // eslint-disable-next-line
+  console.log("onLock :>> ", e);
+};
+
+const onEdit = (e) => {
+  // eslint-disable-next-line
+  console.log("onEdit :>> ", e);
+};
+function Preview(props) {
+  const { id, memo, tag, content } = props;
+
+  const messages = content.map((e, i) => (
+    <MessageHolder
+      key={`${id}${i * 2}`}
+      id={id}
+      content={e.content}
+      isMine={e.isMine}
+      isHighlighted={e.isHighlighted}
+      isModified={e.isModified}
+      reliability={e.reliability}
+    />
+  ));
+
   return (
-    <div>
-      <div style={{ margin: "3px", height: "400px" }}>
-        Preview
-        <MessageHolder />
+    <div style={{ margin: "5px" }}>
+      Preview
+      <div style={{ border: "1px solid", margin: "5px", height: "450px" }}>
+        {messages}
       </div>
-      <div style={{ pstyle }}>
-        <Button type="button" style={{ pborder }}>
-          편집
-        </Button>
-      </div>
-      <div style={{ pstyle }}>
-        <Button type="button" style={{ pborder }}>
-          재생
-        </Button>
-      </div>
-      <div style={{ pstyle }}>
-        <Button type="button" style={{ pborder }}>
-          잠금
-        </Button>
-      </div>
+      <TextField
+        label="태그"
+        value={tag}
+        fullWidth
+        margin="normal"
+        variant="outlined"
+        InputProps={{ readOnly: true }}
+      />
+      <TextField
+        label="메모"
+        value={memo}
+        fullWidth
+        margin="normal"
+        variant="outlined"
+        multiline
+        rows={5}
+        InputProps={{ readOnly: true }}
+      />
+      <Grid container style={{ marginTop: "15px" }}>
+        <Grid item xs={4}>
+          <Button
+            style={pborder}
+            size="large"
+            color="primary"
+            variant="contained"
+            onClick={onEdit}
+          >
+            편집
+          </Button>
+        </Grid>
+        <Grid item xs={4}>
+          <Button
+            style={pborder}
+            size="large"
+            color="primary"
+            variant="contained"
+            component={Link}
+            to={`playing/${id}`}
+          >
+            재생
+          </Button>
+        </Grid>
+        <Grid item xs={4}>
+          <Button
+            style={pborder}
+            size="large"
+            color="primary"
+            variant="contained"
+            onClick={onLock}
+          >
+            잠금
+          </Button>
+        </Grid>
+      </Grid>
     </div>
   );
 }
 export default Preview;
 
-Preview.propType = {
-  name: PropType.string.isRequired,
+const { id, end, ...messageTemplate } = TextBlock;
+Preview.propTypes = {
+  id: PropTypes.number,
+  memo: PropTypes.string,
+  tag: PropTypes.string,
+  content: PropTypes.arrayOf(PropTypes.shape(messageTemplate)).isRequired,
+};
+
+Preview.defaultProps = {
+  id: 0,
+  memo: "저장된 메모가 없습니다.",
+  tag: "저장된 태그가 없습니다.",
 };

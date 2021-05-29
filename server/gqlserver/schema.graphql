@@ -12,17 +12,19 @@ type Mutation {
   addRecord(data: RecordCreateInput!): Record
   addSchedule(data: ScheduleCreateInput!): Schedule
   addTextBlock(data: TextBlockCreateInput!): TextBlock
-  connectPreview(previewId: Int!, recordId: Int!): Preview
+  connectPreviewToRecord(previewId: Int!, recordId: Int!): Preview
+  connectTextBlocksToPreview(previewId: Int!, textBlockId: [Int!]!): Preview
   deleteRecordById(id: Int!): Record
   deleteRecordByPath(path: String!): Record
   deleteScheduleById(id: Int!): Schedule
   deleteTextBlockById(id: Int!): TextBlock
   updateRecord(data: RecordUpdateInput, id: Int!): Record
   updateTextBlock(data: TextBlockUpdateInput!, id: Int!): TextBlock
+  uploadRecord(path: String!, size: Int!, title: String!, voice: String!): Record
 }
 
 type Preview {
-  excerpt: TextBlock
+  excerpt: [TextBlock!]
   id: Int!
   record: Record
   voice: String!
@@ -55,7 +57,7 @@ type Record {
   memo: String
   path: String!
   preview: Preview
-  size: String!
+  size: Int!
   tag: String
   title: String!
   updatedAt: DateTime
@@ -66,7 +68,7 @@ input RecordCreateInput {
   content: [TextBlockCreateInput!]
   memo: String!
   path: String!
-  size: String!
+  size: Int!
   tag: String!
   title: String!
   voice: String!
@@ -76,7 +78,7 @@ input RecordUpdateInput {
   isLocked: Int
   memo: String
   path: String
-  size: String
+  size: Int
   tag: String
   title: String
   voice: String
