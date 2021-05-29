@@ -1,12 +1,22 @@
+/* eslint-disable */
 import React, { useState, useEffect } from "react";
-import { Grid } from "@material-ui/core";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { FullFileBrowser } from "chonky";
-import Preview from "container/Preview/Preview";
 
+import { Grid } from "@material-ui/core";
+import { DropzoneDialogBase } from "material-ui-dropzone";
+
+import Preview from "container/Preview/Preview";
 import { queries } from "./api";
 import { fileToFilemap, getFolderChain } from "./Util";
 import { onFileAction, extraActions } from "./ChonkyOptions";
+
+const onFileSave = (upload, setOpen, refetch) => {
+  console.log("upload :>> ", upload);
+  console.log("upload[0][data] :>> ", upload[0]["data"]);
+  setOpen(false);
+  // refetch();
+};
 
 export const Explorer = () => {
   const { loading, error, data, refetch, networkStatus } = useQuery(
@@ -21,11 +31,14 @@ export const Explorer = () => {
     tag: undefined,
     content: [],
   });
+  const [open, setOpen] = useState(false);
+  const [upload, setUpload] = useState({});
 
   useEffect(() => {
     setFiles(data);
     setNetStat(networkStatus);
-  }, [data, networkStatus]);
+    setUpload(upload);
+  }, [data, networkStatus, upload]);
 
   if (loading) return <div> Loading... </div>;
   if (error) return <div> error! {netStat.message}</div>;
@@ -49,12 +62,28 @@ export const Explorer = () => {
           files={fileMap}
           folderChain={folderChain}
           fileActions={extraActions}
-          onFileAction={(e) => onFileAction(e, { refetch, setCurrSelect })}
+          onFileAction={(e) =>
+            onFileAction(e, { refetch, setCurrSelect, setOpen })
+          }
         />
       </Grid>
       <Grid item xs={4}>
         <Preview id={id} memo={memo} tag={tag} content={content} />
       </Grid>
+      <DropzoneDialogBase
+        dialogTitle="파일을 선택하세요"
+        acceptedFiles={["audio/*"]}
+        fileObjects={upload}
+        cancelButtonText="취소"
+        submitButtonText="업로드"
+        open={open}
+        onAdd={(newUpload) => setUpload(newUpload)}
+        onClose={() => setOpen(false)}
+        onSave={() => onFileSave(upload, setOpen, refetch)}
+        showPreviews={true}
+        showFileNamesInPreview={true}
+        filesLimit={1}
+      />
     </Grid>
   );
 };

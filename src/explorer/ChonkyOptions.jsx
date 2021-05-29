@@ -1,9 +1,6 @@
 import { ChonkyActions } from "chonky";
 
 export const onFileAction = (e, f) => {
-  // eslint-disable-next-line
-  console.log("event, function :>> ", e, f); // development purpose
-
   const { id: eventId } = e;
 
   if (
@@ -33,6 +30,10 @@ export const onFileAction = (e, f) => {
       tag: file.tag,
       content,
     });
+  } else if (eventId === ChonkyActions.UploadFiles.id) {
+    // eslint-disable-next-line
+    console.log("e :>> ", e);
+    f.setOpen(true);
   }
 };
 
