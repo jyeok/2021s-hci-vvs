@@ -24,9 +24,6 @@ const PlayingRecord = () => {
 
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
-  // eslint-disable-next-line no-unused-expressions
-
-  console.log(data);
 
   if (!data.recordById) goBack();
   return (
@@ -54,7 +51,7 @@ const PlayingRecord = () => {
           ))}
       </Grid>
       <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
-        <AudioPlayer src="data.recordById.path" />
+        <AudioPlayer src={data.recordById.voice} />
       </Grid>
       <Grid item xs={1}>
         <HelpIcon fontSize="large" />
