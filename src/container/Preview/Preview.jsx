@@ -38,7 +38,7 @@ function Preview(props) {
   return (
     <div style={{ margin: "5px" }}>
       Preview
-      <div style={{ border: "1px solid", margin: "5px", height: "450px" }}>
+      <div style={{ border: "1px solid", margin: "5px", height: "300px" }}>
         {messages}
       </div>
       <TextField

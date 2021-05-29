@@ -66,12 +66,8 @@ export const Explorer = () => {
   const folderChain = getFolderChain();
 
   return (
-    <Grid
-      container
-      padding={15}
-      style={{ border: "1px solid", height: "800px" }}
-    >
-      <Grid item xs={8}>
+    <Grid container padding={15} style={{ height: "650px" }}>
+      <Grid item xs={8} style={{ border: "1px solid", height: "650px" }}>
         <FullFileBrowser
           files={fileMap}
           folderChain={folderChain}
@@ -81,8 +77,14 @@ export const Explorer = () => {
           }
         />
       </Grid>
-      <Grid item xs={4}>
-        <Preview id={id} memo={memo} tag={tag} content={content} />
+      <Grid item xs={4} style={{ border: "1px solid", height: "650px" }}>
+        <Preview
+          id={id}
+          memo={memo}
+          tag={tag}
+          content={content}
+          style={{ height: "650px" }}
+        />
       </Grid>
       <DropzoneDialogBase
         dialogTitle="파일을 선택하세요"

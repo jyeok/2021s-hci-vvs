@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Route } from "react-router-dom";
+import { Redirect, Route } from "react-router-dom";
 import { ApolloProvider } from "react-apollo";
 import { ApolloClient } from "@apollo/client";
 
@@ -15,17 +15,15 @@ function App(props) {
     <ApolloProvider client={client}>
       <div className="App">
         <Route path="/" exact>
-          <Explorer client={client} />
+          <Explorer />
         </Route>
         <Route path="/recording" exact>
-          <WhileRecording client={client} />
-        </Route>
-        <Route path="/playing" exact>
-          <PlayingRecord client={client} />
+          <WhileRecording />
         </Route>
         <Route path="/playing/:id" exact>
-          <PlayingRecord client={client} />
+          <PlayingRecord />
         </Route>
+        <Redirect to="/" />
       </div>
     </ApolloProvider>
   );
