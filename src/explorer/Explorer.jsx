@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { FullFileBrowser } from "chonky";
@@ -7,21 +6,37 @@ import { Grid } from "@material-ui/core";
 import { DropzoneDialogBase } from "material-ui-dropzone";
 
 import Preview from "container/Preview/Preview";
-import { queries } from "./api";
+import { queries, mutations } from "./api";
 import { fileToFilemap, getFolderChain } from "./Util";
 import { onFileAction, extraActions } from "./ChonkyOptions";
 
-const onFileSave = (upload, setOpen, refetch) => {
-  console.log("upload :>> ", upload);
-  console.log("upload[0][data] :>> ", upload[0]["data"]);
-  setOpen(false);
-  // refetch();
+const onFileSave = (upload, setUpload, uploadMutation, setOpen, refetch) => {
+  const { file } = upload[0];
+
+  const uploadInterface = {
+    path: file.path,
+    title: file.name.substring(0, file.name.lastIndexOf(".")),
+    size: file.size,
+    voice: upload[0].data,
+  };
+
+  uploadMutation({ variables: uploadInterface })
+    .then(() => {
+      setOpen(false);
+      setUpload({});
+      refetch();
+    })
+    .catch(() => {
+      // eslint-disable-next-line no-alert
+      alert("중복된 파일이 있습니다!"); // TODO: Replace this!
+    });
 };
 
 export const Explorer = () => {
   const { loading, error, data, refetch, networkStatus } = useQuery(
     queries.allRecords
   );
+  const [uploadMutation] = useMutation(mutations.uploadRecord);
 
   const [files, setFiles] = useState(data);
   const [netStat, setNetStat] = useState(networkStatus);
@@ -37,8 +52,7 @@ export const Explorer = () => {
   useEffect(() => {
     setFiles(data);
     setNetStat(networkStatus);
-    setUpload(upload);
-  }, [data, networkStatus, upload]);
+  }, [data, networkStatus]);
 
   if (loading) return <div> Loading... </div>;
   if (error) return <div> error! {netStat.message}</div>;
@@ -79,9 +93,11 @@ export const Explorer = () => {
         open={open}
         onAdd={(newUpload) => setUpload(newUpload)}
         onClose={() => setOpen(false)}
-        onSave={() => onFileSave(upload, setOpen, refetch)}
-        showPreviews={true}
-        showFileNamesInPreview={true}
+        onSave={() =>
+          onFileSave(upload, setUpload, uploadMutation, setOpen, refetch)
+        }
+        showPreviews
+        showFileNamesInPreview
         filesLimit={1}
       />
     </Grid>

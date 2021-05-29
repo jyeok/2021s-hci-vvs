@@ -13,11 +13,9 @@ export const fileToFilemap = (files) =>
       }))
     : [];
 
-export const getFolderChain = () => [
-  { id: "xcv", name: "Demo", isDir: true },
-  { id: "abdd", name: "zzz", isDir: true },
-  { id: "asdfasdf", name: "ohno", isDir: true },
-];
+export const getFolderChain = () => [{ id: "xcv", name: "Root", isDir: true }];
+
+export const currentPath = () => "Root";
 
 export default {
   fileToFilemap,

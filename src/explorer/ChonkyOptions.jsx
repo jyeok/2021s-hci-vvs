@@ -31,8 +31,6 @@ export const onFileAction = (e, f) => {
       content,
     });
   } else if (eventId === ChonkyActions.UploadFiles.id) {
-    // eslint-disable-next-line
-    console.log("e :>> ", e);
     f.setOpen(true);
   }
 };

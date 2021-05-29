@@ -42,8 +42,13 @@ export const queries = {
 
 export const mutations = {
   uploadRecord: gql`
-    mutation uploadRecord($path: String!, $voice: String!) {
-      uploadRecord(path: $path, voice: $voice) {
+    mutation uploadRecord(
+      $path: String!
+      $title: String!
+      $size: Int!
+      $voice: String!
+    ) {
+      uploadRecord(path: $path, title: $title, size: $size, voice: $voice) {
         id
       }
     }

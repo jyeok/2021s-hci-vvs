@@ -14,7 +14,7 @@ model Record {
   id        Int      @id @default(autoincrement())
   path      String   @unique
   title     String
-  size      String
+  size      Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tag       String   @default("")

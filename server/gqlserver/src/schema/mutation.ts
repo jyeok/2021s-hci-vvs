@@ -34,6 +34,31 @@ export const Mutation = objectType({
       },
     })
 
+    t.field('uploadRecord', {
+      type: Record,
+      args: {
+        path: nonNull(stringArg()),
+        title: nonNull(stringArg()),
+        size: nonNull(intArg()),
+        voice: nonNull(stringArg()),
+      },
+      resolve: (_, args, context: Context) => {
+        const data = {
+          path: args.path,
+          title: args.title,
+          size: args.size,
+          tag: '',
+          memo: '',
+          isLocked: 0,
+          voice: args.voice,
+        }
+
+        return context.prisma.record.create({
+          data,
+        })
+      },
+    })
+
     t.field('deleteRecordById', {
       type: Record,
       args: {
