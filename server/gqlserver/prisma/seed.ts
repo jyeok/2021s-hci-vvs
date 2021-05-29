@@ -14,7 +14,7 @@ const randomRecordData = () => {
   let res: Prisma.RecordCreateInput = {
     path: randomPhrase(),
     title: randomPhrase(),
-    size: randomPhrase(),
+    size: Math.ceil(Math.random() * 9999 + 10),
     tag: cond() ? randomPhrase() : '',
     memo: cond() ? randomPhrase() : '',
     voice: randomPhrase(),

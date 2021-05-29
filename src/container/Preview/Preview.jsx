@@ -23,21 +23,23 @@ const onEdit = (e) => {
 function Preview(props) {
   const { id, memo, tag, content } = props;
 
+  const messages = content.map((e, i) => (
+    <MessageHolder
+      key={`${id}${i * 2}`}
+      id={id}
+      content={e.content}
+      isMine={e.isMine}
+      isHighlighted={e.isHighlighted}
+      isModified={e.isModified}
+      reliability={e.reliability}
+    />
+  ));
+
   return (
     <div style={{ margin: "5px" }}>
       Preview
       <div style={{ border: "1px solid", margin: "5px", height: "450px" }}>
-        {content.map((e, i) => (
-          <MessageHolder
-            key={`${id}${i * 2}`}
-            id={id}
-            content={e.content}
-            isMine={e.isMine}
-            isHighlighted={e.isHighlighted}
-            isModified={e.isModified}
-            reliability={e.reliability}
-          />
-        ))}
+        {messages}
       </div>
       <TextField
         label="태그"

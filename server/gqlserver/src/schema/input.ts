@@ -5,7 +5,7 @@ export const RecordCreateInput = inputObjectType({
   definition(t) {
     t.nonNull.string('path')
     t.nonNull.string('title')
-    t.nonNull.string('size')
+    t.nonNull.int('size')
     t.nonNull.string('tag')
     t.nonNull.string('memo')
     t.nonNull.string('voice')
@@ -47,7 +47,7 @@ export const RecordUpdateInput = inputObjectType({
   definition(t) {
     t.string('path')
     t.string('title')
-    t.string('size')
+    t.int('size')
     t.string('tag')
     t.string('memo')
     t.int('isLocked')

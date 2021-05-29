@@ -40,6 +40,22 @@ export const queries = {
   `,
 };
 
+export const mutations = {
+  uploadRecord: gql`
+    mutation uploadRecord(
+      $path: String!
+      $title: String!
+      $size: Int!
+      $voice: String!
+    ) {
+      uploadRecord(path: $path, title: $title, size: $size, voice: $voice) {
+        id
+      }
+    }
+  `,
+};
+
 export default {
   queries,
+  mutations,
 };

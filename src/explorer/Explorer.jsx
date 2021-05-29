@@ -1,26 +1,53 @@
 import React, { useState, useEffect } from "react";
-import { Grid } from "@material-ui/core";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { FullFileBrowser } from "chonky";
-import Preview from "container/Preview/Preview";
 
-import { queries } from "./api";
+import { Grid } from "@material-ui/core";
+import { DropzoneDialogBase } from "material-ui-dropzone";
+
+import Preview from "container/Preview/Preview";
+import { queries, mutations } from "./api";
 import { fileToFilemap, getFolderChain } from "./Util";
 import { onFileAction, extraActions } from "./ChonkyOptions";
+
+const onFileSave = (upload, setUpload, uploadMutation, setOpen, refetch) => {
+  const { file } = upload[0];
+
+  const uploadInterface = {
+    path: file.path,
+    title: file.name.substring(0, file.name.lastIndexOf(".")),
+    size: file.size,
+    voice: upload[0].data,
+  };
+
+  uploadMutation({ variables: uploadInterface })
+    .then(() => {
+      setOpen(false);
+      setUpload({});
+      refetch();
+    })
+    .catch(() => {
+      // eslint-disable-next-line no-alert
+      alert("중복된 파일이 있습니다!"); // TODO: Replace this!
+    });
+};
 
 export const Explorer = () => {
   const { loading, error, data, refetch, networkStatus } = useQuery(
     queries.allRecords
   );
+  const [uploadMutation] = useMutation(mutations.uploadRecord);
 
   const [files, setFiles] = useState(data);
   const [netStat, setNetStat] = useState(networkStatus);
   const [currSelect, setCurrSelect] = useState({
-    id: 0,
-    memo: "",
-    tag: "",
+    id: undefined,
+    memo: undefined,
+    tag: undefined,
     content: [],
   });
+  const [open, setOpen] = useState(false);
+  const [upload, setUpload] = useState({});
 
   useEffect(() => {
     setFiles(data);
@@ -49,12 +76,30 @@ export const Explorer = () => {
           files={fileMap}
           folderChain={folderChain}
           fileActions={extraActions}
-          onFileAction={(e) => onFileAction(e, { refetch, setCurrSelect })}
+          onFileAction={(e) =>
+            onFileAction(e, { refetch, setCurrSelect, setOpen })
+          }
         />
       </Grid>
       <Grid item xs={4}>
         <Preview id={id} memo={memo} tag={tag} content={content} />
       </Grid>
+      <DropzoneDialogBase
+        dialogTitle="파일을 선택하세요"
+        acceptedFiles={["audio/*"]}
+        fileObjects={upload}
+        cancelButtonText="취소"
+        submitButtonText="업로드"
+        open={open}
+        onAdd={(newUpload) => setUpload(newUpload)}
+        onClose={() => setOpen(false)}
+        onSave={() =>
+          onFileSave(upload, setUpload, uploadMutation, setOpen, refetch)
+        }
+        showPreviews
+        showFileNamesInPreview
+        filesLimit={1}
+      />
     </Grid>
   );
 };
