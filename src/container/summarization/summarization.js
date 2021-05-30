@@ -172,15 +172,3 @@ class TextRank {
   }
 }
 export default TextRank;
-
-var textrank = new TextRank([
-  "나는 오늘 밥을 먹었다.",
-  "집에서 볶음밥을 해 먹었는데 맛있었다.",
-  "볶음밥 중에서는 비비고가 가장 맛있는 것 같다.",
-  " 비비고 다음으로는 풀무원이 맛있다.",
-  "볶음밥을 먹을 때는 김치를 꼭 같이 먹어 줘야 한다.",
-  "김치를 먹지 않으면 볶음밥이 완성되지 않은 것 같다고 느낀다.",
-  " 밥을 다 먹고 난 뒤에 코딩을 했다.",
-  "좋았다.",
-]);
-console.log(textrank.getSummarizedThreeText());
