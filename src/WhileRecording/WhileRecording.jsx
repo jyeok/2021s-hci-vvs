@@ -17,11 +17,13 @@ class WhileRecording extends PureComponent {
 
   // eslint-disable-next-line class-methods-use-this
   onData(recordedBlob) {
+    // eslint-disable-next-line no-console
     console.log("chunk of real-time data is: ", recordedBlob);
   }
 
   // eslint-disable-next-line class-methods-use-this
   onStop(recordedBlob) {
+    // eslint-disable-next-line no-console
     console.log("recordedBlob is: ", recordedBlob);
   }
 
