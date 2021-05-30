@@ -11,7 +11,7 @@ import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import { compression } from "api/compression";
 import { answerQuestion } from "api/answerQuestion";
-
+import TextRank from "container/summarization/summarization";
 import MessageHolder from "../MessageHolder/MessageHolder";
 import { queries } from "./api";
 
@@ -31,6 +31,7 @@ const PlayingRecord = () => {
   if (!data.recordById) goBack();
 
   const newData = data.recordById.content.map((e) => e.content);
+
   const finalCompressData = newData.reduce((acc, cur) => `${acc} ${cur}`, "");
 
   const handleValue = (e) => {
@@ -40,6 +41,8 @@ const PlayingRecord = () => {
     answerQuestion(finalCompressData, questionInput);
   };
 
+  const textrank = new TextRank(newData);
+
   return (
     <Grid container padding={15} style={{ border: "1px solid" }}>
       <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
@@ -47,7 +50,8 @@ const PlayingRecord = () => {
         <button
           type="button"
           onClick={() => {
-            compression(finalCompressData);
+            // eslint-disable-next-line no-alert
+            alert(textrank.getSummarizedThreeText());
           }}
         >
           전체 요약
