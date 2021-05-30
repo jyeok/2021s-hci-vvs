@@ -21,6 +21,7 @@ function answerQuestion(sampleParagraph, sampleQuestion) {
         const { answer } = data.result;
         const answerIndex = data.result.answer_index;
         const answersToQuestion = [answer, answerIndex];
+        console.log(answersToQuestion);
         return answersToQuestion;
       })
       // eslint-disable-next-line no-console

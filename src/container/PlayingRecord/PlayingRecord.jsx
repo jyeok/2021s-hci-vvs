@@ -26,6 +26,13 @@ const PlayingRecord = () => {
   if (error) return `Error! ${error.message}`;
 
   if (!data.recordById) goBack();
+
+  const handleValue = (e) => {
+    e.preventDefault();
+    // eslint-disable-next-line no-unused-vars
+    const questionInput = e.target.question.value;
+  };
+
   return (
     <Grid container padding={15} style={{ border: "1px solid" }}>
       <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
@@ -57,12 +64,14 @@ const PlayingRecord = () => {
         <HelpIcon fontSize="large" />
       </Grid>
       <Grid item xs={11}>
-        <TextField
-          id="Question"
-          row="1"
-          label="여기에 질문을 입력해보세요."
-          fullWidth
-        />
+        <form onSubmit={handleValue}>
+          <TextField
+            id="question"
+            row="1"
+            label="여기에 질문을 입력해보세요."
+            fullWidth
+          />
+        </form>
       </Grid>
     </Grid>
   );

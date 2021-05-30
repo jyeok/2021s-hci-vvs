@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 
-function compressParagraph(samplequestion) {
+function compressParagraph(questionInput) {
   return (
     fetch("http://svc.saltlux.ai:31781", {
       method: "POST",
@@ -11,7 +11,7 @@ function compressParagraph(samplequestion) {
         key: "69477979-4494-49c4-8533-d23d70d17872",
         serviceId: "00116013830",
         argument: {
-          question: samplequestion,
+          question: questionInput,
         },
       }),
     })
@@ -19,6 +19,7 @@ function compressParagraph(samplequestion) {
       .then((data) => {
         const datakey = data.return_object.keylists;
         const keylist = datakey.map((e) => e.keyword);
+        console.log(keylist);
         return keylist;
       })
       // eslint-disable-next-line no-console
