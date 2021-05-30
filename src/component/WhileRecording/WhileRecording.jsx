@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import { Grid, TextField } from "@material-ui/core";
 import { Delete, SaveAlt } from "@material-ui/icons";
 import { ReactMic } from "react-mic";
-import RecordingMessage from "../container/RecordingMessage/RecordingMessage";
+import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
 
 class WhileRecording extends PureComponent {
   constructor(props) {
@@ -51,6 +51,7 @@ class WhileRecording extends PureComponent {
             onData={this.onData}
             strokeColor="#000000"
             visualSetting="False"
+            sampleRate={16000}
           />
           <button onClick={this.startRecording} type="button">
             Start

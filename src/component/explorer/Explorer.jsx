@@ -6,7 +6,7 @@ import { Grid } from "@material-ui/core";
 import { DropzoneDialogBase } from "material-ui-dropzone";
 
 import Preview from "container/Preview/Preview";
-import { queries, mutations } from "./api";
+import { queries, mutations } from "api/gql/schema";
 import { fileToFilemap, getFolderChain } from "./Util";
 import { onFileAction, extraActions } from "./ChonkyOptions";
 

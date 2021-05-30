@@ -9,11 +9,11 @@ import HelpIcon from "@material-ui/icons/Help";
 import { useQuery } from "@apollo/client";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
-import { compression } from "api/compression";
-import { answerQuestion } from "api/answerQuestion";
+import { compression } from "api/ai/compression";
+import { answerQuestion } from "api/ai/answerQuestion";
 import TextRank from "container/summarization/summarization";
 import MessageHolder from "../MessageHolder/MessageHolder";
-import { queries } from "./api";
+import { queries } from "../../api/gql/schema";
 
 const PlayingRecord = () => {
   const recordId = parseInt(useParams().id, 10);
