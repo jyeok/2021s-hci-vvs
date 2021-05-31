@@ -9,49 +9,41 @@ import { upload } from "api/ai/simpleTTS";
 
 import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
 
-function blobToBase64(blob) {
-  upload(blob);
-  // const reader = new FileReader();
-
-  // reader.onloadend = async () => {
-  //   const base64data = reader.result;
-  //   const [dataType, codecs, encoding, data] = base64data.split(/;|,/);
-
-  //   console.log(
-  //     "dataType, codecs, encoding, data :>> ",
-  //     dataType,
-  //     codecs,
-  //     encoding,
-  //     data
-  //   );
-
-  //   upload(blob);
-  // };
-
-  // reader.readAsDataURL(blob);
-}
 class WhileRecording extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
       record: false,
+      textBlocks: null,
     };
+
     this.startRecording = this.startRecording.bind(this);
     this.stopRecording = this.stopRecording.bind(this);
+
+    this.blobToBase64 = this.blobToBase64.bind(this);
+    this.onData = this.onData.bind(this);
+    this.onStop = this.onStop.bind(this);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  onData(recordedBlob) {
-    // eslint-disable-next-line no-console
-    console.log("chunk of real-time data is: ", recordedBlob);
+  async blobToBase64(blob) {
+    const reader = new FileReader();
+
+    reader.onloadend = async () => {
+      const base64data = reader.result;
+      const [dataType, codecs, encoding, data] = base64data.split(/;|,/);
+      const textBlocks = await upload(data, dataType, codecs, encoding);
+
+      console.log("textBlocks :>> ", textBlocks);
+    };
+
+    reader.readAsDataURL(blob);
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  onData(recordedBlob) {}
+
   onStop(recordedBlob) {
-    // eslint-disable-next-line no-console
-    console.log("recordedBlob is: ", recordedBlob);
-    blobToBase64(recordedBlob.blob);
+    this.blobToBase64(recordedBlob.blob);
   }
 
   startRecording() {

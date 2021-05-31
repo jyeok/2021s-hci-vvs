@@ -1,19 +1,21 @@
 const fetch = require("node-fetch");
 
-export const upload = (blob) => {
-  console.log("upload blob :>> ", blob);
-  return fetch("http://localhost:3002/upload", {
+export const upload = async (chunks, dataType, codecs, encoding) => {
+  const data = await fetch("http://localhost:3002/upload", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: blob,
-  })
-    .then((response) => response.text())
-    .then((data) => {
-      console.log("data :>> ", data);
-    })
-    .catch((error) => console.log("error: ", error));
+    body: JSON.stringify({
+      chunks,
+      dataType,
+      codecs,
+      encoding,
+    }),
+  }).then((response) => response.json());
+
+  console.log("data :>> ", data);
+  return data;
 };
 
 export default { upload };
