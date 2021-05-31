@@ -7,6 +7,7 @@ import { ApolloClient } from "@apollo/client";
 import WhileRecording from "component/WhileRecording/WhileRecording";
 import PlayingRecord from "container/PlayingRecord/PlayingRecord";
 import { Explorer } from "component/explorer/Explorer";
+import TempComponent from "TempComponent";
 
 function App(props) {
   const { client } = props;
@@ -18,6 +19,7 @@ function App(props) {
           <Route path="/" exact component={Explorer} />
           <Route path="/recording" exact component={WhileRecording} />
           <Route path="/playing/:id" exact component={PlayingRecord} />
+          <Route path="/temp" exact component={TempComponent} />
           <Redirect path="*" to="/" />
         </Switch>
       </div>

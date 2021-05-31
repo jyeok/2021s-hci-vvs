@@ -22,8 +22,11 @@ class WhileRecording extends PureComponent {
     this.stopRecording = this.stopRecording.bind(this);
 
     this.blobToBase64 = this.blobToBase64.bind(this);
-    this.onData = this.onData.bind(this);
     this.onStop = this.onStop.bind(this);
+  }
+
+  onStop(recordedBlob) {
+    this.blobToBase64(recordedBlob.blob);
   }
 
   async blobToBase64(blob) {
@@ -35,15 +38,10 @@ class WhileRecording extends PureComponent {
       const textBlocks = await upload(data, dataType, codecs, encoding);
 
       console.log("textBlocks :>> ", textBlocks);
+      this.setState({ textBlocks });
     };
 
     reader.readAsDataURL(blob);
-  }
-
-  onData(recordedBlob) {}
-
-  onStop(recordedBlob) {
-    this.blobToBase64(recordedBlob.blob);
   }
 
   startRecording() {
