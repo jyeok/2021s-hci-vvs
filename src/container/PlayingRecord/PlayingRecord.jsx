@@ -45,10 +45,15 @@ const PlayingRecord = () => {
 
   return (
     <Grid container padding={15} style={{ border: "1px solid" }}>
-      <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
+      <Grid
+        item
+        xs={12}
+        style={({ borderBottom: "0.5px solid" }, { height: "50px" })}
+      >
         <ArrowBack onClick={goBack} />
         <button
           type="button"
+          style={{ float: "right" }}
           onClick={() => {
             // eslint-disable-next-line no-alert
             alert(textrank.getSummarizedThreeText());
@@ -56,12 +61,14 @@ const PlayingRecord = () => {
         >
           전체 요약
         </button>
-        <button type="button">선택 요약</button>
+        <button type="button" style={{ float: "right" }}>
+          선택 요약
+        </button>
       </Grid>
       <Grid
         item
         xs={12}
-        style={{ borderBottom: "0.5px solid", height: "600px" }}
+        style={{ borderBottom: "0.5px solid", height: "500px" }}
       >
         {data.recordById &&
           data.recordById.content.map((e, i) => (
