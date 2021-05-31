@@ -1,6 +1,5 @@
 /* eslint-disable*/
 import React, { Component } from "react";
-import { useHistory } from "react-router-dom";
 import { Grid, TextField, IconButton } from "@material-ui/core";
 import { Delete, SaveAlt, ArrowBack } from "@material-ui/icons";
 
@@ -63,7 +62,10 @@ class WhileRecording extends Component {
           xs={12}
           style={({ height: "150px" }, { borderBottom: "0.5px solid" })}
         >
-          <ArrowBack fontsize="large" />
+          <ArrowBack
+            fontsize="large"
+            onClick={() => this.props.history.goBack()}
+          />
           <TextField label="제목" />
         </Grid>
         <Grid
@@ -82,26 +84,28 @@ class WhileRecording extends Component {
           xs={4}
           style={({ height: "600px" }, { borderBottom: "0.5px solid" })}
         >
-          <div>메모</div>
-          <TextField
-            variant="outlined"
-            name="메모"
-            style={({ margin: "10px" }, { width: "90%" })}
-            multiline
-            rows={15}
-            defaultValue="여기에 메모를 입력하세요."
-            fullWidth
-          />
-          <div>키워드</div>
-          <TextField
-            variant="outlined"
-            name="키워드"
-            style={({ margin: "10px" }, { width: "90%" })}
-            multiline
-            rows={8}
-            defaultValue="키워드가 이곳에 나타납니다. 여기를 눌러 수정도 가능합니다."
-            fullWidth
-          />
+          <div style={{ margin: "10px" }}>
+            메모
+            <TextField
+              variant="outlined"
+              name="메모"
+              multiline
+              rows={15}
+              placeholder="여기에 메모를 입력하세요."
+              fullWidth
+            />
+          </div>
+          <div style={{ margin: "10px" }}>
+            키워드
+            <TextField
+              variant="outlined"
+              name="키워드"
+              multiline
+              rows={8}
+              placeholder="녹음이 종료되면 키워드가 생성됩니다. 직접 추가할 수도 있습니다."
+              fullWidth
+            />
+          </div>
         </Grid>
         <Grid
           item
