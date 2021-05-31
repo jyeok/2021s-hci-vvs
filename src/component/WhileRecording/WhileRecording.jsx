@@ -1,9 +1,35 @@
+/* eslint-disable */
+
 import React, { PureComponent } from "react";
 import { Grid, TextField } from "@material-ui/core";
 import { Delete, SaveAlt } from "@material-ui/icons";
 import { ReactMic } from "react-mic";
+
+import { upload } from "api/ai/simpleTTS";
+
 import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
 
+function blobToBase64(blob) {
+  upload(blob);
+  // const reader = new FileReader();
+
+  // reader.onloadend = async () => {
+  //   const base64data = reader.result;
+  //   const [dataType, codecs, encoding, data] = base64data.split(/;|,/);
+
+  //   console.log(
+  //     "dataType, codecs, encoding, data :>> ",
+  //     dataType,
+  //     codecs,
+  //     encoding,
+  //     data
+  //   );
+
+  //   upload(blob);
+  // };
+
+  // reader.readAsDataURL(blob);
+}
 class WhileRecording extends PureComponent {
   constructor(props) {
     super(props);
@@ -25,6 +51,7 @@ class WhileRecording extends PureComponent {
   onStop(recordedBlob) {
     // eslint-disable-next-line no-console
     console.log("recordedBlob is: ", recordedBlob);
+    blobToBase64(recordedBlob.blob);
   }
 
   startRecording() {
@@ -51,7 +78,6 @@ class WhileRecording extends PureComponent {
             onData={this.onData}
             strokeColor="#000000"
             visualSetting="False"
-            sampleRate={16000}
           />
           <button onClick={this.startRecording} type="button">
             Start
