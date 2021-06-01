@@ -1,16 +1,16 @@
 /* eslint-disable*/
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { ReactMic } from "react-mic";
+
 import { Grid, TextField, Button } from "@material-ui/core";
 import { Delete, SaveAlt, ArrowBack, RadioRounded } from "@material-ui/icons";
-import { useMutation } from "@apollo/client";
-import { useHistory } from "react-router-dom";
 
-import { ReactMic } from "react-mic";
+import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
 
 import { getTextBlocks } from "api/ai/simpleTTS";
 import { mutations } from "api/gql/schema";
-
-import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
 
 const splitBase64String = (base64String) => {
   const [dataType, codecs, encoding, data] = base64String.split(/;|,/);

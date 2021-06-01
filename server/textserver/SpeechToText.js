@@ -24,6 +24,7 @@ module.exports = {
         this.stopRecognitionStream();
       })
       .on("data", (data) => {
+        // eslint-disable-next-line no-console
         console.log(
           "[RecognizeStream]: Got data:>>",
           data.results[0].alternatives
