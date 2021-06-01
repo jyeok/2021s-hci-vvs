@@ -18,6 +18,7 @@ export const compression = (input) =>
     .then((data) => {
       const datakey = data.return_object.keylists;
       const keylist = datakey.map((e) => e.keyword);
+      // eslint-disable-next-line no-console
       console.log(keylist);
       return keylist;
     })

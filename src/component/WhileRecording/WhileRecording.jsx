@@ -73,7 +73,7 @@ const generateTextBlock = async (base64Data) => {
   return textBlocks;
 };
 
-export const WhileRecording = () => {
+const WhileRecording = () => {
   const history = useHistory();
 
   const [inputState, setInputState] = useState({

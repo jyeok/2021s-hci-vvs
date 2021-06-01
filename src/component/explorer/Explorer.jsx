@@ -32,7 +32,7 @@ const onFileSave = (upload, setUpload, uploadMutation, setOpen, refetch) => {
     });
 };
 
-export const Explorer = () => {
+const Explorer = () => {
   const { loading, error, data, refetch, networkStatus } = useQuery(
     queries.allRecords
   );

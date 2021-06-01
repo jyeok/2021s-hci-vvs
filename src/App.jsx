@@ -6,7 +6,7 @@ import { ApolloClient } from "@apollo/client";
 
 import WhileRecording from "component/WhileRecording/WhileRecording";
 import PlayingRecord from "container/PlayingRecord/PlayingRecord";
-import { Explorer } from "component/explorer/Explorer";
+import Explorer from "component/explorer/Explorer";
 import TempComponent from "TempComponent";
 
 function App(props) {
