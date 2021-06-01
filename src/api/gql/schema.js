@@ -1,64 +1,76 @@
 import { gql } from "@apollo/client";
 
+export const fragments = {
+  allRecordFields: gql`
+    fragment allRecordFields on Record {
+      id
+      path
+      title
+      size
+      createdAt
+      updatedAt
+      tag
+      memo
+      isLocked
+      voice
+    }
+  `,
+
+  allTextBlockFields: gql`
+    fragment allTextBlockFields on TextBlock {
+      id
+      content
+      isMine
+      isHighlighted
+      isModified
+      reliability
+      start
+      end
+    }
+  `,
+
+  allPreviewFields: gql`
+    fragment allPreviewFields on Preview {
+      id
+      voice
+    }
+  `,
+
+  allScheduleFields: gql`
+    fragment allScheduleFields on Schedule {
+      id
+      date
+      memo
+    }
+  `,
+};
+
 export const queries = {
   recordById: gql`
+    ${fragments.allRecordFields}
+    ${fragments.allTextBlockFields}
     query recordById($id: Int!) {
       recordById(id: $id) {
-        id
-        path
-        title
-        size
-        createdAt
-        isLocked
-        tag
-        memo
-        voice
+        ...allRecordFields
         content {
-          id
-          content
-          isMine
-          isHighlighted
-          isModified
-          reliability
-          start
+          ...allTextBlockFields
         }
       }
     }
   `,
+
   allRecords: gql`
+    ${fragments.allRecordFields}
+    ${fragments.allTextBlockFields}
     query allRecords {
       allRecords {
-        id
-        path
-        title
-        size
-        createdAt
-        updatedAt
-        tag
-        memo
-        isLocked
+        ...allRecordFields
         preview {
           id
           excerpt {
-            id
-            content
-            isMine
-            isModified
-            isHighlighted
-            reliability
-            start
+            ...allTextBlockFields
           }
         }
-      }
-    }
-  `,
-  previewById: gql`
-    query previewById($id: Int!) {
-      previewById(id: $id) {
-        id
-        memo
-        tag
-        content
       }
     }
   `,
@@ -77,9 +89,25 @@ export const mutations = {
       }
     }
   `,
+  addRecord: gql`
+    ${fragments.allRecordFields}
+    ${fragments.allTextBlockFields}
+    mutation addRecord($data: RecrodCreateInput!) {
+      addRecord(data: $data) {
+        ...allRecordFields
+        content {
+          ...allTextBlockFields
+          record {
+            id
+          }
+        }
+      }
+    }
+  `,
 };
 
 export default {
   queries,
   mutations,
+  fragments,
 };
