@@ -32,7 +32,16 @@ yarn
 yarn start
 ```
 
-3. Install Backend Dependencies
+3. SETUP GOOGLE API KEY
+   별도로 첨부해 드린 crdential 파일을 다운받은 후 아래 명령어를 입력해 주세요.
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="path/to/credential/file" # MAC or Linux
+$env:GOOGLE_APPLICATION_CREDENTIALS="path/to/credential/file" # Window Powershell
+set GOOGLE_APPLICATION_CREDENTIALS="path/to/credential/file" # Window CMD
+```
+
+4. Install Backend Dependencies and run
 
 ```bash
 # in server/gqlserver
@@ -52,15 +61,6 @@ node index.js
 # in server/textserver
 npm install
 node index.js
-```
-
-4. SETUP GOOGLE API KEY
-   별도로 첨부해 드린 crdential 파일을 다운받은 후 아래 명령어를 입력해 주세요.
-
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS="path/to/credential/file" # MAC or Linux
-$env:GOOGLE_APPLICATION_CREDENTIALS="path/to/credential/file" # Window Powershell
-set GOOGLE_APPLICATION_CREDENTIALS="path/to/credential/file" # Window CMD
 ```
 
 ## External APIs/Libraries
