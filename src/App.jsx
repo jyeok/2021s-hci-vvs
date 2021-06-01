@@ -1,12 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Route } from "react-router-dom";
+import { Switch, Redirect, Route } from "react-router-dom";
 import { ApolloProvider } from "react-apollo";
 import { ApolloClient } from "@apollo/client";
 
-import WhileRecording from "WhileRecording/WhileRecording";
+import WhileRecording from "component/WhileRecording/WhileRecording";
 import PlayingRecord from "container/PlayingRecord/PlayingRecord";
-import { Explorer } from "explorer/Explorer";
+import { Explorer } from "component/explorer/Explorer";
+import TempComponent from "TempComponent";
 
 function App(props) {
   const { client } = props;
@@ -14,18 +15,13 @@ function App(props) {
   return (
     <ApolloProvider client={client}>
       <div className="App">
-        <Route path="/" exact>
-          <Explorer client={client} />
-        </Route>
-        <Route path="/recording" exact>
-          <WhileRecording client={client} />
-        </Route>
-        <Route path="/playing" exact>
-          <PlayingRecord client={client} />
-        </Route>
-        <Route path="/playing/:id" exact>
-          <PlayingRecord client={client} />
-        </Route>
+        <Switch>
+          <Route path="/" exact component={Explorer} />
+          <Route path="/recording" exact component={WhileRecording} />
+          <Route path="/playing/:id" exact component={PlayingRecord} />
+          <Route path="/temp" exact component={TempComponent} />
+          <Redirect path="*" to="/" />
+        </Switch>
       </div>
     </ApolloProvider>
   );

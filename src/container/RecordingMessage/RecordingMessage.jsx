@@ -39,7 +39,7 @@ RecordingMessage.PropType = {
 };
 
 RecordingMessage.defaultProps = {
-  content: "Does this work?",
+  content: "Mock",
   isMine: 0,
   start: "00:34",
 };

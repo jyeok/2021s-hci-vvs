@@ -15,11 +15,6 @@ const onLock = (e) => {
   // eslint-disable-next-line
   console.log("onLock :>> ", e);
 };
-
-const onEdit = (e) => {
-  // eslint-disable-next-line
-  console.log("onEdit :>> ", e);
-};
 function Preview(props) {
   const { id, memo, tag, content } = props;
 
@@ -38,7 +33,7 @@ function Preview(props) {
   return (
     <div style={{ margin: "5px" }}>
       Preview
-      <div style={{ border: "1px solid", margin: "5px", height: "450px" }}>
+      <div style={{ border: "1px solid", margin: "5px", height: "300px" }}>
         {messages}
       </div>
       <TextField
@@ -66,9 +61,10 @@ function Preview(props) {
             size="large"
             color="primary"
             variant="contained"
-            onClick={onEdit}
+            component={Link}
+            to="recording"
           >
-            편집
+            녹음 추가
           </Button>
         </Grid>
         <Grid item xs={4}>
@@ -79,8 +75,9 @@ function Preview(props) {
             variant="contained"
             component={Link}
             to={`playing/${id}`}
+            disabled={!(id && id !== 0)}
           >
-            재생
+            녹음 재생
           </Button>
         </Grid>
         <Grid item xs={4}>
@@ -90,8 +87,9 @@ function Preview(props) {
             color="primary"
             variant="contained"
             onClick={onLock}
+            disabled={!(id && id !== 0)}
           >
-            잠금
+            파일 잠금
           </Button>
         </Grid>
       </Grid>
