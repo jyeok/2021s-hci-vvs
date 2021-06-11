@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
-import { Grid, TextField } from "@material-ui/core";
+import { Grid, TextField, Button, Menu, MenuItem } from "@material-ui/core";
 import { ArrowBack } from "@material-ui/icons";
 import HelpIcon from "@material-ui/icons/Help";
+import { DropdownButton, Dropdown } from "react-bootstrap";
 
 import { useQuery } from "@apollo/client";
 import AudioPlayer from "react-h5-audio-player";
@@ -24,7 +25,7 @@ const PlayingRecord = () => {
   const goBack = () => {
     history.goBack();
   };
-
+  const [anchorEl, setAnchorEl] = React.useState(null);
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
@@ -32,16 +33,29 @@ const PlayingRecord = () => {
 
   const newData = data.recordById.content.map((e) => e.content);
 
-  const finalCompressData = newData.reduce((acc, cur) => `${acc} ${cur}`, "");
+  const finalQuestionData = newData.reduce((acc, cur) => `${acc} ${cur}`, "");
+
+  const textrank = new TextRank(newData);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleValue = (e) => {
     e.preventDefault();
     // eslint-disable-next-line no-unused-vars
     const questionInput = e.target.question.value;
-    answerQuestion(finalCompressData, questionInput);
+    answerQuestion(finalQuestionData, questionInput);
   };
-
-  const textrank = new TextRank(newData);
+  const SelectItem = (eventKey) => {
+    const numOfSentence = eventKey.target.value;
+    // eslint-disable-next-line no-alert
+    alert(textrank.getSummarizedText(numOfSentence));
+    setAnchorEl(null);
+  };
 
   return (
     <Grid container padding={15} style={{ border: "1px solid" }}>
@@ -51,19 +65,39 @@ const PlayingRecord = () => {
         style={({ borderBottom: "0.5px solid" }, { height: "50px" })}
       >
         <ArrowBack onClick={goBack} />
-        <button
-          type="button"
+        <Button
+          aria-controls="compressAll"
+          aria-haspopup="true"
+          onMouseEnter={handleClick}
           style={{ float: "right" }}
-          onClick={() => {
-            // eslint-disable-next-line no-alert
-            alert(textrank.getSummarizedThreeText());
-          }}
         >
-          전체 요약
-        </button>
-        <button type="button" style={{ float: "right" }}>
-          선택 요약
-        </button>
+          전체요약
+        </Button>
+        <Menu
+          id="compressAll"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={SelectItem} value={1}>
+            1
+          </MenuItem>
+          <MenuItem onClick={SelectItem} value={2}>
+            2
+          </MenuItem>
+          <MenuItem onClick={SelectItem} value={3}>
+            3
+          </MenuItem>
+          <MenuItem onClick={SelectItem} value={4}>
+            4
+          </MenuItem>
+          <MenuItem onClick={SelectItem} value={5}>
+            5
+          </MenuItem>
+        </Menu>
+
+        <Button style={{ float: "right" }}>선택요약</Button>
       </Grid>
       <Grid
         item
