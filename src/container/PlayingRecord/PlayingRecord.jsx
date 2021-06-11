@@ -10,7 +10,6 @@ import { DropdownButton, Dropdown } from "react-bootstrap";
 import { useQuery } from "@apollo/client";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
-import { compression } from "api/ai/compression";
 import { answerQuestion } from "api/ai/answerQuestion";
 import TextRank from "api/ai/summarization";
 import MessageHolder from "../MessageHolder/MessageHolder";
@@ -48,7 +47,10 @@ const PlayingRecord = () => {
     e.preventDefault();
     // eslint-disable-next-line no-unused-vars
     const questionInput = e.target.question.value;
-    answerQuestion(finalQuestionData, questionInput);
+    answerQuestion(finalQuestionData, questionInput).then((result) => {
+      // eslint-disable-next-line no-alert
+      alert(result);
+    });
   };
   const SelectItem = (eventKey) => {
     const numOfSentence = eventKey.target.value;

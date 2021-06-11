@@ -143,7 +143,6 @@ class TextRank {
         }
       }
     }
-    console.log(ranking);
 
     var returnString = "";
     for (var i = 0; i < n; i++) {
