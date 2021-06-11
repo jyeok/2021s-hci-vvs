@@ -65,7 +65,7 @@ node index.js
 
 ## External APIs/Libraries
 
-[Chonky] (https://chonky.io/docs/2.x/)
+[Chonky](https://chonky.io/docs/2.x/)
 
 [Voice Recorder](https://www.npmjs.com/package/react-voice-recorder)
 
@@ -73,7 +73,7 @@ node index.js
 
 [prisma GraphQL Sevrer Example](https://github.com/prisma/prisma-examples/tree/latest/typescript/graphql)
 
-[react-h5-audio-player] (https://github.com/lhz516/react-h5-audio-player)
+[react-h5-audio-player](https://github.com/lhz516/react-h5-audio-player)
 
 [react-mic] (https://github.com/hackingbeauty/react-mic)
 

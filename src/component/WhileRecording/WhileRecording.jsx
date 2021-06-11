@@ -1,16 +1,24 @@
-/* eslint-disable*/
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
 import { useMutation } from "@apollo/client";
 import { ReactMic } from "react-mic";
 
 import { Grid, TextField, Button } from "@material-ui/core";
-import { Delete, SaveAlt, ArrowBack, RadioRounded } from "@material-ui/icons";
+import { Delete, SaveAlt, ArrowBack } from "@material-ui/icons";
+
+import { getTextBlocks } from "api/ai/simpleTTS";
+// eslint-disable-next-line no-unused-vars
+import { mutations } from "api/gql/schema";
 
 import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
 
-import { getTextBlocks } from "api/ai/simpleTTS";
-import { mutations } from "api/gql/schema";
+const generateTextBlock = async (base64Data) => {
+  const { data, dataType, codecs, encoding } = base64Data;
+  const textBlocks = await getTextBlocks(data, dataType, codecs, encoding);
+
+  return textBlocks;
+};
 
 const splitBase64String = (base64String) => {
   const [dataType, codecs, encoding, data] = base64String.split(/;|,/);
@@ -29,24 +37,18 @@ const onStop = async (data, setVoice, setTextBlockData) => {
 
   reader.onloadend = async () => {
     const base64Data = splitBase64String(reader.result);
-    const { dataType, codecs, encoding, data } = base64Data;
+    const { data: voiceData } = base64Data;
     const textBlockData = await generateTextBlock(base64Data);
 
-    setVoice(data);
+    setVoice(voiceData);
     setTextBlockData(textBlockData);
-
-    console.log("dataType :>> ", dataType);
-    console.log("codecs :>> ", codecs);
-    console.log("encoding :>> ", encoding);
-    console.log("data :>> ", data);
-    console.log("textBlockData :>> ", textBlockData);
   };
 
   reader.readAsDataURL(blob);
 };
 
 const onInputChange = (e, inputState, setInputState) => {
-  const name = e.target.name;
+  const { name } = e.target;
   const newInputState = {
     ...inputState,
   };
@@ -55,22 +57,49 @@ const onInputChange = (e, inputState, setInputState) => {
   setInputState(newInputState);
 };
 
-const onSave = (e, inputData, textBlockData, voice) => {
-  if (!voice) alert("녹음이 완료되지 않았습니다!");
+const onSave = (
+  inputData,
+  textBlockData,
+  voiceData,
+  addRecordMutation,
+  goBackHandler
+) => {
+  if (!voiceData) alert("녹음이 완료되지 않았습니다!");
+  if (!inputData.title) alert("제목을 입력하세요!");
+  // TODO: change to popup
   else {
-    console.log("e :>> ", e);
-    console.log("inputData :>> ", inputData);
-    console.log("textBlockData :>> ", textBlockData);
-    console.log("voice :>> ", voice);
+    const textBlockCreateInput = textBlockData.map((block) => ({
+      content: block.content,
+      isMine: 1,
+      isHighlighted: 0,
+      isModified: 0,
+      reliability: block.reliability,
+      start: block.start,
+      end: block.end,
+    }));
+
+    const recordCreateInput = {
+      path: inputData.title,
+      title: inputData.title,
+      size: Number.parseInt(Math.ceil((voiceData.length * 3) / 4 - 2), 10),
+      tag: inputData.tag,
+      memo: inputData.memo,
+      voice: voiceData,
+      content: textBlockCreateInput,
+    };
+
+    console.log("recordCreateInput :>> ", recordCreateInput);
+
+    addRecordMutation({
+      variables: {
+        data: recordCreateInput,
+      },
+    })
+      .then(() => goBackHandler())
+      .catch((e) => {
+        console.log("e :>> ", e);
+      });
   }
-};
-
-const generateTextBlock = async (base64Data) => {
-  const { data, dataType, codecs, encoding } = base64Data;
-
-  const textBlocks = await getTextBlocks(data, dataType, codecs, encoding);
-
-  return textBlocks;
 };
 
 const WhileRecording = () => {
@@ -84,6 +113,8 @@ const WhileRecording = () => {
   const [recording, setRecording] = useState(false);
   const [textBlockData, setTextBlockData] = useState([]);
   const [voice, setVoice] = useState(undefined);
+
+  const [addRecordMutation] = useMutation(mutations.addRecord);
 
   const { title, memo, tag } = inputState;
 
@@ -128,7 +159,15 @@ const WhileRecording = () => {
           <Delete fontSize="large" onClick={goBackHandler} />
           <SaveAlt
             fontSize="large"
-            onClick={(e) => onSave(e, inputState, textBlockData, voice)}
+            onClick={() =>
+              onSave(
+                inputState,
+                textBlockData,
+                voice,
+                addRecordMutation,
+                goBackHandler
+              )
+            }
           />
         </Grid>
       </Grid>
