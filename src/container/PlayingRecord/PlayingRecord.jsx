@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useRef } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
 import { Grid, TextField } from "@material-ui/core";
@@ -12,10 +12,13 @@ import "react-h5-audio-player/lib/styles.css";
 import { compression } from "api/ai/compression";
 import { answerQuestion } from "api/ai/answerQuestion";
 import TextRank from "api/ai/summarization";
+import { base64StringToBlob } from "blob-util";
+
 import MessageHolder from "../MessageHolder/MessageHolder";
 import { queries } from "../../api/gql/schema";
 
 const PlayingRecord = () => {
+  const audioRef = useRef();
   const recordId = parseInt(useParams().id, 10);
   const { loading, error, data } = useQuery(queries.recordById, {
     variables: { id: recordId },
@@ -42,6 +45,15 @@ const PlayingRecord = () => {
   };
 
   const textrank = new TextRank(newData);
+
+  // console.log(temp);
+  const dataType = "data:audio/webm;";
+  const codecs = "codecs=opus";
+  const encoding = "base64";
+  const url = `${dataType};${codecs};${encoding},{data.recordById.voice}`;
+
+  const blob = base64StringToBlob(data.recordById.voice, dataType + codecs);
+  const temp = URL.createObjectURL(blob);
 
   return (
     <Grid container padding={15} style={{ border: "1px solid" }}>
@@ -83,7 +95,21 @@ const PlayingRecord = () => {
           ))}
       </Grid>
       <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
-        <AudioPlayer src={data.recordById.voice} />
+        <AudioPlayer
+          autoplay
+          src={temp}
+          ref={audioRef}
+          onLoadedMetaData={() => {
+            const aud = audioRef.current.audio.current;
+            if (aud.duration === Infinity) {
+              aud.currentTime = 1e101;
+            }
+          }}
+          onLoadedData={() => {
+            const aud = audioRef.current.audio.current;
+            aud.currentTime = 0;
+          }}
+        />
       </Grid>
       <Grid item xs={1}>
         <HelpIcon fontSize="large" />
