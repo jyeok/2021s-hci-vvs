@@ -92,7 +92,7 @@ export const mutations = {
   addRecord: gql`
     ${fragments.allRecordFields}
     ${fragments.allTextBlockFields}
-    mutation addRecord($data: RecrodCreateInput!) {
+    mutation addRecord($data: RecordCreateInput!) {
       addRecord(data: $data) {
         ...allRecordFields
         content {

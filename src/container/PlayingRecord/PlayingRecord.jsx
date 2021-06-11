@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 /* eslint-disable no-unused-vars */
 import React from "react";
 import { useParams, useHistory } from "react-router-dom";
@@ -12,6 +13,7 @@ import "react-h5-audio-player/lib/styles.css";
 import { compression } from "api/ai/compression";
 import { answerQuestion } from "api/ai/answerQuestion";
 import TextRank from "api/ai/summarization";
+import { base64StringToBlob } from "blob-util";
 import MessageHolder from "../MessageHolder/MessageHolder";
 import { queries } from "../../api/gql/schema";
 
@@ -40,6 +42,17 @@ const PlayingRecord = () => {
     const questionInput = e.target.question.value;
     answerQuestion(finalCompressData, questionInput);
   };
+
+  // console.log(temp);
+  const dataType = "data:audio/webm;";
+  const codecs = "codecs=opus";
+  const encoding = "base64";
+  const url = `${dataType};${codecs};${encoding},{data.recordById.voice}`;
+
+  const blob = base64StringToBlob(data.recordById.voice, dataType + codecs);
+  console.log(blob);
+  const temp = URL.createObjectURL(blob);
+  console.log("temp :>> ", temp);
 
   const textrank = new TextRank(newData);
 
@@ -83,7 +96,7 @@ const PlayingRecord = () => {
           ))}
       </Grid>
       <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
-        <AudioPlayer src={data.recordById.voice} />
+        <AudioPlayer src={temp} preload="metadata" />
       </Grid>
       <Grid item xs={1}>
         <HelpIcon fontSize="large" />
