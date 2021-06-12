@@ -4,6 +4,7 @@ import { FullFileBrowser } from "chonky";
 
 import { Grid } from "@material-ui/core";
 import { DropzoneDialogBase } from "material-ui-dropzone";
+// import { useSnackbar } from "notistack";
 
 import Preview from "container/Preview/Preview";
 import { queries, mutations } from "api/gql/schema";
@@ -51,6 +52,8 @@ const Explorer = () => {
   });
   const [open, setOpen] = useState(false);
   const [upload, setUpload] = useState({});
+
+  // const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     setFiles(data);
