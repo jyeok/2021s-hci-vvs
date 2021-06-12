@@ -8,6 +8,7 @@ import { Delete, SaveAlt, ArrowBack } from "@material-ui/icons";
 import { useSnackbar } from "notistack";
 
 import { getTextBlocks } from "api/ai/simpleTTS";
+import { compression } from "api/ai/compression";
 import { mutations } from "api/gql/schema";
 
 import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
@@ -95,11 +96,29 @@ const WhileRecording = () => {
         end: block.end,
       }));
 
+      const allContents = textBlockData
+        .reduce((acc, cur) => `${acc} ${cur.content}`, "")
+        .trim();
+
+      const userTag = inputState.tag.trim()
+        ? inputState.tag
+            .split(" ")
+            .map((e) => (e.startsWith("#") ? e : `#${e}`))
+        : [];
+
+      const getTags = await compression(allContents);
+      const tagList = getTags.return_object.keylists.map((e) =>
+        e.keyword.startsWith("#") ? e.keyword : `#${e.keyword}`
+      );
+
+      const tagConcat = userTag.concat(tagList);
+      const finalTag = [...new Set(tagConcat)].join(" ").trim();
+
       const recordCreateInput = {
         path: inputState.title,
         title: inputState.title,
         size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
-        tag: inputState.tag,
+        tag: finalTag,
         memo: inputState.memo,
         content: textBlockCreateInput,
         voice,
@@ -216,10 +235,10 @@ const WhileRecording = () => {
             variant="outlined"
             multiline
             rows={8}
-            placeholder="녹음이 종료되면 키워드가 생성됩니다. 직접 추가할 수도 있습니다."
-            fullWidth
+            placeholder="녹음이 종료되면 키워드가 생성됩니다. 직접 추가할 수도 있습니다. 예시: #약속 #밥"
             name="tag"
             value={tag}
+            fullWidth
             onChange={inputChangeHandler}
           />
         </div>
