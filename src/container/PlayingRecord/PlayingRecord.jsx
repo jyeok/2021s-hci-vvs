@@ -35,10 +35,6 @@ const PlayingRecord = () => {
     variables: { id: recordId },
   });
 
-  const messageStyle = {
-    color: yellow,
-  };
-
   const [updateTextMutation, { loading2, error2 }] = useMutation(
     mutations.updateTextBlock
   );
@@ -118,12 +114,12 @@ const PlayingRecord = () => {
     });
   }
 
-  function handleBookMark(textId) {
+  function handleBookMark(textId, highlight) {
     updateTextMutation({
       variables: {
         id: textId,
         data: {
-          isHighlighted: 1,
+          isHighlighted: 1 - highlight,
         },
       },
     });
@@ -187,8 +183,8 @@ const PlayingRecord = () => {
             key={`${recordId + i * 10}`}
             title={
               <>
-                <Button onClick={() => handleBookMark(e.id)}>
-                  북마크 추가
+                <Button onClick={() => handleBookMark(e.id, e.isHighlighted)}>
+                  {e.isHighlighted ? "북마크 제거" : "북마크 추가"}
                 </Button>
                 <Button onClick={handleTextOpen}>텍스트 편집</Button>
                 <Dialog
