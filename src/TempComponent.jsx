@@ -1,59 +1,45 @@
 /* eslint-disable */
 
-import React, { Component } from "react";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import AudioStreamer from "./Util";
 
-class TempComponent extends Component {
-  constructor(props) {
-    super(props);
+const onStart = (setRecording) => {
+  // if (this.props.onStart) {
+  //   this.props.onStart();
+  // }
 
-    this.state = {
-      recording: false,
-    };
+  setRecording(true);
 
-    this.onStart = this.onStart.bind(this);
-    this.onStop = this.onStop.bind(this);
-  }
-
-  onStart() {
-    if (this.props.onStart) {
-      this.props.onStart();
+  AudioStreamer.initRecording(
+    (data) => {
+      // if (this.props.onUpdate) {
+      //   this.props.onUpdate(data);
+      // }
+    },
+    (error) => {
+      console.error("Error when recording", error);
+      setRecording(false);
     }
+  );
+};
 
-    this.setState({
-      recording: true,
-    });
+const onStop = (setRecording) => {
+  setRecording(false);
+  AudioStreamer.stopRecording();
+  // if (this.props.onStop) {
+  //   this.props.onStop();
+  // }
+};
 
-    AudioStreamer.initRecording(
-      (data) => {
-        // if (this.props.onUpdate) {
-        //   this.props.onUpdate(data);
-        // }
-      },
-      (error) => {
-        console.error("Error when recording", error);
-        this.setState({ recording: false });
-        // No further action needed, as this already closes itself on error
-      }
-    );
-  }
-
-  onStop() {
-    this.setState({ recording: false });
-    AudioStreamer.stopRecording();
-    if (this.props.onStop) {
-      this.props.onStop();
-    }
-  }
-
-  render() {
-    return (
-      <div>
-        <button onClick={() => this.onStart()}> Click </button>
-        <button onClick={() => this.onStop()}> Stop </button>
-      </div>
-    );
-  }
-}
+const TempComponent = () => {
+  const [recording, setRecording] = useState(false);
+  return (
+    <div>
+      <button onClick={() => onStart(setRecording)}> Click </button>
+      <button onClick={() => onStop(setRecording)}> Stop </button>
+    </div>
+  );
+};
 
 export default TempComponent;
