@@ -6,22 +6,20 @@ import { Grid } from "@material-ui/core";
 import { DropzoneDialogBase } from "material-ui-dropzone";
 import { useSnackbar } from "notistack";
 
-import Preview from "container/Preview/Preview";
 import { queries, mutations } from "api/gql/schema";
-import { fileToFilemap, getFolderChain } from "./Util";
+import Preview from "container/Preview/Preview";
+import Loading from "container/Loading/Loading";
+
 import { onFileAction, extraActions } from "./ChonkyOptions";
+import { fileToFilemap, getFolderChain } from "./Util";
 
 const Explorer = () => {
-  const { loading, error, data, refetch, networkStatus } = useQuery(
-    queries.allRecords,
-    {
-      fetchPolicy: "network-only",
-    }
-  );
+  const { loading, error, data, refetch } = useQuery(queries.allRecords, {
+    fetchPolicy: "network-only",
+  });
   const [uploadMutation] = useMutation(mutations.uploadRecord);
 
   const [files, setFiles] = useState(data);
-  const [netStat, setNetStat] = useState(networkStatus);
   const [currSelect, setCurrSelect] = useState({
     id: undefined,
     memo: undefined,
@@ -35,14 +33,18 @@ const Explorer = () => {
 
   useEffect(() => {
     setFiles(data);
-    setNetStat(networkStatus);
-  }, [data, networkStatus]);
+  }, [data]);
 
-  if (loading) return <div> Loading... </div>;
-  if (error) return <div> error! {netStat.message}</div>;
+  if (loading) return <Loading message="파일을 로딩중입니다." transparent />;
+  if (error)
+    return (
+      <Loading
+        error
+        message="파일을 로드할 수 없습니다! 인터넷 연결을 확인해 주세요."
+      />
+    );
   if (!files) {
     setFiles(data);
-    setNetStat(networkStatus);
   }
 
   const onFileSave = () => {
