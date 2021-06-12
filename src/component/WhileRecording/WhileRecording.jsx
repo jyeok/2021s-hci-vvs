@@ -105,19 +105,39 @@ const WhileRecording = () => {
         voice,
       };
 
-      const res = await addRecordMutation({
-        variables: {
-          data: recordCreateInput,
-        },
-      });
+      try {
+        const res = await addRecordMutation({
+          variables: {
+            data: recordCreateInput,
+          },
+        });
 
-      await generatePreviewMutation({
-        variables: {
-          id: res.data.addRecord.id,
-        },
-      });
+        await generatePreviewMutation({
+          variables: {
+            id: res.data.addRecord.id,
+          },
+        });
 
-      goBackHandler();
+        enqueueSnackbar("녹음이 완료되었습니다.", {
+          variant: "success",
+        });
+        goBackHandler();
+      } catch (err) {
+        if (err.message.includes("Unique constraint failed")) {
+          enqueueSnackbar("이미 존재하는 제목입니다. 제목을 수정해 주세요.", {
+            variant: "error",
+          });
+        } else if (err.message.includes("Failed to fetch")) {
+          enqueueSnackbar("인터넷 연결을 확인해 주세요.", {
+            variant: "error",
+          });
+        } else {
+          enqueueSnackbar(
+            "알 수 없는 오류가 발생했습니다. 다시 시도해 주세요.",
+            { variant: "error" }
+          );
+        }
+      }
     }
   };
 
