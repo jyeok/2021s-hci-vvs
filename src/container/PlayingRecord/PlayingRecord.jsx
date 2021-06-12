@@ -151,7 +151,6 @@ const PlayingRecord = () => {
           aria-controls="compressAll"
           aria-haspopup="true"
           onMouseEnter={handleClick}
-          onMouseLeave={handleClose}
           style={{ float: "right" }}
         >
           전체요약
@@ -259,8 +258,8 @@ const PlayingRecord = () => {
         <Button>{speed.toFixed(1)}x</Button>
         <Button onClick={fastPlaybackSpeed}>+</Button>
       </Grid>
-      <Grid item xs={1}>
-        <HelpIcon fontSize="large" />
+      <Grid item xs={1} justify-content="center">
+        <HelpIcon fontSize="large" alignItems="center" />
       </Grid>
       <Grid item xs={11}>
         <form onSubmit={handleValue}>
