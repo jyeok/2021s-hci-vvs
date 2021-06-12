@@ -9,18 +9,21 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Dialog,
+  DialogActions,
+  DialogContent,
 } from "@material-ui/core";
 import { ArrowBack } from "@material-ui/icons";
 import HelpIcon from "@material-ui/icons/Help";
 
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import { answerQuestion } from "api/ai/answerQuestion";
 import TextRank from "api/ai/summarization";
 import { base64StringToBlob } from "blob-util";
 
-import { separateOperations } from "graphql";
+// import { separateOperations } from "graphql";
 import MessageHolder from "../MessageHolder/MessageHolder";
 import { queries, mutations } from "../../api/gql/schema";
 
@@ -30,13 +33,20 @@ const PlayingRecord = () => {
   const { loading, error, data } = useQuery(queries.recordById, {
     variables: { id: recordId },
   });
+
+  const [updateTextMutation] = useMutation(mutations.updateTextBlock);
+
   const history = useHistory();
   const goBack = () => {
     history.goBack();
   };
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
+  const [editTextOpen, editTextsetOpen] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [textB, setTextB] = useState("");
+
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
@@ -75,12 +85,31 @@ const PlayingRecord = () => {
   const handleTooltipOpen = () => {
     setOpen(true);
   };
-  const changePlaybackSpeed = () => {
+  const slowPlaybackSpeed = () => {
+    setSpeed(speed - 0.1);
+    audioRef.current.audio.current.playbackRate = speed;
+  };
+  const fastPlaybackSpeed = () => {
     setSpeed(speed + 0.1);
     audioRef.current.audio.current.playbackRate = speed;
-    //   console.log(audioRef.current.audio.current.playbackRate);
   };
-  // console.log(temp);
+  const handleTextOpen = () => {
+    editTextsetOpen(true);
+  };
+  const handleTextClose = () => {
+    editTextsetOpen(false);
+  };
+
+  function updateText(newContent, textId) {
+    updateTextMutation({
+      variables: {
+        id: textId,
+        data: {
+          content: newContent,
+        },
+      },
+    });
+  }
   const dataType = "data:audio/webm;";
   const codecs = "codecs=opus";
   const encoding = "base64";
@@ -128,25 +157,61 @@ const PlayingRecord = () => {
             5
           </MenuItem>
         </Menu>
-
-        <Button style={{ float: "right" }}>선택요약</Button>
       </Grid>
       <Grid
         item
         xs={12}
         style={{ borderBottom: "0.5px solid", height: "500px" }}
       >
-        {data.recordById &&
-          data.recordById.content.map((e, i) => (
-            <MessageHolder
-              key={`${recordId + i * 2}`}
-              id={e.id}
-              content={e.content}
-              isMine={e.isMine}
-              start={e.start}
-              isHighlighted={e.isHighlighted}
-            />
-          ))}
+        {data.recordById?.content.map((e, i) => (
+          <Tooltip
+            interactive
+            key={`${recordId + i * 10}`}
+            title={
+              <>
+                <Button>북마크 추가</Button>
+                <Button onClick={handleTextOpen}>텍스트 편집</Button>
+                <Dialog
+                  open={editTextOpen}
+                  onClose={handleTextClose}
+                  fullWidth
+                  maxWidth="lg"
+                >
+                  <DialogContent>
+                    <TextField
+                      autoFocus
+                      margin="dense"
+                      label="수정할 텍스트 입력"
+                      defaultValue={e.content}
+                      fullWidth
+                      maxWidth="lg"
+                      onChange={(er) => {
+                        setTextB(er.target.value);
+                      }}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleTextClose}>취소</Button>
+                    <Button onClick={() => updateText(textB, e.id)}>
+                      확인
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+              </>
+            }
+          >
+            <div>
+              <MessageHolder
+                key={`${recordId + i * 20000}`}
+                id={e.id}
+                content={e.content}
+                isMine={e.isMine}
+                start={e.start}
+                isHighlighted={e.isHighlighted}
+              />
+            </div>
+          </Tooltip>
+        ))}
       </Grid>
       <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
         <AudioPlayer
@@ -165,7 +230,9 @@ const PlayingRecord = () => {
             aud.playbackRate = speed;
           }}
         />
-        <Button onClick={changePlaybackSpeed}>{speed}x</Button>
+        <Button onClick={slowPlaybackSpeed}>-</Button>
+        <Button>{speed.toFixed(1)}x</Button>
+        <Button onClick={fastPlaybackSpeed}>+</Button>
       </Grid>
       <Grid item xs={1}>
         <HelpIcon fontSize="large" />
