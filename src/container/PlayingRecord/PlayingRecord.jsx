@@ -132,6 +132,13 @@ const PlayingRecord = () => {
   const blob = base64StringToBlob(data.recordById.voice, dataType + codecs);
   const temp = URL.createObjectURL(blob);
 
+  const playText = (d) => {
+    const aud = audioRef.current.audio.current;
+    const dd = d.split(":").map((e) => parseInt(e, 10));
+    const curTime = dd[0] * 60 + dd[1];
+    aud.currentTime = curTime;
+  };
+
   return (
     <Grid container padding={15} style={{ border: "1px solid" }}>
       <Grid
@@ -144,6 +151,7 @@ const PlayingRecord = () => {
           aria-controls="compressAll"
           aria-haspopup="true"
           onMouseEnter={handleClick}
+          onMouseLeave={handleClose}
           style={{ float: "right" }}
         >
           전체요약
@@ -183,6 +191,7 @@ const PlayingRecord = () => {
             key={`${recordId + i * 10}`}
             title={
               <>
+                <Button onClick={() => playText(e.start)}>텍스트 재생</Button>
                 <Button onClick={() => handleBookMark(e.id, e.isHighlighted)}>
                   {e.isHighlighted ? "북마크 제거" : "북마크 추가"}
                 </Button>
@@ -216,7 +225,7 @@ const PlayingRecord = () => {
               </>
             }
           >
-            <p1 onClick={console.log(e.content)}>
+            <div>
               <MessageHolder
                 key={`${recordId + i * 20000}`}
                 id={e.id}
@@ -225,7 +234,7 @@ const PlayingRecord = () => {
                 start={e.start}
                 isHighlighted={e.isHighlighted}
               />
-            </p1>
+            </div>
           </Tooltip>
         ))}
       </Grid>
