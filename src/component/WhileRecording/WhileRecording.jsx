@@ -103,12 +103,12 @@ const WhileRecording = () => {
       const userTag = inputState.tag.trim()
         ? inputState.tag
             .split(" ")
-            .map((e) => (e.startsWith("#") ? e : `#${e}`))
+            .map((e) => (e.startsWith("#") ? e.trim() : `#${e.trim()}`))
         : [];
 
       const getTags = await compression(allContents);
       const tagList = getTags.return_object.keylists.map((e) =>
-        e.keyword.startsWith("#") ? e.keyword : `#${e.keyword}`
+        e.keyword.startsWith("#") ? e.keyword.trim() : `#${e.keyword.trim()}`
       );
 
       const tagConcat = userTag.concat(tagList);
