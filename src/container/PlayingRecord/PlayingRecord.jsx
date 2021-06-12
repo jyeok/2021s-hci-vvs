@@ -12,6 +12,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  Modal,
 } from "@material-ui/core";
 import { ArrowBack, Message } from "@material-ui/icons";
 import HelpIcon from "@material-ui/icons/Help";
@@ -49,6 +50,7 @@ const PlayingRecord = () => {
   const [editTextOpen, editTextsetOpen] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [textB, setTextB] = useState("");
+  const [summary, setSummary] = useState(true);
 
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
@@ -76,11 +78,21 @@ const PlayingRecord = () => {
       alert(result);
     });
   };
+
+  const sumClose = () => {
+    setSummary(false);
+  };
   const SelectItem = (eventKey) => {
     const numOfSentence = eventKey.target.value;
-    // eslint-disable-next-line no-alert
-    alert(textrank.getSummarizedText(numOfSentence));
+    console.log(textrank.getSummarizedText(numOfSentence));
     setAnchorEl(null);
+    return textrank.getSummarizedText(numOfSentence);
+    // <Dialog open={open} onClose={sumClose}>
+    //   <DialogContent>{textrank.getSummarizedText(numOfSentence)}</DialogContent>
+    //   <DialogActions>
+    //     <Button onClick={sumClose}>확인</Button>
+    //   </DialogActions>
+    // </Dialog>;
   };
   const handleTooltipClose = () => {
     setOpen(false);
@@ -124,6 +136,18 @@ const PlayingRecord = () => {
       },
     });
   }
+
+  function textLocation(textId, mine) {
+    updateTextMutation({
+      variables: {
+        id: textId,
+        data: {
+          isMine: 1 - mine,
+        },
+      },
+    });
+  }
+
   const dataType = "data:audio/webm;";
   const codecs = "codecs=opus";
   const encoding = "base64";
@@ -191,10 +215,13 @@ const PlayingRecord = () => {
             title={
               <>
                 <Button onClick={() => playText(e.start)}>텍스트 재생</Button>
+                <Button onClick={handleTextOpen}>텍스트 편집</Button>
+                <Button onClick={() => textLocation(e.id, e.isMine)}>
+                  텍스트 위치 변환
+                </Button>
                 <Button onClick={() => handleBookMark(e.id, e.isHighlighted)}>
                   {e.isHighlighted ? "북마크 제거" : "북마크 추가"}
                 </Button>
-                <Button onClick={handleTextOpen}>텍스트 편집</Button>
                 <Dialog
                   open={editTextOpen}
                   onClose={handleTextClose}
@@ -259,7 +286,7 @@ const PlayingRecord = () => {
         <Button onClick={fastPlaybackSpeed}>+</Button>
       </Grid>
       <Grid item xs={1} justify-content="center">
-        <HelpIcon fontSize="large" alignItems="center" />
+        <HelpIcon fontSize="large" />
       </Grid>
       <Grid item xs={11}>
         <form onSubmit={handleValue}>

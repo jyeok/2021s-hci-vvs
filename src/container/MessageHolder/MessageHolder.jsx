@@ -11,7 +11,7 @@ const MessageHolder = (prop) => {
       model={{
         message: content,
         sentTime: start,
-        direction: isMine ? "incoming" : "outgoing",
+        direction: isMine ? "outgoing" : "incoming",
         position: "single",
       }}
     >
