@@ -1,7 +1,7 @@
 import { intArg, list, nonNull, objectType, stringArg, arg } from 'nexus'
 
 import { Context } from '../context'
-import { Record, TextBlock, Preview, Schedule, DateTime } from './model'
+import { Record, TextBlock, Preview, Schedule } from './model'
 import {
   RecordCreateInput,
   RecordUpdateInput,
@@ -9,8 +9,9 @@ import {
   TextBlockUpdateInput,
   PreviewCreateInput,
   ScheduleCreateInput,
-  ScheduleUpdateInput,
 } from './input'
+
+import { TextRank } from '../util/summarization'
 
 export const Mutation = objectType({
   name: 'Mutation',
@@ -253,24 +254,54 @@ export const Mutation = objectType({
       },
     })
 
-    // t.field('generatePreview', {
-    //   type: Preview,
-    //   args: {
-    //     recordId: nonNull(intArg()),
-    //   },
-    //   resolve: (parent, args, context: Context) => {
-    //     return context.prisma.record
-    //       .findUnique({
-    //         where: {
-    //           id: args.recordId,
-    //         },
-    //       })
-    //       .then((e) => {
-    //         console.log(e)
-    //         // TODO: Generate....
-    //       })
-    //   },
-    // })
+    t.field('generatePreview', {
+      type: Preview,
+      args: {
+        recordId: nonNull(intArg()),
+      },
+      resolve: async (_, args, context: Context) => {
+        const textBlocks = await context.prisma.textBlock.findMany({
+          where: {
+            record: {
+              id: args.recordId,
+            },
+          },
+        })
+
+        const textBlockList = textBlocks.map((e) => ({
+          content: e.content,
+          id: e.id,
+        }))
+
+        const textBlockContents = textBlockList.map((e) => e.content)
+        const sum = new TextRank(textBlockContents)
+        const [excerpt, index] = sum.getSummarizedOneText()
+
+        const start = Math.max(0, index - 1)
+        const end = Math.min(index + 1, textBlockList.length - 1)
+        const connect = []
+
+        for (let i = start; i < end + 1; i++) {
+          connect.push({
+            id: textBlockList[i].id,
+          })
+        }
+
+        return context.prisma.preview.create({
+          data: {
+            voice: '',
+            record: {
+              connect: {
+                id: args.recordId,
+              },
+            },
+            excerpt: {
+              connect: connect,
+            },
+          },
+        })
+      },
+    })
 
     t.field('deleteScheduleById', {
       type: Schedule,

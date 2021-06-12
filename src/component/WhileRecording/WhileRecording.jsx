@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-// eslint-disable-next-line no-unused-vars
 import { useMutation } from "@apollo/client";
 import { ReactMic } from "react-mic";
 
@@ -8,7 +7,6 @@ import { Grid, TextField, Button } from "@material-ui/core";
 import { Delete, SaveAlt, ArrowBack } from "@material-ui/icons";
 
 import { getTextBlocks } from "api/ai/simpleTTS";
-// eslint-disable-next-line no-unused-vars
 import { mutations } from "api/gql/schema";
 
 import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
@@ -57,7 +55,7 @@ const onInputChange = (e, inputState, setInputState) => {
   setInputState(newInputState);
 };
 
-const onSave = (
+const onSave = async (
   inputData,
   textBlockData,
   voiceData,
@@ -88,17 +86,15 @@ const onSave = (
       content: textBlockCreateInput,
     };
 
-    console.log("recordCreateInput :>> ", recordCreateInput);
-
-    addRecordMutation({
+    const res = await addRecordMutation({
       variables: {
         data: recordCreateInput,
       },
-    })
-      .then(() => goBackHandler())
-      .catch((e) => {
-        console.log("e :>> ", e);
-      });
+    });
+
+    console.log("res :>> ", res);
+
+    goBackHandler();
   }
 };
 

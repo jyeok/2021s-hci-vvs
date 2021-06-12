@@ -46,7 +46,6 @@ const PlayingRecord = () => {
 
   const textrank = new TextRank(newData);
 
-  // console.log(temp);
   const dataType = "data:audio/webm;";
   const codecs = "codecs=opus";
   const encoding = "base64";
