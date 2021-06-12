@@ -16,6 +16,7 @@ const MessageHolder = (prop) => {
       }}
     >
       {isHighlighted && <Message.Header>북마크</Message.Header>}
+      <Message.Footer sentTime={start} />
     </Message>
   );
 };

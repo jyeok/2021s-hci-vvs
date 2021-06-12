@@ -216,7 +216,7 @@ const PlayingRecord = () => {
               </>
             }
           >
-            <div>
+            <p1 onClick={console.log(e.content)}>
               <MessageHolder
                 key={`${recordId + i * 20000}`}
                 id={e.id}
@@ -225,7 +225,7 @@ const PlayingRecord = () => {
                 start={e.start}
                 isHighlighted={e.isHighlighted}
               />
-            </div>
+            </p1>
           </Tooltip>
         ))}
       </Grid>
