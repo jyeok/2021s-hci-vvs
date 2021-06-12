@@ -2,7 +2,14 @@
 import React, { useState, useRef } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
-import { Grid, TextField, Button, Menu, MenuItem } from "@material-ui/core";
+import {
+  Grid,
+  TextField,
+  Button,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from "@material-ui/core";
 import { ArrowBack } from "@material-ui/icons";
 import HelpIcon from "@material-ui/icons/Help";
 
@@ -13,8 +20,9 @@ import { answerQuestion } from "api/ai/answerQuestion";
 import TextRank from "api/ai/summarization";
 import { base64StringToBlob } from "blob-util";
 
+import { separateOperations } from "graphql";
 import MessageHolder from "../MessageHolder/MessageHolder";
-import { queries } from "../../api/gql/schema";
+import { queries, mutations } from "../../api/gql/schema";
 
 const PlayingRecord = () => {
   const audioRef = useRef();
@@ -27,13 +35,14 @@ const PlayingRecord = () => {
     history.goBack();
   };
   const [anchorEl, setAnchorEl] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [speed, setSpeed] = useState(1);
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
   if (!data.recordById) goBack();
 
   const newData = data.recordById.content.map((e) => e.content);
-
   const finalQuestionData = newData.reduce((acc, cur) => `${acc} ${cur}`, "");
 
   const textrank = new TextRank(newData);
@@ -60,7 +69,17 @@ const PlayingRecord = () => {
     alert(textrank.getSummarizedText(numOfSentence));
     setAnchorEl(null);
   };
-
+  const handleTooltipClose = () => {
+    setOpen(false);
+  };
+  const handleTooltipOpen = () => {
+    setOpen(true);
+  };
+  const changePlaybackSpeed = () => {
+    setSpeed(speed + 0.1);
+    audioRef.current.audio.current.playbackRate = speed;
+    //   console.log(audioRef.current.audio.current.playbackRate);
+  };
   // console.log(temp);
   const dataType = "data:audio/webm;";
   const codecs = "codecs=opus";
@@ -143,8 +162,10 @@ const PlayingRecord = () => {
           onLoadedData={() => {
             const aud = audioRef.current.audio.current;
             aud.currentTime = 0;
+            aud.playbackRate = speed;
           }}
         />
+        <Button onClick={changePlaybackSpeed}>{speed}x</Button>
       </Grid>
       <Grid item xs={1}>
         <HelpIcon fontSize="large" />
