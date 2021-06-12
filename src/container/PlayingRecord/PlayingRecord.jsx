@@ -13,7 +13,7 @@ import {
   DialogActions,
   DialogContent,
 } from "@material-ui/core";
-import { ArrowBack } from "@material-ui/icons";
+import { ArrowBack, Message } from "@material-ui/icons";
 import HelpIcon from "@material-ui/icons/Help";
 
 import { useQuery, useMutation } from "@apollo/client";
@@ -24,6 +24,7 @@ import TextRank from "api/ai/summarization";
 import { base64StringToBlob } from "blob-util";
 
 // import { separateOperations } from "graphql";
+import { yellow } from "@material-ui/core/colors";
 import MessageHolder from "../MessageHolder/MessageHolder";
 import { queries, mutations } from "../../api/gql/schema";
 
@@ -34,7 +35,13 @@ const PlayingRecord = () => {
     variables: { id: recordId },
   });
 
-  const [updateTextMutation] = useMutation(mutations.updateTextBlock);
+  const messageStyle = {
+    color: yellow,
+  };
+
+  const [updateTextMutation, { loading2, error2 }] = useMutation(
+    mutations.updateTextBlock
+  );
 
   const history = useHistory();
   const goBack = () => {
@@ -110,6 +117,17 @@ const PlayingRecord = () => {
       },
     });
   }
+
+  function handleBookMark(textId) {
+    updateTextMutation({
+      variables: {
+        id: textId,
+        data: {
+          isHighlighted: 1,
+        },
+      },
+    });
+  }
   const dataType = "data:audio/webm;";
   const codecs = "codecs=opus";
   const encoding = "base64";
@@ -169,7 +187,9 @@ const PlayingRecord = () => {
             key={`${recordId + i * 10}`}
             title={
               <>
-                <Button>북마크 추가</Button>
+                <Button onClick={() => handleBookMark(e.id)}>
+                  북마크 추가
+                </Button>
                 <Button onClick={handleTextOpen}>텍스트 편집</Button>
                 <Dialog
                   open={editTextOpen}
