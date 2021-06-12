@@ -5,6 +5,7 @@ import { ReactMic } from "react-mic";
 
 import { Grid, TextField, Button } from "@material-ui/core";
 import { Delete, SaveAlt, ArrowBack } from "@material-ui/icons";
+import { useSnackbar } from "notistack";
 
 import { getTextBlocks } from "api/ai/simpleTTS";
 import { mutations } from "api/gql/schema";
@@ -55,57 +56,9 @@ const onInputChange = (e, inputState, setInputState) => {
   setInputState(newInputState);
 };
 
-const onSave = async (
-  inputData,
-  textBlockData,
-  voiceData,
-  addRecordMutation,
-  generatePreviewMutaton,
-  goBackHandler
-) => {
-  if (!voiceData) alert("녹음이 완료되지 않았습니다!");
-  else if (!inputData.title) alert("제목을 입력하세요!");
-  // TODO: change to popup
-  // TODO: Check existing title
-  else {
-    const textBlockCreateInput = textBlockData.map((block) => ({
-      content: block.content,
-      isMine: 1,
-      isHighlighted: 0,
-      isModified: 0,
-      reliability: block.reliability,
-      start: block.start,
-      end: block.end,
-    }));
-
-    const recordCreateInput = {
-      path: inputData.title,
-      title: inputData.title,
-      size: Number.parseInt(Math.ceil((voiceData.length * 3) / 4 - 2), 10),
-      tag: inputData.tag,
-      memo: inputData.memo,
-      voice: voiceData,
-      content: textBlockCreateInput,
-    };
-
-    const res = await addRecordMutation({
-      variables: {
-        data: recordCreateInput,
-      },
-    });
-
-    await generatePreviewMutaton({
-      variables: {
-        id: res.data.addRecord.id,
-      },
-    });
-
-    goBackHandler();
-  }
-};
-
 const WhileRecording = () => {
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [inputState, setInputState] = useState({
     title: "",
@@ -123,6 +76,50 @@ const WhileRecording = () => {
 
   const inputChangeHandler = (e) => onInputChange(e, inputState, setInputState);
   const goBackHandler = () => history.goBack();
+
+  const onSave = async () => {
+    if (!voice)
+      enqueueSnackbar("녹음이 완료되지 않았습니다!", {
+        variant: "warning",
+      });
+    else if (!inputState.title)
+      enqueueSnackbar("제목을 입력하세요!", { variant: "error" });
+    else {
+      const textBlockCreateInput = textBlockData.map((block) => ({
+        content: block.content,
+        isMine: 1,
+        isHighlighted: 0,
+        isModified: 0,
+        reliability: block.reliability,
+        start: block.start,
+        end: block.end,
+      }));
+
+      const recordCreateInput = {
+        path: inputState.title,
+        title: inputState.title,
+        size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
+        tag: inputState.tag,
+        memo: inputState.memo,
+        content: textBlockCreateInput,
+        voice,
+      };
+
+      const res = await addRecordMutation({
+        variables: {
+          data: recordCreateInput,
+        },
+      });
+
+      await generatePreviewMutation({
+        variables: {
+          id: res.data.addRecord.id,
+        },
+      });
+
+      goBackHandler();
+    }
+  };
 
   return (
     <Grid container padding={15} style={{ border: "1px solid" }}>

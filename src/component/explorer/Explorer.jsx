@@ -4,34 +4,12 @@ import { FullFileBrowser } from "chonky";
 
 import { Grid } from "@material-ui/core";
 import { DropzoneDialogBase } from "material-ui-dropzone";
-// import { useSnackbar } from "notistack";
+import { useSnackbar } from "notistack";
 
 import Preview from "container/Preview/Preview";
 import { queries, mutations } from "api/gql/schema";
 import { fileToFilemap, getFolderChain } from "./Util";
 import { onFileAction, extraActions } from "./ChonkyOptions";
-
-const onFileSave = (upload, setUpload, uploadMutation, setOpen, refetch) => {
-  const { file } = upload[0];
-
-  const uploadInterface = {
-    path: file.path,
-    title: file.name.substring(0, file.name.lastIndexOf(".")),
-    size: file.size,
-    voice: upload[0].data,
-  };
-
-  uploadMutation({ variables: uploadInterface })
-    .then(() => {
-      setOpen(false);
-      setUpload({});
-      refetch();
-    })
-    .catch(() => {
-      // eslint-disable-next-line no-alert
-      alert("중복된 파일이 있습니다!"); // TODO: Replace this!
-    });
-};
 
 const Explorer = () => {
   const { loading, error, data, refetch, networkStatus } = useQuery(
@@ -53,7 +31,7 @@ const Explorer = () => {
   const [open, setOpen] = useState(false);
   const [upload, setUpload] = useState({});
 
-  // const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     setFiles(data);
@@ -66,6 +44,28 @@ const Explorer = () => {
     setFiles(data);
     setNetStat(networkStatus);
   }
+
+  const onFileSave = () => {
+    const { file } = upload[0];
+
+    const uploadInterface = {
+      path: file.path,
+      title: file.name.substring(0, file.name.lastIndexOf(".")),
+      size: file.size,
+      voice: upload[0].data,
+    };
+
+    (async () => {
+      try {
+        await uploadMutation({ variables: uploadInterface });
+        setOpen(false);
+        setUpload({});
+        refetch();
+      } catch {
+        enqueueSnackbar("중복된 파일이 있습니다!", { variant: "error" });
+      }
+    })();
+  };
 
   const fileMap = files ? fileToFilemap(files.allRecords) : null;
   const { id, memo, tag, content } = currSelect;
@@ -101,9 +101,7 @@ const Explorer = () => {
         open={open}
         onAdd={(newUpload) => setUpload(newUpload)}
         onClose={() => setOpen(false)}
-        onSave={() =>
-          onFileSave(upload, setUpload, uploadMutation, setOpen, refetch)
-        }
+        onSave={() => onFileSave()}
         showPreviews
         showFileNamesInPreview
         filesLimit={1}
