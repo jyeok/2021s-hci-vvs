@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { FullFileBrowser } from "chonky";
 
 import { Grid } from "@material-ui/core";
+import { AudiotrackOutlined } from "@material-ui/icons";
 import { DropzoneDialogBase } from "material-ui-dropzone";
 import { useSnackbar } from "notistack";
 
@@ -63,6 +64,9 @@ const Explorer = () => {
         setOpen(false);
         setUpload({});
         refetch();
+        enqueueSnackbar("파일 업로드가 완료되었습니다.", {
+          variant: "success",
+        });
       } catch {
         enqueueSnackbar("중복된 파일이 있습니다!", { variant: "error" });
       }
@@ -95,18 +99,39 @@ const Explorer = () => {
         />
       </Grid>
       <DropzoneDialogBase
-        dialogTitle="파일을 선택하세요"
-        acceptedFiles={["audio/*"]}
-        fileObjects={upload}
+        dialogTitle="녹음 파일 불러오기"
+        dropzoneText="버튼을 눌러 파일을 선택하거나 아래에 드래그 앤 드롭"
         cancelButtonText="취소"
         submitButtonText="업로드"
+        fileObjects={upload}
         open={open}
+        acceptedFiles={["audio/*"]}
         onAdd={(newUpload) => setUpload(newUpload)}
-        onClose={() => setOpen(false)}
+        onDelete={() => {
+          setUpload({});
+        }}
+        onClose={() => {
+          setUpload({});
+          setOpen(false);
+        }}
         onSave={() => onFileSave()}
-        showPreviews
-        showFileNamesInPreview
+        showPreviews={false}
+        showPreviewsInDropzone
+        showFileNames
+        showAlerts={false}
         filesLimit={1}
+        getFileAddedMessage={(name) =>
+          enqueueSnackbar(
+            `파일 ${name}이 추가되었습니다! 업로드 버튼을 클릭하세요.`,
+            { variant: "info" }
+          )
+        }
+        getFileRemovedMessage={(name) =>
+          enqueueSnackbar(`파일 ${name} 업로드가 취소되었습니다.`, {
+            variant: "default",
+          })
+        }
+        getPreviewIcon={() => <AudiotrackOutlined style={{ fontSize: 40 }} />}
       />
     </Grid>
   );
