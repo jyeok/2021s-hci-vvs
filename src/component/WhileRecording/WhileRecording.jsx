@@ -60,11 +60,13 @@ const onSave = async (
   textBlockData,
   voiceData,
   addRecordMutation,
+  generatePreviewMutaton,
   goBackHandler
 ) => {
   if (!voiceData) alert("녹음이 완료되지 않았습니다!");
-  if (!inputData.title) alert("제목을 입력하세요!");
+  else if (!inputData.title) alert("제목을 입력하세요!");
   // TODO: change to popup
+  // TODO: Check existing title
   else {
     const textBlockCreateInput = textBlockData.map((block) => ({
       content: block.content,
@@ -92,7 +94,11 @@ const onSave = async (
       },
     });
 
-    console.log("res :>> ", res);
+    await generatePreviewMutaton({
+      variables: {
+        id: res.data.addRecord.id,
+      },
+    });
 
     goBackHandler();
   }
@@ -111,6 +117,7 @@ const WhileRecording = () => {
   const [voice, setVoice] = useState(undefined);
 
   const [addRecordMutation] = useMutation(mutations.addRecord);
+  const [generatePreviewMutation] = useMutation(mutations.generatePreview);
 
   const { title, memo, tag } = inputState;
 
@@ -161,6 +168,7 @@ const WhileRecording = () => {
                 textBlockData,
                 voice,
                 addRecordMutation,
+                generatePreviewMutation,
                 goBackHandler
               )
             }

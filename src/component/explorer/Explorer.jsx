@@ -34,7 +34,10 @@ const onFileSave = (upload, setUpload, uploadMutation, setOpen, refetch) => {
 
 const Explorer = () => {
   const { loading, error, data, refetch, networkStatus } = useQuery(
-    queries.allRecords
+    queries.allRecords,
+    {
+      fetchPolicy: "network-only",
+    }
   );
   const [uploadMutation] = useMutation(mutations.uploadRecord);
 

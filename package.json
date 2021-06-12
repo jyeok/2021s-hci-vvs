@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/client": "^3.3.19",
+    "@apollo/client": "^3.3.20",
     "@chatscope/chat-ui-kit-react": "^1.7.2",
     "@chatscope/chat-ui-kit-styles": "^1.2.0",
     "@google-cloud/storage": "^5.8.5",

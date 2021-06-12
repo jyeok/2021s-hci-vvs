@@ -104,6 +104,20 @@ export const mutations = {
       }
     }
   `,
+  generatePreview: gql`
+    mutation generatePreview($id: Int!) {
+      generatePreview(recordId: $id) {
+        id
+        record {
+          id
+        }
+        excerpt {
+          id
+          content
+        }
+      }
+    }
+  `,
 };
 
 export default {
