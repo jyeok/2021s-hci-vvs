@@ -12,7 +12,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  Modal,
 } from "@material-ui/core";
 import { ArrowBack, Message } from "@material-ui/icons";
 import HelpIcon from "@material-ui/icons/Help";
@@ -26,6 +25,7 @@ import { base64StringToBlob } from "blob-util";
 
 // import { separateOperations } from "graphql";
 import { yellow } from "@material-ui/core/colors";
+import { MessageInput } from "@chatscope/chat-ui-kit-react";
 import MessageHolder from "../MessageHolder/MessageHolder";
 import { queries, mutations } from "../../api/gql/schema";
 
@@ -70,12 +70,11 @@ const PlayingRecord = () => {
   };
 
   const handleValue = (e) => {
-    e.preventDefault();
-    // eslint-disable-next-line no-unused-vars
-    const questionInput = e.target.question.value;
+    const questionInput = e;
     answerQuestion(finalQuestionData, questionInput).then((result) => {
-      // eslint-disable-next-line no-alert
-      alert(result);
+      const answerFinal = result[0];
+      const realAnswer = newData.filter((x) => x.indexOf(answerFinal) !== -1);
+      alert(realAnswer);
     });
   };
 
@@ -86,13 +85,8 @@ const PlayingRecord = () => {
     const numOfSentence = eventKey.target.value;
     console.log(textrank.getSummarizedText(numOfSentence));
     setAnchorEl(null);
+
     return textrank.getSummarizedText(numOfSentence);
-    // <Dialog open={open} onClose={sumClose}>
-    //   <DialogContent>{textrank.getSummarizedText(numOfSentence)}</DialogContent>
-    //   <DialogActions>
-    //     <Button onClick={sumClose}>확인</Button>
-    //   </DialogActions>
-    // </Dialog>;
   };
   const handleTooltipClose = () => {
     setOpen(false);
@@ -124,6 +118,7 @@ const PlayingRecord = () => {
         },
       },
     });
+    handleTextClose();
   }
 
   function handleBookMark(textId, highlight) {
@@ -212,8 +207,10 @@ const PlayingRecord = () => {
           <Tooltip
             interactive
             key={`${recordId + i * 10}`}
+            fullWidth
+            maxWidth="ml"
             title={
-              <>
+              <div>
                 <Button onClick={() => playText(e.start)}>텍스트 재생</Button>
                 <Button onClick={handleTextOpen}>텍스트 편집</Button>
                 <Button onClick={() => textLocation(e.id, e.isMine)}>
@@ -235,7 +232,6 @@ const PlayingRecord = () => {
                       label="수정할 텍스트 입력"
                       defaultValue={e.content}
                       fullWidth
-                      maxWidth="lg"
                       onChange={(er) => {
                         setTextB(er.target.value);
                       }}
@@ -248,7 +244,7 @@ const PlayingRecord = () => {
                     </Button>
                   </DialogActions>
                 </Dialog>
-              </>
+              </div>
             }
           >
             <div>
@@ -264,11 +260,12 @@ const PlayingRecord = () => {
           </Tooltip>
         ))}
       </Grid>
-      <Grid item xs={12} style={{ borderBottom: "0.5px solid" }}>
+      <Grid item xs={11}>
         <AudioPlayer
           autoplay
           src={temp}
           ref={audioRef}
+          autoPlayAfterSrcChange={false}
           onLoadedMetaData={() => {
             const aud = audioRef.current.audio.current;
             if (aud.duration === Infinity) {
@@ -281,22 +278,22 @@ const PlayingRecord = () => {
             aud.playbackRate = speed;
           }}
         />
-        <Button onClick={slowPlaybackSpeed}>-</Button>
-        <Button>{speed.toFixed(1)}x</Button>
-        <Button onClick={fastPlaybackSpeed}>+</Button>
       </Grid>
-      <Grid item xs={1} justify-content="center">
-        <HelpIcon fontSize="large" />
+      <Grid item xs={1}>
+        <Button onClick={fastPlaybackSpeed} size="small">
+          +
+        </Button>
+        <Button size="small">{speed.toFixed(1)}x</Button>
+        <Button onClick={slowPlaybackSpeed} size="small">
+          -
+        </Button>
       </Grid>
-      <Grid item xs={11}>
-        <form onSubmit={handleValue}>
-          <TextField
-            id="question"
-            row="1"
-            label="여기에 질문을 입력해보세요."
-            fullWidth
-          />
-        </form>
+      <Grid item xs={12}>
+        <MessageInput
+          attachButton={false}
+          placeholder="여기에 질문을 입력해보세요"
+          onSend={handleValue}
+        />
       </Grid>
     </Grid>
   );
