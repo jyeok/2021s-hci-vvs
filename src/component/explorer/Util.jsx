@@ -13,9 +13,11 @@ export const fileToFilemap = (files) =>
       }))
     : [];
 
-export const getFolderChain = () => [{ id: "xcv", name: "Root", isDir: true }];
+export const getFolderChain = () => [
+  { id: "xcv", name: "홈 폴더", isDir: true },
+];
 
-export const currentPath = () => "Root";
+export const currentPath = () => "홈 폴더";
 
 export default {
   fileToFilemap,

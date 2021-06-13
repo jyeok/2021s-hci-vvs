@@ -23,7 +23,7 @@ const RecordingMessage = (prop) => {
 
     return (
       <Message model={model} key={m.start}>
-        <Message.Footer sentTime={secondsToTime(m.start)} />
+        <Message.Footer sentTime={secondsToTime(m.end)} />
       </Message>
     );
   });

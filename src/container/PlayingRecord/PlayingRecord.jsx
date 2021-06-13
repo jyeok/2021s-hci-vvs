@@ -179,9 +179,7 @@ const PlayingRecord = () => {
 
   const playText = (d) => {
     const aud = audioRef.current.audio.current;
-    const dd = d.split(":").map((e) => parseInt(e, 10));
-    const curTime = dd[0] * 60 + dd[1];
-    aud.currentTime = curTime;
+    aud.currentTime = Number.parseFloat(d);
   };
 
   return (

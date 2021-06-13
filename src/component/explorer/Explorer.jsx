@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { FullFileBrowser } from "chonky";
+import {
+  FileBrowser,
+  FileToolbar,
+  FileNavbar,
+  FileList,
+  FileContextMenu,
+} from "chonky";
 
 import { Grid } from "@material-ui/core";
 import { AudiotrackOutlined } from "@material-ui/icons";
@@ -11,7 +17,7 @@ import { queries, mutations } from "api/gql/schema";
 import Preview from "container/Preview/Preview";
 import Loading from "container/Loading/Loading";
 
-import { onFileAction, extraActions } from "./ChonkyOptions";
+import { onFileAction, extraActions, actionsToDisable } from "./ChonkyOptions";
 import { fileToFilemap, getFolderChain } from "./Util";
 
 const Explorer = () => {
@@ -80,14 +86,21 @@ const Explorer = () => {
   return (
     <Grid container padding={15} style={{ height: "650px" }}>
       <Grid item xs={8} style={{ border: "1px solid", height: "650px" }}>
-        <FullFileBrowser
+        <FileBrowser
+          disableDragAndDrop
           files={fileMap}
           folderChain={folderChain}
           fileActions={extraActions}
+          disableDefaultFileActions={actionsToDisable}
           onFileAction={(e) =>
             onFileAction(e, { refetch, setCurrSelect, setOpen })
           }
-        />
+        >
+          <FileNavbar />
+          <FileToolbar />
+          <FileList />
+          <FileContextMenu />
+        </FileBrowser>
       </Grid>
       <Grid item xs={4} style={{ border: "1px solid", height: "650px" }}>
         <Preview
