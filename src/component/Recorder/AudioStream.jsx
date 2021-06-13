@@ -58,7 +58,7 @@ let AudioStreamer = {
     // Bind the data handler callback
     if (onData) {
       socket.on("speechData", (data) => {
-        onData(data);
+        onData(data[0]);
       });
     }
 

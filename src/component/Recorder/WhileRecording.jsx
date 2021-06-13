@@ -7,29 +7,12 @@ import { Grid, TextField, Button } from "@material-ui/core";
 import { Delete, SaveAlt, ArrowBack } from "@material-ui/icons";
 import { useSnackbar } from "notistack";
 
-import { getTextBlocks } from "api/ai/simpleTTS";
 import { compression } from "api/ai/compression";
 import { mutations } from "api/gql/schema";
 
-import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
+import RecordingMessage from "container/RecordingMessage/RecordingMessage";
 
-const generateTextBlock = async (base64Data) => {
-  const { data, dataType, codecs, encoding } = base64Data;
-  const textBlocks = await getTextBlocks(data, dataType, codecs, encoding);
-
-  return textBlocks;
-};
-
-const splitBase64String = (base64String) => {
-  const [dataType, codecs, encoding, data] = base64String.split(/;|,/);
-
-  return {
-    dataType,
-    codecs,
-    encoding,
-    data,
-  };
-};
+import { generateTextBlock, splitBase64String } from "./Util";
 
 const onStop = async (data, setVoice, setTextBlockData) => {
   const { blob } = data;

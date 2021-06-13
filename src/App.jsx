@@ -5,10 +5,10 @@ import { ApolloProvider } from "react-apollo";
 import { ApolloClient } from "@apollo/client";
 import { SnackbarProvider } from "notistack";
 
-import WhileRecording from "component/WhileRecording/WhileRecording";
+import WhileRecording from "component/Recorder/WhileRecording";
 import PlayingRecord from "container/PlayingRecord/PlayingRecord";
 import Explorer from "component/explorer/Explorer";
-import TempComponent from "TempComponent";
+import StreamRecord from "component/Recorder/StreamRecord";
 
 function App(props) {
   const { client } = props;
@@ -19,9 +19,9 @@ function App(props) {
         <div className="App">
           <Switch>
             <Route path="/" exact component={Explorer} />
-            <Route path="/recording" exact component={WhileRecording} />
+            <Route path="/legacy" exact component={WhileRecording} />
             <Route path="/playing/:id" exact component={PlayingRecord} />
-            <Route path="/temp" exact component={TempComponent} />
+            <Route path="/recording" exact component={StreamRecord} />
             <Redirect path="*" to="/" />
           </Switch>
         </div>
