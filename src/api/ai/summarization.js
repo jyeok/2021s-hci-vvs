@@ -110,12 +110,8 @@ class TextRank {
     for (var i = 0; i < 20; i++) this._updateLoop();
   }
 
-  getSummarizedOneText() {
-    return this._top1();
-  }
-
-  getSummarizedThreeText() {
-    return this._top3();
+  getSummarizedText(n) {
+    return this._top(n + 1);
   }
 
   _initRanking() {
@@ -136,20 +132,7 @@ class TextRank {
     }
   }
 
-  _top1() {
-    var maxScore = 0;
-    var maxIndex = 0;
-    for (var i = 0; i < this.score.length - 1; i++) {
-      if (maxScore < this.score[i]) {
-        maxScore = this.score[i];
-        maxIndex = i;
-      }
-    }
-
-    return this.weightMetrics.sentenceMetrics[maxIndex];
-  }
-
-  _top3() {
+  _top(n) {
     var ranking = new Array(this.score.length).fill(1);
     for (var i = 0; i < this.score.length - 1; i++) {
       for (var j = i + 1; j < this.score.length; j++) {
@@ -162,9 +145,11 @@ class TextRank {
     }
 
     var returnString = "";
-    for (var i = 1; i < 4; i++)
-      returnString +=
-        this.weightMetrics.sentenceMetrics[ranking.indexOf(i)] + "\n";
+    for (var i = 0; i < n; i++) {
+      if (ranking[i] < n) {
+        returnString += this.ps.sentence[i] + "\n";
+      }
+    }
     return returnString;
   }
 }

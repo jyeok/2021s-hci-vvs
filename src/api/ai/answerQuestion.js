@@ -20,8 +20,6 @@ export const answerQuestion = (sampleParagraph, sampleQuestion) =>
       const { answer } = data.result;
       const answerIndex = data.result.answer_index;
       const answersToQuestion = [answer, answerIndex];
-      // eslint-disable-next-line no-alert
-      alert(answer);
       return answersToQuestion;
     })
     // eslint-disable-next-line no-console

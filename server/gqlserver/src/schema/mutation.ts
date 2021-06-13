@@ -133,8 +133,14 @@ export const Mutation = objectType({
           where: { id: args.id },
           data: {
             content: args.data.content || undefined,
-            isMine: args.data.isMine || undefined,
-            isHighlighted: args.data.isHighlighted || undefined,
+            isMine:
+              typeof args.data.isMine === 'number'
+                ? args.data.isMine
+                : undefined,
+            isHighlighted:
+              typeof args.data.isHighlighted === 'number'
+                ? args.data.isHighlighted
+                : undefined,
             isModified: 1,
             reliability: args.data.reliability || undefined,
             start: args.data.start || undefined,
