@@ -15,7 +15,7 @@ const MessageHolder = (prop) => {
         position: "single",
       }}
     >
-      {isHighlighted && <Message.Header>북마크</Message.Header>}
+      {isHighlighted ? <Message.Header>북마크</Message.Header> : false}
       <Message.Footer sentTime={start} />
     </Message>
   );
