@@ -23,20 +23,6 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const onStop = (data, setVoice, setStatus) => {
-  const { blob } = data;
-  const reader = new FileReader();
-
-  reader.onloadend = async () => {
-    const base64Data = splitBase64String(reader.result);
-    const { data: voiceData } = base64Data;
-    setVoice(voiceData);
-    setStatus("ready");
-  };
-
-  reader.readAsDataURL(blob);
-};
-
 const onInputChange = (e, inputState, setInputState) => {
   const { name } = e.target;
   const newInputState = {
@@ -74,19 +60,21 @@ const StreamRecord = () => {
   const goBackHandler = () => history.goBack();
 
   const onStart = () => {
-    setRecording(true);
-    setStatus("recording");
-
     AudioStreamer.initRecording(
       (data) => {
         setNewData(data);
       },
-      (err) => {
-        console.log(err);
-        enqueueSnackbar("Error when recording", { variant: "error" });
+      () => {
+        enqueueSnackbar("녹음 중 오류가 발생했습니다! 새로고침해 주세요.", {
+          variant: "error",
+        });
+        setStatus("error");
         setRecording(false);
       }
     );
+
+    setRecording(true);
+    setStatus("recording");
   };
 
   const accumulateTextBlocks = (newTextBlock) => {
@@ -94,16 +82,14 @@ const StreamRecord = () => {
       setTextBlockData([newTextBlock]);
     } else {
       const lastBlock = textBlockData[textBlockData.length - 1];
-      let start = parseFloat(newTextBlock.start);
-      let end = parseFloat(newTextBlock.end);
 
-      start += parseFloat(lastBlock.end);
-      end += start;
+      const start = lastBlock.end;
+      const end = elapsedTime;
 
       const newTextBlockData = {
         ...newTextBlock,
-        start: start.toFixed(2).toString(),
-        end: end.toFixed(2).toString(),
+        start,
+        end: end.toFixed(2),
       };
 
       setTextBlockData([...textBlockData, newTextBlockData]);
@@ -111,9 +97,23 @@ const StreamRecord = () => {
     }
   };
 
+  const onStop = (data) => {
+    const { blob } = data;
+    const reader = new FileReader();
+
+    reader.onloadend = async () => {
+      const base64Data = splitBase64String(reader.result);
+      const { data: voiceData } = base64Data;
+      setVoice(voiceData);
+      setStatus("ready");
+    };
+
+    reader.readAsDataURL(blob);
+  };
+
   useEffect(() => {
     if (newData) accumulateTextBlocks(newData);
-  }, [newData, status]);
+  }, [newData]);
 
   const onSave = async () => {
     if (!inputState.title) {
@@ -216,8 +216,11 @@ const StreamRecord = () => {
             // eslint-disable-next-line no-nested-ternary
             status === "recording"
               ? "orange"
-              : status === "ready"
+              : // eslint-disable-next-line no-nested-ternary
+              status === "ready"
               ? "skyblue"
+              : status === "error"
+              ? "red"
               : "",
         }}
       >
@@ -239,7 +242,7 @@ const StreamRecord = () => {
         <Grid item lg={1} hidden>
           <ReactMic
             record={recording}
-            onStop={(data) => onStop(data, setVoice, setStatus)}
+            onStop={(data) => onStop(data)}
             strokeColor="#000000"
             visualSetting={false}
           />
