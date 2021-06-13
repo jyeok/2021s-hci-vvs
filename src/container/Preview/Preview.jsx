@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import { Link } from "react-router-dom";
-import { Button, Grid, TextField } from "@material-ui/core";
+import { Link, useHistory } from "react-router-dom";
+import { Box, Button, Grid, TextField } from "@material-ui/core";
 
 import { TextBlock } from "proptypes/ModelPropTypes";
 import MessageHolder from "../MessageHolder/MessageHolder";
@@ -15,8 +15,10 @@ const onLock = (e) => {
   // eslint-disable-next-line
   console.log("onLock :>> ", e);
 };
+
 function Preview(props) {
   const { id, memo, tag, content } = props;
+  const history = useHistory();
 
   const messages = content.map((e, i) => (
     <MessageHolder
@@ -33,16 +35,19 @@ function Preview(props) {
   return (
     <div style={{ margin: "5px" }}>
       Preview
-      <div
+      <Box
         style={{
           border: "1px solid",
           margin: "5px",
           height: "300px",
           overflow: "scroll",
         }}
+        onClick={() => {
+          history.push(`playing/${id}`);
+        }}
       >
         {messages}
-      </div>
+      </Box>
       <TextField
         label="태그"
         value={tag}
@@ -61,7 +66,7 @@ function Preview(props) {
         rows={5}
         InputProps={{ readOnly: true }}
       />
-      <Grid container style={{ marginTop: "15px" }}>
+      <Grid container style={{ marginTop: "5px" }}>
         <Grid item xs={4}>
           <Button
             style={pborder}
