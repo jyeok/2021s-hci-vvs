@@ -74,6 +74,40 @@ export const Mutation = objectType({
       },
     })
 
+    t.field('lockRecord', {
+      type: Record,
+      args: {
+        id: nonNull(intArg()),
+      },
+      resolve: (_, args, context: Context) => {
+        return context.prisma.record.update({
+          where: {
+            id: args.id,
+          },
+          data: {
+            isLocked: 1,
+          },
+        })
+      },
+    })
+
+    t.field('unLockRecord', {
+      type: Record,
+      args: {
+        id: nonNull(intArg()),
+      },
+      resolve: (_, args, context: Context) => {
+        return context.prisma.record.update({
+          where: {
+            id: args.id,
+          },
+          data: {
+            isLocked: 0,
+          },
+        })
+      },
+    })
+
     t.field('deleteRecordByPath', {
       type: Record,
       args: {

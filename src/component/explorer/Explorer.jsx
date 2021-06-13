@@ -109,6 +109,9 @@ const Explorer = () => {
           tag={tag}
           content={content}
           style={{ height: "650px" }}
+          isLocked={
+            fileMap && id ? fileMap.filter((e) => e.id === id)[0].isLocked : 0
+          }
         />
       </Grid>
       <DropzoneDialogBase

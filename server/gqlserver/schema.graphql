@@ -20,6 +20,8 @@ type Mutation {
   deleteScheduleById(id: Int!): Schedule
   deleteTextBlockById(id: Int!): TextBlock
   generatePreview(recordId: Int!): Preview
+  lockRecord(id: Int!): Record
+  unLockRecord(id: Int!): Record
   updateRecord(data: RecordUpdateInput, id: Int!): Record
   updateTextBlock(data: TextBlockUpdateInput!, id: Int!): TextBlock
   uploadRecord(path: String!, size: Int!, title: String!, voice: String!): Record

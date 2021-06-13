@@ -138,6 +138,30 @@ export const mutations = {
       }
     }
   `,
+  lockRecord: gql`
+    ${fragments.allRecordFields}
+    mutation lockRecord($id: Int!) {
+      lockRecord(id: $id) {
+        ...allRecordFields
+      }
+    }
+  `,
+  unLockRecord: gql`
+    ${fragments.allRecordFields}
+    mutation unLockRecord($id: Int!) {
+      unLockRecord(id: $id) {
+        ...allRecordFields
+      }
+    }
+  `,
+  deleteRecordById: gql`
+    ${fragments.allRecordFields}
+    mutation deleteRecordById($id: Int!) {
+      deleteRecordById(id: $id) {
+        ...allRecordFields
+      }
+    }
+  `,
 };
 
 export default {

@@ -62,7 +62,9 @@ const PlayingRecord = () => {
     return <Loading message="녹음 파일을 로딩중입니다." transparent />;
   if (error) return <Loading message="오류가 발생했습니다." error />;
 
-  if (!data.recordById) goBack();
+  if (!data.recordById || data.recordById.isLocked) {
+    goBack();
+  }
 
   const newData = data.recordById.content.map((e) => e.content);
   const finalQuestionData = newData.reduce((acc, cur) => `${acc} ${cur}`, "");

@@ -119,83 +119,96 @@ const StreamRecord = () => {
   };
 
   const onSave = async () => {
-    console.log("recording :>> ", recording);
-    console.log("inputState :>> ", inputState);
-    console.log("voice :>> ", voice);
-    console.log("status :>> ", status);
-    console.log("textBlockData :>> ", textBlockData);
-    // TODO: implement this
-
-    const textBlockCreateInput = textBlockData.map((block) => ({
-      content: block.content,
-      isMine: 1,
-      isHighlighted: 0,
-      isModified: 0,
-      reliability: block.reliability,
-      start: block.start,
-      end: block.end,
-    }));
-
-    const allContents = textBlockData
-      .reduce((acc, cur) => `${acc} ${cur.content}`, "")
-      .trim();
-
-    const userTag = inputState.tag.trim()
-      ? inputState.tag
-          .split(" ")
-          .map((e) => (e.startsWith("#") ? e.trim() : `#${e.trim()}`))
-      : [];
-    console.log(allContents);
-
-    const getTags = await compression(allContents);
-
-    const tagList = getTags.return_object.keylists.map((e) =>
-      e.keyword.startsWith("#") ? e.keyword.trim() : `#${e.keyword.trim()}`
-    );
-
-    const tagConcat = userTag.concat(tagList);
-    const finalTag = [...new Set(tagConcat)].join(" ").trim();
-
-    const recordCreateInput = {
-      path: inputState.title,
-      title: inputState.title,
-      size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
-      tag: finalTag,
-      memo: inputState.memo,
-      content: textBlockCreateInput,
-      voice,
-    };
-
-    try {
-      const res = await addRecordMutation({
-        variables: {
-          data: recordCreateInput,
-        },
+    if (!inputState.title) {
+      enqueueSnackbar("녹음 제목을 입력해주세요.", {
+        variant: "error",
       });
+    } else {
+      console.log("recording :>> ", recording);
+      console.log("inputState :>> ", inputState);
+      console.log("voice :>> ", voice);
+      console.log("status :>> ", status);
+      console.log("textBlockData :>> ", textBlockData);
+      // TODO: implement this
 
-      await generatePreviewMutation({
-        variables: {
-          id: res.data.addRecord.id,
-        },
-      });
+      const textBlockCreateInput = textBlockData.map((block) => ({
+        content: block.content,
+        isMine: 1,
+        isHighlighted: 0,
+        isModified: 0,
+        reliability: block.reliability,
+        start: block.start,
+        end: block.end,
+      }));
 
-      enqueueSnackbar("녹음이 완료되었습니다.", {
-        variant: "success",
-      });
-      goBackHandler();
-    } catch (err) {
-      if (err.message.includes("Unique constraint failed")) {
-        enqueueSnackbar("이미 존재하는 제목입니다. 제목을 수정해 주세요.", {
-          variant: "error",
+      const allContents = textBlockData
+        .reduce((acc, cur) => `${acc} ${cur.content}`, "")
+        .trim();
+
+      const userTag = inputState.tag.trim()
+        ? inputState.tag
+            .split(" ")
+            .map((e) => (e.startsWith("#") ? e.trim() : `#${e.trim()}`))
+        : [];
+      console.log(allContents);
+
+      const getTags = await compression(allContents);
+
+      const tagList = getTags
+        ? getTags.return_object.keylists.map((e) =>
+            e.keyword.startsWith("#")
+              ? e.keyword.trim()
+              : `#${e.keyword.trim()}`
+          )
+        : [];
+
+      const tagConcat = userTag.concat(tagList);
+      const finalTag = [...new Set(tagConcat)].join(" ").trim();
+
+      const recordCreateInput = {
+        path: inputState.title,
+        title: inputState.title,
+        size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
+        tag: finalTag,
+        memo: inputState.memo,
+        content: textBlockCreateInput,
+        voice,
+      };
+
+      try {
+        const res = await addRecordMutation({
+          variables: {
+            data: recordCreateInput,
+          },
         });
-      } else if (err.message.includes("Failed to fetch")) {
-        enqueueSnackbar("인터넷 연결을 확인해 주세요.", {
-          variant: "error",
+
+        await generatePreviewMutation({
+          variables: {
+            id: res.data.addRecord.id,
+          },
         });
-      } else {
-        enqueueSnackbar("알 수 없는 오류가 발생했습니다. 다시 시도해 주세요.", {
-          variant: "error",
+
+        enqueueSnackbar("녹음이 완료되었습니다.", {
+          variant: "success",
         });
+        goBackHandler();
+      } catch (err) {
+        if (err.message.includes("Unique constraint failed")) {
+          enqueueSnackbar("이미 존재하는 제목입니다. 제목을 수정해 주세요.", {
+            variant: "error",
+          });
+        } else if (err.message.includes("Failed to fetch")) {
+          enqueueSnackbar("인터넷 연결을 확인해 주세요.", {
+            variant: "error",
+          });
+        } else {
+          enqueueSnackbar(
+            "알 수 없는 오류가 발생했습니다. 다시 시도해 주세요.",
+            {
+              variant: "error",
+            }
+          );
+        }
       }
     }
   };

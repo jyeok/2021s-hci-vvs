@@ -10,6 +10,7 @@ export const fileToFilemap = (files) =>
         tag: e.tag,
         memo: e.memo,
         preview: e.preview,
+        isLocked: e.isLocked,
       }))
     : [];
 
