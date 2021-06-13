@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useMutation } from "@apollo/client";
@@ -67,10 +65,6 @@ const StreamRecord = () => {
   const [addRecordMutation] = useMutation(mutations.addRecord);
   const [generatePreviewMutation] = useMutation(mutations.generatePreview);
 
-  useEffect(() => {
-    if (newData) accumulateTextBlocks(newData);
-  }, [newData]);
-
   const classes = useStyles();
   const { elapsedTime } = useElapsedTime(recording);
 
@@ -79,44 +73,47 @@ const StreamRecord = () => {
   const inputChangeHandler = (e) => onInputChange(e, inputState, setInputState);
   const goBackHandler = () => history.goBack();
 
+  const onStart = () => {
+    setRecording(true);
+    setStatus("recording");
+
+    AudioStreamer.initRecording(
+      (data) => {
+        setNewData(data);
+      },
+      (err) => {
+        console.log(err);
+        enqueueSnackbar("Error when recording", { variant: "error" });
+        setRecording(false);
+      }
+    );
+  };
+
   const accumulateTextBlocks = (newTextBlock) => {
     if (textBlockData.length === 0) {
       setTextBlockData([newTextBlock]);
     } else {
       const lastBlock = textBlockData[textBlockData.length - 1];
-
-      console.log("lastBlock: ", lastBlock);
-      console.log("current: ", newTextBlock);
-
       let start = parseFloat(newTextBlock.start);
       let end = parseFloat(newTextBlock.end);
 
       start += parseFloat(lastBlock.end);
       end += start;
 
-      const newData = {
+      const newTextBlockData = {
         ...newTextBlock,
         start: start.toFixed(2).toString(),
         end: end.toFixed(2).toString(),
       };
 
-      setTextBlockData([...textBlockData, newData]);
+      setTextBlockData([...textBlockData, newTextBlockData]);
+      setNewData();
     }
   };
 
-  const onStart = (setRecording, accumulateTextBlocks) => {
-    setRecording(true);
-
-    AudioStreamer.initRecording(
-      (data) => {
-        accumulateTextBlocks(data);
-      },
-      (error) => {
-        console.error("Error when recording", error);
-        setRecording(false);
-      }
-    );
-  };
+  useEffect(() => {
+    if (newData) accumulateTextBlocks(newData);
+  }, [newData, status]);
 
   const onSave = async () => {
     if (!inputState.title) {
@@ -124,13 +121,6 @@ const StreamRecord = () => {
         variant: "error",
       });
     } else {
-      console.log("recording :>> ", recording);
-      console.log("inputState :>> ", inputState);
-      console.log("voice :>> ", voice);
-      console.log("status :>> ", status);
-      console.log("textBlockData :>> ", textBlockData);
-      // TODO: implement this
-
       const textBlockCreateInput = textBlockData.map((block) => ({
         content: block.content,
         isMine: 1,
@@ -150,7 +140,6 @@ const StreamRecord = () => {
             .split(" ")
             .map((e) => (e.startsWith("#") ? e.trim() : `#${e.trim()}`))
         : [];
-      console.log(allContents);
 
       const getTags = await compression(allContents);
 
@@ -222,6 +211,15 @@ const StreamRecord = () => {
         spacing={0}
         direction="row"
         className={classes.topElements}
+        style={{
+          backgroundColor:
+            // eslint-disable-next-line no-nested-ternary
+            status === "recording"
+              ? "orange"
+              : status === "ready"
+              ? "skyblue"
+              : "",
+        }}
       >
         <Grid item lg={1}>
           <Button
@@ -262,8 +260,9 @@ const StreamRecord = () => {
             color="primary"
             variant="contained"
             onClick={() => {
-              onStart(setRecording, setNewData);
+              onStart();
             }}
+            disabled={status !== ""}
           >
             녹음 시작
           </Button>
@@ -277,7 +276,7 @@ const StreamRecord = () => {
             }}
             color="primary"
             variant="contained"
-            disabled={!recording}
+            disabled={status !== "recording"}
           >
             녹음 중지
           </Button>

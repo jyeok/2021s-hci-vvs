@@ -113,6 +113,8 @@ export const onFileAction = (e, f) => {
 
   if (eventId === myGridview.id || eventId === myListView.id) {
     f.onRefetch();
+  } else if (eventId === myRecord.id) {
+    f.onRecord();
   } else if (eventId === ChonkyActions.MouseClickFile.id) {
     const {
       payload: { file },

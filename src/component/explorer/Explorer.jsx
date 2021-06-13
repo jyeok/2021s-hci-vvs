@@ -7,6 +7,7 @@ import {
   FileList,
   FileContextMenu,
 } from "chonky";
+import { useHistory } from "react-router";
 
 import { Grid } from "@material-ui/core";
 import { AudiotrackOutlined } from "@material-ui/icons";
@@ -37,11 +38,16 @@ const Explorer = () => {
   const [open, setOpen] = useState(false);
   const [upload, setUpload] = useState({});
 
+  const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     setFiles(data);
   }, [data]);
+
+  const onRecord = () => {
+    history.push("/recording");
+  };
 
   const onRefetch = () => {
     setCurrSelect({
@@ -110,6 +116,7 @@ const Explorer = () => {
               setOpen,
               deleteMutation,
               enqueueSnackbar,
+              onRecord,
             })
           }
         >
