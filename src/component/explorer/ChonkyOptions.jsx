@@ -5,40 +5,14 @@ import {
   FileViewMode,
 } from "chonky";
 
-export const onFileAction = (e, f) => {
-  const { id: eventId } = e;
-
-  if (
-    eventId === ChonkyActions.EnableGridView.id ||
-    eventId === ChonkyActions.EnableListView.id
-  ) {
-    f.refetch();
-  } else if (eventId === ChonkyActions.MouseClickFile.id) {
-    const {
-      payload: { file },
-    } = e;
-
-    const content = file.preview
-      ? file.preview.excerpt.map((el) => ({
-          content: el.content,
-          isMine: el.isMine,
-          isHighlighted: el.isHighlighted,
-          isModified: el.isModified,
-          reliability: el.reliability,
-          start: el.start,
-        }))
-      : [];
-
-    f.setCurrSelect({
-      id: file.id,
-      memo: file.memo,
-      tag: file.tag,
-      content,
-    });
-  } else if (eventId === ChonkyActions.UploadFiles.id) {
-    f.setOpen(true);
-  }
-};
+const myRecord = defineFileAction({
+  id: "new_record",
+  button: {
+    name: "+  새 녹음 만들기",
+    toolbar: true,
+    tooltip: "녹음을 추가하세요!",
+  },
+});
 
 const myUpload = defineFileAction({
   id: "upload_files",
@@ -134,7 +108,63 @@ const ToggleHiddenFiles = defineFileAction({
   },
 });
 
+export const onFileAction = (e, f) => {
+  const { id: eventId } = e;
+
+  if (eventId === myGridview.id || eventId === myListView.id) {
+    f.onRefetch();
+  } else if (eventId === ChonkyActions.MouseClickFile.id) {
+    const {
+      payload: { file },
+    } = e;
+
+    const content = file.preview
+      ? file.preview.excerpt.map((el) => ({
+          content: el.content,
+          isMine: el.isMine,
+          isHighlighted: el.isHighlighted,
+          isModified: el.isModified,
+          reliability: el.reliability,
+          start: el.start,
+        }))
+      : [];
+
+    f.setCurrSelect({
+      id: file.id,
+      memo: file.memo,
+      tag: file.tag,
+      content,
+    });
+  } else if (eventId === myUpload.id) {
+    f.setOpen(true);
+  } else if (eventId === myDelete.id) {
+    (async () => {
+      for (let index = 0; index < e.state.selectedFiles.length; index += 1) {
+        const element = e.state.selectedFiles[index];
+
+        // eslint-disable-next-line no-await-in-loop
+        await f.deleteMutation({
+          variables: {
+            id: element.id,
+          },
+        });
+      }
+    })()
+      .then(() => {
+        f.enqueueSnackbar("파일이 삭제되었습니다!", { variant: "success" });
+        f.onRefetch();
+      })
+      .catch(() => {
+        f.enqueueSnackbar("오류가 발생했습니다. 다시 시도해 주세요.", {
+          variant: "error",
+        });
+        f.onRefetch();
+      });
+  }
+};
+
 export const extraActions = [
+  myRecord,
   myUpload,
   myDelete,
   myGridview,

@@ -25,6 +25,7 @@ const Explorer = () => {
     fetchPolicy: "network-only",
   });
   const [uploadMutation] = useMutation(mutations.uploadRecord);
+  const [deleteMutation] = useMutation(mutations.deleteRecordById);
 
   const [files, setFiles] = useState(data);
   const [currSelect, setCurrSelect] = useState({
@@ -41,6 +42,16 @@ const Explorer = () => {
   useEffect(() => {
     setFiles(data);
   }, [data]);
+
+  const onRefetch = () => {
+    setCurrSelect({
+      id: undefined,
+      memo: undefined,
+      tag: undefined,
+      content: [],
+    });
+    refetch();
+  };
 
   if (loading) return <Loading message="파일을 로딩중입니다." transparent />;
   if (error)
@@ -93,7 +104,13 @@ const Explorer = () => {
           fileActions={extraActions}
           disableDefaultFileActions={actionsToDisable}
           onFileAction={(e) =>
-            onFileAction(e, { refetch, setCurrSelect, setOpen })
+            onFileAction(e, {
+              onRefetch,
+              setCurrSelect,
+              setOpen,
+              deleteMutation,
+              enqueueSnackbar,
+            })
           }
         >
           <FileNavbar />
