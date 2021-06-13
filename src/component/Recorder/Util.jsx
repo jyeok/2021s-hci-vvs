@@ -18,8 +18,12 @@ export const splitBase64String = (base64String) => {
   };
 };
 
-export const secondsToTime = (seconds) =>
-  new Date(seconds * 1000).toISOString().substr(11, 8);
+export const secondsToTime = (seconds) => {
+  const hms = new Date(seconds * 1000).toISOString().substr(11, 8);
+  const [h, m, s] = hms.split(":").map((e) => Number.parseInt(e, 10));
+
+  return h === 0 ? `${m}분 ${s}초` : `${h}시 ${m}분 ${s}초`;
+};
 
 export default {
   generateTextBlock,

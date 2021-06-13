@@ -8,10 +8,10 @@ import {
   ChatContainer,
 } from "@chatscope/chat-ui-kit-react";
 import { CircularProgress } from "@material-ui/core";
+import { secondsToTime } from "component/Recorder/Util";
 
 const RecordingMessage = (prop) => {
   const { contents, listening } = prop;
-  console.log(contents);
 
   const messages = contents.map((m, i) => {
     const model = {
@@ -21,7 +21,11 @@ const RecordingMessage = (prop) => {
       position: "single",
     };
 
-    return <Message model={model} key={m.start} />;
+    return (
+      <Message model={model} key={m.start}>
+        <Message.Footer sentTime={secondsToTime(m.start)} />
+      </Message>
+    );
   });
 
   return (
