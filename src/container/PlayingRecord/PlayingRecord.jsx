@@ -1,12 +1,10 @@
-// /* eslint-disable no-unused-vars */
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
 import {
   Grid,
   TextField,
   Button,
-  Menu,
   MenuItem,
   Tooltip,
   Dialog,
@@ -22,11 +20,15 @@ import { ArrowBack } from "@material-ui/icons";
 import { useQuery, useMutation } from "@apollo/client";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
+
 import { answerQuestion } from "api/ai/answerQuestion";
 import TextRank from "api/ai/summarization";
 import { base64StringToBlob } from "blob-util";
 
+import { useSnackbar } from "notistack";
+import Loading from "container/Loading/Loading";
 import { MessageInput } from "@chatscope/chat-ui-kit-react";
+import PopupDialog from "container/PopupDialog/PopupDialog";
 import MessageHolder from "../MessageHolder/MessageHolder";
 import { queries, mutations } from "../../api/gql/schema";
 
@@ -45,15 +47,20 @@ const PlayingRecord = () => {
   const goBack = () => {
     history.goBack();
   };
-
-  const [anchorEl, setAnchorEl] = useState(null);
   const [editTextOpen, editTextsetOpen] = useState(false);
   const [textB, setTextB] = useState("");
+  // eslint-disable-next-line prefer-const
+  let [questionBlock, setQuestionBlock] = useState("");
   // eslint-disable-next-line no-unused-vars
-  const [summary, setSummary] = useState(true);
+  const { enqueueSnackbar } = useSnackbar();
 
-  if (loading) return "Loading...";
-  if (error) return `Error! ${error.message}`;
+  useEffect(() => {
+    setQuestionBlock(questionBlock);
+  }, [questionBlock]);
+
+  if (loading)
+    return <Loading message="녹음 파일을 로딩중입니다." transparent />;
+  if (error) return <Loading message="오류가 발생했습니다." error />;
 
   if (!data.recordById) goBack();
 
@@ -64,29 +71,26 @@ const PlayingRecord = () => {
 
   const textrank = new TextRank(newData);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleDialogClose = () => {
+    questionBlock = null;
   };
 
-  const handleValue = (e) => {
+  const handleValue = async (e) => {
     const questionInput = e;
+
     answerQuestion(finalQuestionData, questionInput).then((result) => {
       const answerFinal = result[0];
       const realAnswer = newData.filter((x) => x.indexOf(answerFinal) !== -1);
-      alert(realAnswer);
+
+      questionBlock = realAnswer;
     });
   };
 
-  // eslint-disable-next-line no-unused-vars
-  const SelectItem = (eventKey) => {
+  const selectItem = (eventKey) => {
     const numOfSentence = eventKey.target.value;
-    console.log(textrank.getSummarizedText(numOfSentence));
-    setAnchorEl(null);
-
-    return textrank.getSummarizedText(numOfSentence);
+    return enqueueSnackbar(textrank.getSummarizedText(numOfSentence), {
+      variant: "success",
+    });
   };
 
   const handleTextOpen = () => {
@@ -177,38 +181,22 @@ const PlayingRecord = () => {
         style={({ borderBottom: "0.5px solid" }, { height: "50px" })}
       >
         <ArrowBack onClick={goBack} />
-        {/* <FormControl>
-          <InputLabel id="compress">전체요약</InputLabel>
-          <Select labelId="compress" value={anchorEl} onChange={handleClick}>
-            <MenuItem value={1}> 1</MenuItem>
-            <MenuItem value={2}> 2</MenuItem>
-            <MenuItem value={3}> 3</MenuItem>
-            <MenuItem value={4}> 4</MenuItem>
-            <MenuItem value={5}> 5</MenuItem>
+        <FormControl style={{ float: "right", width: "70px" }}>
+          <InputLabel id="numCompress">전체 요약</InputLabel>
+          <Select
+            labelId="numCompress"
+            onChange={(e) => selectItem(e)}
+            defaultValue={1}
+          >
+            <MenuItem defaultChecked value={1}>
+              1
+            </MenuItem>
+            <MenuItem value={2}>2</MenuItem>
+            <MenuItem value={3}>3</MenuItem>
+            <MenuItem value={4}>4</MenuItem>
+            <MenuItem value={5}>5</MenuItem>
           </Select>
-        </FormControl> */}
-        <Button
-          aria-controls="compressAll"
-          aria-haspopup="true"
-          onMouseEnter={handleClick}
-          style={{ float: "right" }}
-        >
-          전체요약
-        </Button>
-
-        <Menu
-          id="compressAll"
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem value={1}>1</MenuItem>
-          <MenuItem value={2}>2</MenuItem>
-          <MenuItem value={3}>3</MenuItem>
-          <MenuItem value={4}>4</MenuItem>
-          <MenuItem value={5}>5</MenuItem>
-        </Menu>
+        </FormControl>
       </Grid>
       <Grid
         item
@@ -225,7 +213,7 @@ const PlayingRecord = () => {
                   <Button variant="contained" onClick={() => playText(e.start)}>
                     텍스트 재생
                   </Button>
-                  <Button variant="contained" onClick={handleTextOpen}>
+                  <Button variant="contained" onClick={() => handleTextOpen()}>
                     텍스트 편집
                   </Button>
                   <Button
@@ -242,7 +230,7 @@ const PlayingRecord = () => {
                   </Button>
                   <Dialog
                     open={editTextOpen}
-                    onClose={handleTextClose}
+                    onClose={() => handleTextClose()}
                     fullWidth
                     maxWidth="lg"
                   >
@@ -259,7 +247,7 @@ const PlayingRecord = () => {
                       />
                     </DialogContent>
                     <DialogActions>
-                      <Button onClick={handleTextClose}>취소</Button>
+                      <Button onClick={() => handleTextClose()}>취소</Button>
                       <Button onClick={() => updateText(textB, e.id)}>
                         확인
                       </Button>
@@ -312,7 +300,7 @@ const PlayingRecord = () => {
           }}
         />
       </Grid>
-      <Grid item xs={11}>
+      <Grid item xs={10}>
         <AudioPlayer
           autoplay
           src={temp}
@@ -330,7 +318,7 @@ const PlayingRecord = () => {
           }}
         />
       </Grid>
-      <Grid item xs={1}>
+      <Grid item xs={2}>
         <FormControl>
           <InputLabel id="playSpeed">재생 속도</InputLabel>
           <Select
@@ -347,16 +335,22 @@ const PlayingRecord = () => {
             <MenuItem value={1.8}>1.8</MenuItem>
             <MenuItem value={2.0}>2.0</MenuItem>
           </Select>
-          <FormHelperText>클릭해서 배속을 조절합니다</FormHelperText>
+          <FormHelperText>클릭해 배속 조절</FormHelperText>
         </FormControl>
       </Grid>
       <Grid item xs={12}>
         <MessageInput
           attachButton={false}
           placeholder="여기에 질문을 입력해보세요"
-          onSend={handleValue}
+          onSend={(e) => handleValue(e)}
         />
       </Grid>
+      <PopupDialog
+        title="질문"
+        content={questionBlock}
+        open={!!questionBlock}
+        handleClose={() => handleDialogClose()}
+      />
     </Grid>
   );
 };
