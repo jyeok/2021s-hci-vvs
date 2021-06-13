@@ -1,35 +1,18 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-// eslint-disable-next-line no-unused-vars
 import { useMutation } from "@apollo/client";
 import { ReactMic } from "react-mic";
 
 import { Grid, TextField, Button } from "@material-ui/core";
 import { Delete, SaveAlt, ArrowBack } from "@material-ui/icons";
+import { useSnackbar } from "notistack";
 
-import { getTextBlocks } from "api/ai/simpleTTS";
-// eslint-disable-next-line no-unused-vars
+import { compression } from "api/ai/compression";
 import { mutations } from "api/gql/schema";
 
-import RecordingMessage from "../../container/RecordingMessage/RecordingMessage";
+import RecordingMessage from "container/RecordingMessage/RecordingMessage";
 
-const generateTextBlock = async (base64Data) => {
-  const { data, dataType, codecs, encoding } = base64Data;
-  const textBlocks = await getTextBlocks(data, dataType, codecs, encoding);
-
-  return textBlocks;
-};
-
-const splitBase64String = (base64String) => {
-  const [dataType, codecs, encoding, data] = base64String.split(/;|,/);
-
-  return {
-    dataType,
-    codecs,
-    encoding,
-    data,
-  };
-};
+import { generateTextBlock, splitBase64String } from "./Util";
 
 const onStop = async (data, setVoice, setTextBlockData) => {
   const { blob } = data;
@@ -57,53 +40,9 @@ const onInputChange = (e, inputState, setInputState) => {
   setInputState(newInputState);
 };
 
-const onSave = (
-  inputData,
-  textBlockData,
-  voiceData,
-  addRecordMutation,
-  goBackHandler
-) => {
-  if (!voiceData) alert("녹음이 완료되지 않았습니다!");
-  if (!inputData.title) alert("제목을 입력하세요!");
-  // TODO: change to popup
-  else {
-    const textBlockCreateInput = textBlockData.map((block) => ({
-      content: block.content,
-      isMine: 1,
-      isHighlighted: 0,
-      isModified: 0,
-      reliability: block.reliability,
-      start: block.start,
-      end: block.end,
-    }));
-
-    const recordCreateInput = {
-      path: inputData.title,
-      title: inputData.title,
-      size: Number.parseInt(Math.ceil((voiceData.length * 3) / 4 - 2), 10),
-      tag: inputData.tag,
-      memo: inputData.memo,
-      voice: voiceData,
-      content: textBlockCreateInput,
-    };
-
-    console.log("recordCreateInput :>> ", recordCreateInput);
-
-    addRecordMutation({
-      variables: {
-        data: recordCreateInput,
-      },
-    })
-      .then(() => goBackHandler())
-      .catch((e) => {
-        console.log("e :>> ", e);
-      });
-  }
-};
-
 const WhileRecording = () => {
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [inputState, setInputState] = useState({
     title: "",
@@ -115,11 +54,94 @@ const WhileRecording = () => {
   const [voice, setVoice] = useState(undefined);
 
   const [addRecordMutation] = useMutation(mutations.addRecord);
+  const [generatePreviewMutation] = useMutation(mutations.generatePreview);
 
   const { title, memo, tag } = inputState;
 
   const inputChangeHandler = (e) => onInputChange(e, inputState, setInputState);
   const goBackHandler = () => history.goBack();
+
+  const onSave = async () => {
+    if (!voice)
+      enqueueSnackbar("녹음이 완료되지 않았습니다!", {
+        variant: "warning",
+      });
+    else if (!inputState.title)
+      enqueueSnackbar("제목을 입력하세요!", { variant: "error" });
+    else {
+      const textBlockCreateInput = textBlockData.map((block) => ({
+        content: block.content,
+        isMine: 1,
+        isHighlighted: 0,
+        isModified: 0,
+        reliability: block.reliability,
+        start: block.start,
+        end: block.end,
+      }));
+
+      const allContents = textBlockData
+        .reduce((acc, cur) => `${acc} ${cur.content}`, "")
+        .trim();
+
+      const userTag = inputState.tag.trim()
+        ? inputState.tag
+            .split(" ")
+            .map((e) => (e.startsWith("#") ? e.trim() : `#${e.trim()}`))
+        : [];
+
+      const getTags = await compression(allContents);
+      const tagList = getTags.return_object.keylists.map((e) =>
+        e.keyword.startsWith("#") ? e.keyword.trim() : `#${e.keyword.trim()}`
+      );
+
+      const tagConcat = userTag.concat(tagList);
+      const finalTag = [...new Set(tagConcat)].join(" ").trim();
+
+      const recordCreateInput = {
+        path: inputState.title,
+        title: inputState.title,
+        size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
+        tag: finalTag,
+        memo: inputState.memo,
+        content: textBlockCreateInput,
+        voice,
+      };
+
+      try {
+        const res = await addRecordMutation({
+          variables: {
+            data: recordCreateInput,
+          },
+        });
+
+        await generatePreviewMutation({
+          variables: {
+            id: res.data.addRecord.id,
+          },
+        });
+
+        enqueueSnackbar("녹음이 완료되었습니다.", {
+          variant: "success",
+        });
+        goBackHandler();
+      } catch (err) {
+        if (err.message.includes("Unique constraint failed")) {
+          enqueueSnackbar("이미 존재하는 제목입니다. 제목을 수정해 주세요.", {
+            variant: "error",
+          });
+        } else if (err.message.includes("Failed to fetch")) {
+          enqueueSnackbar("인터넷 연결을 확인해 주세요.", {
+            variant: "error",
+          });
+        } else {
+          enqueueSnackbar(
+            "알 수 없는 오류가 발생했습니다. 다시 시도해 주세요.",
+            { variant: "error" }
+          );
+        }
+      }
+    }
+  };
 
   return (
     <Grid container padding={15} style={{ border: "1px solid" }}>
@@ -165,6 +187,7 @@ const WhileRecording = () => {
                 textBlockData,
                 voice,
                 addRecordMutation,
+                generatePreviewMutation,
                 goBackHandler
               )
             }
@@ -195,10 +218,10 @@ const WhileRecording = () => {
             variant="outlined"
             multiline
             rows={8}
-            placeholder="녹음이 종료되면 키워드가 생성됩니다. 직접 추가할 수도 있습니다."
-            fullWidth
+            placeholder="녹음이 종료되면 키워드가 생성됩니다. 직접 추가할 수도 있습니다. 예시: #약속 #밥"
             name="tag"
             value={tag}
+            fullWidth
             onChange={inputChangeHandler}
           />
         </div>

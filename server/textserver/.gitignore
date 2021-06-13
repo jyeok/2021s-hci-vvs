@@ -24,3 +24,4 @@ yarn-error.log*
 
 # API KEY
 credential.json
+voice.bin
