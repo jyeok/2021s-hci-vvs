@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/client": "^3.3.19",
+    "@apollo/client": "^3.3.20",
     "@chatscope/chat-ui-kit-react": "^1.7.2",
     "@chatscope/chat-ui-kit-styles": "^1.2.0",
     "@google-cloud/storage": "^5.8.5",
@@ -27,6 +27,7 @@
     "korean-text-analytics": "^0.0.7",
     "material-ui-dropzone": "^3.5.0",
     "node-fetch": "^2.6.1",
+    "notistack": "^1.0.9",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-apollo": "^3.1.5",
@@ -45,6 +46,7 @@
     "react-voice-recorder": "^2.1.0",
     "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2",
+    "use-elapsed-time": "^2.1.8",
     "video-react": "^0.14.1",
     "web-vitals": "^1.0.1"
   },

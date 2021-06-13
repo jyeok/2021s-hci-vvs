@@ -15,15 +15,7 @@ export const compression = (input) =>
     }),
   })
     .then((response) => response.json())
-    .then((data) => {
-      const datakey = data.return_object.keylists;
-      const keylist = datakey.map((e) => e.keyword);
-      // eslint-disable-next-line no-console
-      console.log(keylist);
-      return keylist;
-    })
-    // eslint-disable-next-line no-console
-    .catch((error) => console.log("error: ", error));
+    .then((data) => data);
 
 export default {
   compression,

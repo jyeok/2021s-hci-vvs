@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from "react";
 import ReactDOM from "react-dom";
 import reportWebVitals from "reportWebVitals";
@@ -10,16 +11,31 @@ import {
   InMemoryCache,
   createHttpLink,
   ApolloProvider,
+  from,
 } from "@apollo/client";
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { onError } from "@apollo/client/link/error";
+
 import App from "App";
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors)
+    graphQLErrors.forEach(({ message, locations, path }) =>
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+      )
+    );
+
+  if (networkError) console.log(`[Network error]: ${networkError}`);
+});
 
 const httpLink = createHttpLink({
   uri: "http://localhost:4000/",
 });
 
 const client = new ApolloClient({
-  link: httpLink,
+  link: from([errorLink, httpLink]),
   cache: new InMemoryCache(),
 });
 
