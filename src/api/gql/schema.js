@@ -104,6 +104,19 @@ export const mutations = {
       }
     }
   `,
+  updateRecord: gql`
+    ${fragments.allRecordFields}
+    ${fragments.allTextBlockFields}
+    mutation updateRecord($id: Int!, $data: RecordUpdateInput!) {
+      updateRecord(id: $id, data: $data) {
+        ...allRecordFields
+        content {
+          ...allTextBlockFields
+        }
+      }
+    }
+  `,
+
   updateTextBlock: gql`
     ${fragments.allTextBlockFields}
     mutation updateTextBlock($id: Int!, $data: TextBlockUpdateInput!) {

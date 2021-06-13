@@ -39,6 +39,9 @@ const PlayingRecord = () => {
   const [updateTextMutation, { loading2, error2 }] = useMutation(
     mutations.updateTextBlock
   );
+  const [updateRecordMutation, { loading3, error3 }] = useMutation(
+    mutations.updateRecord
+  );
 
   const history = useHistory();
   const goBack = () => {
@@ -59,6 +62,8 @@ const PlayingRecord = () => {
 
   const newData = data.recordById.content.map((e) => e.content);
   const finalQuestionData = newData.reduce((acc, cur) => `${acc} ${cur}`, "");
+  const { memo } = data.recordById;
+  const { tag } = data.recordById;
 
   const textrank = new TextRank(newData);
 
@@ -143,6 +148,27 @@ const PlayingRecord = () => {
     });
   }
 
+  function updateMemoMutation(recordIdNum, memoContent) {
+    updateRecordMutation({
+      variables: {
+        id: recordIdNum,
+        data: {
+          memo: memoContent,
+        },
+      },
+    });
+  }
+  function updateTagMutation(recordIdNum, tagContent) {
+    updateRecordMutation({
+      variables: {
+        id: recordIdNum,
+        data: {
+          tag: tagContent,
+        },
+      },
+    });
+  }
+
   const dataType = "data:audio/webm;";
   const codecs = "codecs=opus";
   const encoding = "base64";
@@ -200,8 +226,8 @@ const PlayingRecord = () => {
       </Grid>
       <Grid
         item
-        xs={12}
-        style={{ borderBottom: "0.5px solid", height: "500px" }}
+        xs={9}
+        style={({ borderBottom: "0.5px solid" }, { height: "500px" })}
       >
         {data.recordById?.content.map((e, i) => (
           <Tooltip
@@ -259,6 +285,36 @@ const PlayingRecord = () => {
             </div>
           </Tooltip>
         ))}
+      </Grid>
+      <Grid
+        item
+        xs={3}
+        style={({ borderLeft: "0.5px solid" }, { height: "500px" })}
+      >
+        <TextField
+          label="메모"
+          defaultValue={memo}
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          multiline
+          rows={8}
+          onChange={(er) => {
+            updateMemoMutation(data.recordById.id, er.target.value);
+          }}
+        />
+        <TextField
+          label="태그"
+          defaultValue={tag}
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          multiline
+          rows={3}
+          onChange={(er) => {
+            updateTagMutation(data.recordById.id, er.target.value);
+          }}
+        />
       </Grid>
       <Grid item xs={11}>
         <AudioPlayer
