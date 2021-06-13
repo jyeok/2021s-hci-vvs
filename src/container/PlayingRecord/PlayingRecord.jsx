@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+// /* eslint-disable no-unused-vars */
 import React, { useState, useRef } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
@@ -12,9 +12,12 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  FormControl,
+  InputLabel,
+  Select,
+  FormHelperText,
 } from "@material-ui/core";
-import { ArrowBack, Message } from "@material-ui/icons";
-import HelpIcon from "@material-ui/icons/Help";
+import { ArrowBack } from "@material-ui/icons";
 
 import { useQuery, useMutation } from "@apollo/client";
 import AudioPlayer from "react-h5-audio-player";
@@ -23,25 +26,20 @@ import { answerQuestion } from "api/ai/answerQuestion";
 import TextRank from "api/ai/summarization";
 import { base64StringToBlob } from "blob-util";
 
-// import { separateOperations } from "graphql";
-import { yellow } from "@material-ui/core/colors";
 import { MessageInput } from "@chatscope/chat-ui-kit-react";
 import MessageHolder from "../MessageHolder/MessageHolder";
 import { queries, mutations } from "../../api/gql/schema";
 
 const PlayingRecord = () => {
   const audioRef = useRef();
+
   const recordId = parseInt(useParams().id, 10);
   const { loading, error, data } = useQuery(queries.recordById, {
     variables: { id: recordId },
   });
 
-  const [updateTextMutation, { loading2, error2 }] = useMutation(
-    mutations.updateTextBlock
-  );
-  const [updateRecordMutation, { loading3, error3 }] = useMutation(
-    mutations.updateRecord
-  );
+  const [updateTextMutation] = useMutation(mutations.updateTextBlock);
+  const [updateRecordMutation] = useMutation(mutations.updateRecord);
 
   const history = useHistory();
   const goBack = () => {
@@ -49,10 +47,9 @@ const PlayingRecord = () => {
   };
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const [open, setOpen] = useState(false);
   const [editTextOpen, editTextsetOpen] = useState(false);
-  const [speed, setSpeed] = useState(1);
   const [textB, setTextB] = useState("");
+  // eslint-disable-next-line no-unused-vars
   const [summary, setSummary] = useState(true);
 
   if (loading) return "Loading...";
@@ -83,9 +80,7 @@ const PlayingRecord = () => {
     });
   };
 
-  const sumClose = () => {
-    setSummary(false);
-  };
+  // eslint-disable-next-line no-unused-vars
   const SelectItem = (eventKey) => {
     const numOfSentence = eventKey.target.value;
     console.log(textrank.getSummarizedText(numOfSentence));
@@ -93,23 +88,11 @@ const PlayingRecord = () => {
 
     return textrank.getSummarizedText(numOfSentence);
   };
-  const handleTooltipClose = () => {
-    setOpen(false);
-  };
-  const handleTooltipOpen = () => {
-    setOpen(true);
-  };
-  const slowPlaybackSpeed = () => {
-    setSpeed(speed - 0.1);
-    audioRef.current.audio.current.playbackRate = speed;
-  };
-  const fastPlaybackSpeed = () => {
-    setSpeed(speed + 0.1);
-    audioRef.current.audio.current.playbackRate = speed;
-  };
+
   const handleTextOpen = () => {
     editTextsetOpen(true);
   };
+
   const handleTextClose = () => {
     editTextsetOpen(false);
   };
@@ -171,17 +154,19 @@ const PlayingRecord = () => {
 
   const dataType = "data:audio/webm;";
   const codecs = "codecs=opus";
-  const encoding = "base64";
-  const url = `${dataType};${codecs};${encoding},{data.recordById.voice}`;
 
   const blob = base64StringToBlob(data.recordById.voice, dataType + codecs);
   const temp = URL.createObjectURL(blob);
 
   const playText = (d) => {
     const aud = audioRef.current.audio.current;
-    const dd = d.split(":").map((e) => parseInt(e, 10));
-    const curTime = dd[0] * 60 + dd[1];
+    const timeStamp = d.split(":").map((e) => parseInt(e, 10));
+    const curTime = timeStamp[0] * 60 + timeStamp[1];
     aud.currentTime = curTime;
+  };
+
+  const handleChange = (event) => {
+    audioRef.current.audio.current.playbackRate = event.target.value;
   };
 
   return (
@@ -192,6 +177,16 @@ const PlayingRecord = () => {
         style={({ borderBottom: "0.5px solid" }, { height: "50px" })}
       >
         <ArrowBack onClick={goBack} />
+        {/* <FormControl>
+          <InputLabel id="compress">전체요약</InputLabel>
+          <Select labelId="compress" value={anchorEl} onChange={handleClick}>
+            <MenuItem value={1}> 1</MenuItem>
+            <MenuItem value={2}> 2</MenuItem>
+            <MenuItem value={3}> 3</MenuItem>
+            <MenuItem value={4}> 4</MenuItem>
+            <MenuItem value={5}> 5</MenuItem>
+          </Select>
+        </FormControl> */}
         <Button
           aria-controls="compressAll"
           aria-haspopup="true"
@@ -200,6 +195,7 @@ const PlayingRecord = () => {
         >
           전체요약
         </Button>
+
         <Menu
           id="compressAll"
           anchorEl={anchorEl}
@@ -207,21 +203,11 @@ const PlayingRecord = () => {
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem onClick={SelectItem} value={1}>
-            1
-          </MenuItem>
-          <MenuItem onClick={SelectItem} value={2}>
-            2
-          </MenuItem>
-          <MenuItem onClick={SelectItem} value={3}>
-            3
-          </MenuItem>
-          <MenuItem onClick={SelectItem} value={4}>
-            4
-          </MenuItem>
-          <MenuItem onClick={SelectItem} value={5}>
-            5
-          </MenuItem>
+          <MenuItem value={1}>1</MenuItem>
+          <MenuItem value={2}>2</MenuItem>
+          <MenuItem value={3}>3</MenuItem>
+          <MenuItem value={4}>4</MenuItem>
+          <MenuItem value={5}>5</MenuItem>
         </Menu>
       </Grid>
       <Grid
@@ -229,62 +215,72 @@ const PlayingRecord = () => {
         xs={9}
         style={({ borderBottom: "0.5px solid" }, { height: "500px" })}
       >
-        {data.recordById?.content.map((e, i) => (
-          <Tooltip
-            interactive
-            key={`${recordId + i * 10}`}
-            fullWidth
-            maxWidth="ml"
-            title={
+        <div style={{ height: "500px", overflow: "scroll" }}>
+          {data.recordById?.content.map((e, i) => (
+            <Tooltip
+              interactive
+              key={`${recordId + i * 10}`}
+              title={
+                <div>
+                  <Button variant="contained" onClick={() => playText(e.start)}>
+                    텍스트 재생
+                  </Button>
+                  <Button variant="contained" onClick={handleTextOpen}>
+                    텍스트 편집
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => textLocation(e.id, e.isMine)}
+                  >
+                    텍스트 위치 변환
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => handleBookMark(e.id, e.isHighlighted)}
+                  >
+                    {e.isHighlighted ? "북마크 제거" : "북마크 추가"}
+                  </Button>
+                  <Dialog
+                    open={editTextOpen}
+                    onClose={handleTextClose}
+                    fullWidth
+                    maxWidth="lg"
+                  >
+                    <DialogContent>
+                      <TextField
+                        autoFocus
+                        margin="dense"
+                        label="수정할 텍스트 입력"
+                        defaultValue={e.content}
+                        fullWidth
+                        onChange={(er) => {
+                          setTextB(er.target.value);
+                        }}
+                      />
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={handleTextClose}>취소</Button>
+                      <Button onClick={() => updateText(textB, e.id)}>
+                        확인
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </div>
+              }
+            >
               <div>
-                <Button onClick={() => playText(e.start)}>텍스트 재생</Button>
-                <Button onClick={handleTextOpen}>텍스트 편집</Button>
-                <Button onClick={() => textLocation(e.id, e.isMine)}>
-                  텍스트 위치 변환
-                </Button>
-                <Button onClick={() => handleBookMark(e.id, e.isHighlighted)}>
-                  {e.isHighlighted ? "북마크 제거" : "북마크 추가"}
-                </Button>
-                <Dialog
-                  open={editTextOpen}
-                  onClose={handleTextClose}
-                  fullWidth
-                  maxWidth="lg"
-                >
-                  <DialogContent>
-                    <TextField
-                      autoFocus
-                      margin="dense"
-                      label="수정할 텍스트 입력"
-                      defaultValue={e.content}
-                      fullWidth
-                      onChange={(er) => {
-                        setTextB(er.target.value);
-                      }}
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleTextClose}>취소</Button>
-                    <Button onClick={() => updateText(textB, e.id)}>
-                      확인
-                    </Button>
-                  </DialogActions>
-                </Dialog>
+                <MessageHolder
+                  key={`${recordId + i * 20000}`}
+                  id={e.id}
+                  content={e.content}
+                  isMine={e.isMine}
+                  start={e.start}
+                  isHighlighted={e.isHighlighted}
+                />
               </div>
-            }
-          >
-            <div>
-              <MessageHolder
-                key={`${recordId + i * 20000}`}
-                id={e.id}
-                content={e.content}
-                isMine={e.isMine}
-                start={e.start}
-                isHighlighted={e.isHighlighted}
-              />
-            </div>
-          </Tooltip>
-        ))}
+            </Tooltip>
+          ))}
+        </div>
       </Grid>
       <Grid
         item
@@ -321,7 +317,6 @@ const PlayingRecord = () => {
           autoplay
           src={temp}
           ref={audioRef}
-          autoPlayAfterSrcChange={false}
           onLoadedMetaData={() => {
             const aud = audioRef.current.audio.current;
             if (aud.duration === Infinity) {
@@ -331,18 +326,29 @@ const PlayingRecord = () => {
           onLoadedData={() => {
             const aud = audioRef.current.audio.current;
             aud.currentTime = 0;
-            aud.playbackRate = speed;
+            aud.playbackRate = 1;
           }}
         />
       </Grid>
       <Grid item xs={1}>
-        <Button onClick={fastPlaybackSpeed} size="small">
-          +
-        </Button>
-        <Button size="small">{speed.toFixed(1)}x</Button>
-        <Button onClick={slowPlaybackSpeed} size="small">
-          -
-        </Button>
+        <FormControl>
+          <InputLabel id="playSpeed">재생 속도</InputLabel>
+          <Select
+            labelId="playSpeed"
+            onChange={(e) => handleChange(e)}
+            defaultValue={1}
+          >
+            <MenuItem value={0.8}>0.8</MenuItem>
+            <MenuItem defaultChecked value={1}>
+              1
+            </MenuItem>
+            <MenuItem value={1.2}>1.2</MenuItem>
+            <MenuItem value={1.5}>1.5</MenuItem>
+            <MenuItem value={1.8}>1.8</MenuItem>
+            <MenuItem value={2.0}>2.0</MenuItem>
+          </Select>
+          <FormHelperText>클릭해서 배속을 조절합니다</FormHelperText>
+        </FormControl>
       </Grid>
       <Grid item xs={12}>
         <MessageInput
