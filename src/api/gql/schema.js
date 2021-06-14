@@ -58,7 +58,13 @@ export const queries = {
       }
     }
   `,
-
+  voiceById: gql`
+    query voiceById($id: Int!) {
+      recordById(id: $id) {
+        voice
+      }
+    }
+  `,
   allRecords: gql`
     ${fragments.allRecordFields}
     ${fragments.allTextBlockFields}

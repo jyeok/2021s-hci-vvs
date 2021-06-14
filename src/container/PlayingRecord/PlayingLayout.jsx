@@ -29,7 +29,7 @@ const PlayingLayout = () => {
   const recordId = parseInt(useParams().id, 10);
 
   // GrqphQL Queries and Mutations
-  const { loading, error, data } = useQuery(queries.recordById, {
+  const { loading, error, data } = useQuery(queries.voiceById, {
     variables: { id: recordId },
   });
 
