@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 // /* eslint-disable */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router";
 import PropTypes from "prop-types";
 
@@ -64,8 +64,8 @@ const RecordComponent = (props) => {
   const [openCompress, setOpenCompress] = useState(false);
   const [editText, setEditText] = useState("");
   const [editOpen, setEditOpen] = useState(false);
-  const [memo, setMemo] = useState(data.recordById.memo);
-  const [tag, setTag] = useState(data.recordById.tag);
+  const [memo, setMemo] = useState("");
+  const [tag, setTag] = useState("");
   const [answer, setAnswer] = useState();
 
   // Hooks
@@ -73,6 +73,13 @@ const RecordComponent = (props) => {
 
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    if (data && data.recordById) {
+      setMemo(data.recordById.memo);
+      setTag(data.recordById.tag);
+    }
+  }, [data]);
 
   // GrqphQL Queries and Mutations
   const [updateTextBlockMutation] = useMutation(mutations.updateTextBlock);
@@ -83,6 +90,13 @@ const RecordComponent = (props) => {
     if (msg) enqueueSnackbar(msg, { variant });
     history.push("/");
   };
+
+  if (loading)
+    return <Loading message="녹음 파일을 로딩중입니다." transparent />;
+  if (error) return <Loading message="오류가 발생했습니다." error />;
+  if (!data || !data.recordById || data.recordById.isLocked) {
+    onBack("올바르지 않은 접근입니다.", "warning");
+  }
 
   const allContents = data.recordById.content.map((e) => e.content);
   const contentsConcat = allContents.reduce((acc, cur) => `${acc} ${cur}`, "");
@@ -141,6 +155,7 @@ const RecordComponent = (props) => {
 
   const onPlayText = (time) => {
     audioRef.current.audio.current.currentTime = Number.parseFloat(time);
+    audioRef.current.audio.current.play();
   };
 
   const onEditOpen = (textBlock) => {
@@ -205,13 +220,6 @@ const RecordComponent = (props) => {
       });
     });
   };
-
-  if (loading)
-    return <Loading message="녹음 파일을 로딩중입니다." transparent />;
-  if (error) return <Loading message="오류가 발생했습니다." error />;
-  if (!data || !data.recordById || data.recordById.isLocked) {
-    onBack("올바르지 않은 접근입니다.", "warning");
-  }
 
   const handleSpeed = (e) => {
     audioRef.current.audio.current.playbackRate = e.target.value;
