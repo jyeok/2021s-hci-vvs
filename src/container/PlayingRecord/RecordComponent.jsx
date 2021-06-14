@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 import PropTypes from "prop-types";
 
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import {
   Grid,
@@ -25,11 +25,14 @@ import PopupState, { bindHover, bindPopover } from "material-ui-popup-state";
 import Popover from "material-ui-popup-state/HoverPopover";
 import { useSnackbar } from "notistack";
 
-import { mutations } from "api/gql/schema";
+import { mutations, queries } from "api/gql/schema";
 
 import TextRank from "api/ai/summarization";
 import MessageHolder from "container/MessageHolder/MessageHolder";
 import { secondsToTime } from "component/Recorder/Util";
+import Loading from "container/Loading/Loading";
+import MessageInput from "@chatscope/chat-ui-kit-react/dist/cjs/MessageInput";
+import { answerQuestion } from "api/ai/answerQuestion";
 
 const useStyles = makeStyles(() => ({
   topElements: {
@@ -38,11 +41,10 @@ const useStyles = makeStyles(() => ({
   },
   formControl: {
     minWidth: 100,
-    float: "right",
     marginRight: "5px",
   },
   middleElements: {
-    height: "550px",
+    height: "500px",
     overflow: "scroll",
   },
   popupButtons: {
@@ -51,7 +53,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 const RecordComponent = (props) => {
-  const { data, id, audioRef } = props;
+  const { audioRef, id } = props;
+
+  const { loading, error, data } = useQuery(queries.recordById, {
+    variables: { id },
+  });
 
   // State
   const [numCompress, setNumCompress] = useState(3);
@@ -77,10 +83,6 @@ const RecordComponent = (props) => {
     if (msg) enqueueSnackbar(msg, { variant });
     history.push("/");
   };
-
-  // Data Logic
-  // setMemo(data.recordById.memo);
-  // setTag(data.recordById.tag);
 
   const allContents = data.recordById.content.map((e) => e.content);
   const contentsConcat = allContents.reduce((acc, cur) => `${acc} ${cur}`, "");
@@ -204,6 +206,34 @@ const RecordComponent = (props) => {
     });
   };
 
+  if (loading)
+    return <Loading message="녹음 파일을 로딩중입니다." transparent />;
+  if (error) return <Loading message="오류가 발생했습니다." error />;
+  if (!data || !data.recordById || data.recordById.isLocked) {
+    onBack("올바르지 않은 접근입니다.", "warning");
+  }
+
+  const handleSpeed = (e) => {
+    audioRef.current.audio.current.playbackRate = e.target.value;
+  };
+
+  const handleQuestion = async (input) => {
+    answerQuestion(contentsConcat, input).then((result) => {
+      const ans = result[0];
+      const ansBlock = data.recordById.content.filter(
+        (x) => x.content.indexOf(ans) !== -1
+      );
+
+      setAnswer({
+        answer: ans,
+        block: ansBlock,
+      });
+
+      alert(ans);
+      console.log(ansBlock); // TODO: FIX IT
+    });
+  };
+
   return (
     <>
       <Grid
@@ -221,15 +251,33 @@ const RecordComponent = (props) => {
           </Button>
         </Grid>
         <Grid item lg={4} />
-        <Grid item lg={2}>
-          <Button onClick={() => onMemoUpdate()}>메모 업데이트</Button>
-        </Grid>
-        <Grid item lg={2}>
-          <Button onClick={() => onTagUpdate()}>태그 업데이트</Button>
-        </Grid>
-        <Grid item lg={3}>
+        <Grid item lg={1}>
           <FormControl className={classes.formControl}>
-            <InputLabel id="numCompress"> 녹음 요약 </InputLabel>
+            <InputLabel variant="filled" color="primary" id="playSpeed">
+              재생 속도
+            </InputLabel>
+            <Select
+              labelId="playSpeed"
+              onChange={(e) => handleSpeed(e)}
+              defaultValue={1}
+            >
+              <MenuItem value={0.8}>0.8</MenuItem>
+              <MenuItem defaultChecked value={1}>
+                1
+              </MenuItem>
+              <MenuItem value={1.2}>1.2</MenuItem>
+              <MenuItem value={1.5}>1.5</MenuItem>
+              <MenuItem value={1.8}>1.8</MenuItem>
+              <MenuItem value={2.0}>2.0</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item lg={1} />
+        <Grid item lg={1}>
+          <FormControl className={classes.formControl}>
+            <InputLabel variant="filled" color="primary" id="numCompress">
+              N줄 요약
+            </InputLabel>
             <Select
               labelId="numCompress"
               value={numCompress}
@@ -243,6 +291,26 @@ const RecordComponent = (props) => {
               <MenuItem value={7}> 7 </MenuItem>
             </Select>
           </FormControl>
+        </Grid>
+        <Grid item lg={1} />
+        <Grid item lg={1}>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={() => onMemoUpdate()}
+          >
+            메모 업데이트
+          </Button>
+        </Grid>
+        <Grid item lg={1} />
+        <Grid item lg={1}>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={() => onTagUpdate()}
+          >
+            태그 업데이트
+          </Button>
         </Grid>
       </Grid>
 
@@ -377,7 +445,13 @@ const RecordComponent = (props) => {
         </Grid>
       </Grid>
       <Grid container justify="center" alignItems="center" spacing={0}>
-        질문자리
+        <Grid item lg={12}>
+          <MessageInput
+            attachButton={false}
+            placeholder="여기에 질문을 입력해보세요"
+            onSend={(e) => handleQuestion(e)}
+          />
+        </Grid>
       </Grid>
     </>
   );
@@ -386,22 +460,9 @@ const RecordComponent = (props) => {
 export default RecordComponent;
 
 RecordComponent.propTypes = {
-  id: PropTypes.number.isRequired,
-  data: PropTypes.shape({
-    recordById: PropTypes.shape({
-      id: PropTypes.number,
-      content: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.number,
-          start: PropTypes.string,
-        })
-      ),
-      memo: PropTypes.string,
-      tag: PropTypes.string,
-    }),
-  }).isRequired,
   audioRef: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
     current: PropTypes.any,
   }).isRequired,
+  id: PropTypes.number.isRequired,
 };
