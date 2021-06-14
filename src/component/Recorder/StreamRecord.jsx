@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useMutation } from "@apollo/client";
@@ -19,7 +20,6 @@ import { secondsToTime, splitBase64String } from "./Util";
 const useStyles = makeStyles(() => ({
   topElements: {
     height: "50px",
-    borderBottom: "0.5px solid",
   },
 }));
 
@@ -203,7 +203,7 @@ const StreamRecord = () => {
   };
 
   return (
-    <Grid container style={{ border: "1px solid" }}>
+    <Grid container>
       <Grid
         container
         justify="center"
@@ -213,15 +213,15 @@ const StreamRecord = () => {
         className={classes.topElements}
         style={{
           backgroundColor:
-            // eslint-disable-next-line no-nested-ternary
             status === "recording"
               ? "orange"
-              : // eslint-disable-next-line no-nested-ternary
-              status === "ready"
+              : status === "ready"
               ? "skyblue"
               : status === "error"
               ? "red"
               : "",
+          border: "1px solid",
+          borderBottom: "0px",
         }}
       >
         <Grid item lg={1}>
@@ -305,43 +305,40 @@ const StreamRecord = () => {
           </Button>
         </Grid>
       </Grid>
-      <Grid
-        container
-        justify="center"
-        alignItems="center"
-        spacing={0}
-        style={{ marginTop: "10px" }}
-      >
-        <Grid item xs={8} style={{ height: "600px" }}>
+      <Grid container justify="center" alignItems="center" spacing={0}>
+        <Grid item xs={8} style={{ height: "600px", border: "1px solid" }}>
           <RecordingMessage
             contents={textBlockData}
             setContents={setTextBlockData}
             listening={recording}
           />
         </Grid>
-        <Grid item xs={4} style={{ height: "600px" }}>
-          메모
+        <Grid
+          item
+          xs={4}
+          style={{ height: "600px", border: "1px solid", overflow: "scroll" }}
+        >
           <TextField
-            variant="outlined"
-            multiline
-            rows={15}
-            placeholder="여기에 메모를 입력하세요."
-            fullWidth
+            label="메모"
             name="memo"
             value={memo}
-            onChange={inputChangeHandler}
-            style={{ marginBottom: "10px" }}
-          />
-          태그
-          <TextField
-            variant="outlined"
             multiline
-            rows={8}
+            rows={19}
+            placeholder="여기에 메모를 입력하세요."
+            fullWidth
+            onChange={inputChangeHandler}
+            style={{ marginTop: "5px" }}
+          />
+          <TextField
+            label="태그"
+            multiline
+            rows={9}
             placeholder="녹음이 종료되면 키워드가 생성됩니다. 직접 추가할 수도 있습니다. 예시: #약속 #밥"
             name="tag"
             value={tag}
             fullWidth
             onChange={inputChangeHandler}
+            style={{ marginTop: "5px" }}
           />
         </Grid>
       </Grid>
