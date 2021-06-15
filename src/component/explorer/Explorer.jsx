@@ -126,7 +126,11 @@ const Explorer = () => {
           <FileContextMenu />
         </FileBrowser>
       </Grid>
-      <Grid item xs={4} style={{ border: "1px solid", height: "650px" }}>
+      <Grid
+        item
+        xs={4}
+        style={{ border: "1px solid", height: "650px", overflow: "scroll" }}
+      >
         <Preview
           id={id}
           memo={memo}

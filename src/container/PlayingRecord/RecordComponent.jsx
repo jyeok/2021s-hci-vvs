@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
-// /* eslint-disable */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createRef } from "react";
 import { useHistory } from "react-router";
 import PropTypes from "prop-types";
 
@@ -19,8 +18,11 @@ import {
   Dialog,
   DialogContent,
   DialogActions,
+  DialogTitle,
+  DialogContentText,
+  Typography,
 } from "@material-ui/core";
-import { ArrowBack } from "@material-ui/icons";
+import { ArrowBack, ArrowBackIos, ArrowForwardIos } from "@material-ui/icons";
 import PopupState, { bindHover, bindPopover } from "material-ui-popup-state";
 import Popover from "material-ui-popup-state/HoverPopover";
 import { useSnackbar } from "notistack";
@@ -66,7 +68,17 @@ const RecordComponent = (props) => {
   const [editOpen, setEditOpen] = useState(false);
   const [memo, setMemo] = useState("");
   const [tag, setTag] = useState("");
-  const [answer, setAnswer] = useState();
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState({
+    title: "",
+    contents: [],
+    onClose: () => {},
+    onConfirm: undefined,
+  });
+
+  const [currBookmark, setCurrBookmark] = useState(undefined);
+  const [bookmarkRefs, setBookmarkRefs] = useState([]);
 
   // Hooks
   const history = useHistory();
@@ -78,8 +90,30 @@ const RecordComponent = (props) => {
     if (data && data.recordById) {
       setMemo(data.recordById.memo);
       setTag(data.recordById.tag);
+      setBookmarkRefs((refs) =>
+        Array(data.recordById.content.length)
+          .fill()
+          .map((_, i) => refs[i] || createRef())
+      );
     }
   }, [data]);
+
+  useEffect(() => {
+    if (
+      currBookmark !== undefined &&
+      currBookmark >= 0 &&
+      currBookmark < bookmarkRefs.length
+    ) {
+      const realContentBookmark = data.recordById.content.findIndex(
+        (e) =>
+          e.id ===
+          data.recordById.content.filter((t) => t.isHighlighted)[currBookmark]
+            .id
+      );
+
+      bookmarkRefs[realContentBookmark].current.scrollIntoView();
+    }
+  }, [currBookmark]);
 
   // GrqphQL Queries and Mutations
   const [updateTextBlockMutation] = useMutation(mutations.updateTextBlock);
@@ -99,16 +133,34 @@ const RecordComponent = (props) => {
   }
 
   const allContents = data.recordById.content.map((e) => e.content);
+  const allBookmarks = data.recordById.content.filter((e) => e.isHighlighted);
+
   const contentsConcat = allContents.reduce((acc, cur) => `${acc} ${cur}`, "");
   const textRank = new TextRank(allContents);
 
   // Handlers
   const changeNumCompress = (e) => {
-    // TODO: CHANGE IT
-    const currNumCompress = e.target.value;
+    const currNumCompress = e.target.value || numCompress;
 
     setNumCompress(currNumCompress);
-    alert(textRank.getSummarizedText(currNumCompress));
+    const result = textRank.getSummarizedText(currNumCompress);
+    const resultSplited = result.split("\n").map((s, i) => ({
+      id: i + 1,
+      content: s,
+    }));
+
+    setDialogContent({
+      title: `${currNumCompress}줄요약 결과!`,
+      contents: [
+        { id: 0, content: `${currNumCompress}줄요약 결과는...` },
+        ...resultSplited,
+        { id: resultSplited.length + 1, content: "재미로만 봐 주세요 :)" },
+      ],
+      onClose: () => setDialogOpen(false),
+      onConfirm: undefined,
+    });
+
+    setDialogOpen(true);
   };
 
   const onMemoUpdate = () => {
@@ -121,7 +173,7 @@ const RecordComponent = (props) => {
       },
     })
       .then(() => {
-        enqueueSnackbar("수정된 내용이 저장되었습니다.", {
+        enqueueSnackbar("메모가 저장되었습니다.", {
           variant: "success",
         });
       })
@@ -142,7 +194,7 @@ const RecordComponent = (props) => {
       },
     })
       .then(() => {
-        enqueueSnackbar("수정된 내용이 저장되었습니다.", {
+        enqueueSnackbar("태그가 저장되었습니다.", {
           variant: "success",
         });
       })
@@ -232,33 +284,101 @@ const RecordComponent = (props) => {
         (x) => x.content.indexOf(ans) !== -1
       );
 
-      setAnswer({
-        answer: ans,
-        block: ansBlock,
+      setDialogContent({
+        title: `질문: ${input}에 대해!`,
+        contents: [
+          { id: 0, content: `질문 ${input}에 대해 찾은 답변이에요` },
+          { id: 1, content: ans },
+          { id: 2, content: "이 부분의 음성을 자세히 들어보시겠어요?" },
+        ],
+        onClose: () => setDialogOpen(false),
+        onConfirm: () => {
+          onPlayText(Number.parseFloat(ansBlock[0].start, 10));
+          setDialogOpen(false);
+        },
       });
 
-      alert(ans);
-      console.log(ansBlock); // TODO: FIX IT
+      setDialogOpen(true);
     });
+  };
+
+  const nextBookmark = () => {
+    if (allBookmarks >= allBookmarks.length) return undefined;
+    if (currBookmark === undefined) {
+      return 0;
+    }
+
+    return currBookmark + 1;
+  };
+
+  const prevBookmark = () => {
+    if (currBookmark >= allBookmarks.length) {
+      return allBookmarks.length - 1;
+    }
+    if (currBookmark === 0 || allBookmarks.length === 0) {
+      return undefined;
+    }
+
+    return currBookmark - 1;
+  };
+
+  const onForward = () => {
+    const next = nextBookmark();
+    setCurrBookmark(next);
+  };
+
+  const onBackward = () => {
+    const prev = prevBookmark();
+    setCurrBookmark(prev);
   };
 
   return (
     <>
       <Grid
         container
-        justify="center"
         alignItems="center"
         spacing={0}
         direction="row"
         className={classes.topElements}
         style={{ border: "1px solid" }}
       >
+        {/* 돌아가기 */}
         <Grid item lg={1}>
           <Button onClick={() => onBack()} startIcon={<ArrowBack />}>
             돌아가기
           </Button>
         </Grid>
-        <Grid item lg={4} />
+        {/* 북마크 탐색 */}
+        {allBookmarks.length === 0 ? (
+          <Grid item lg={4}>
+            <Typography variant="caption">
+              북마크가 없습니다. 텍스트를 클릭해 북마크를 추가해 보세요!
+            </Typography>
+          </Grid>
+        ) : (
+          <>
+            <Grid item lg={1}>
+              <Button
+                disabled={currBookmark === undefined}
+                onClick={() => onBackward()}
+                endIcon={<ArrowBackIos />}
+              >
+                {currBookmark === 0 ? "끝내기" : "이전 북마크"}
+              </Button>
+            </Grid>
+            <Grid item lg={1}>
+              <Button
+                disabled={currBookmark >= allBookmarks.length - 1}
+                onClick={() => onForward()}
+                startIcon={<ArrowForwardIos />}
+              >
+                {currBookmark === undefined ? "북마크 보기" : "다음 북마크"}
+              </Button>
+            </Grid>
+            <Grid item lg={2} />
+          </>
+        )}
+        {/* 재생 속도 */}
         <Grid item lg={1}>
           <FormControl className={classes.formControl}>
             <InputLabel variant="filled" color="primary" id="playSpeed">
@@ -269,18 +389,20 @@ const RecordComponent = (props) => {
               onChange={(e) => handleSpeed(e)}
               defaultValue={1}
             >
-              <MenuItem value={0.8}>0.8</MenuItem>
+              <MenuItem value={0.8}>0.8배속</MenuItem>
               <MenuItem defaultChecked value={1}>
-                1
+                1배속
               </MenuItem>
-              <MenuItem value={1.2}>1.2</MenuItem>
-              <MenuItem value={1.5}>1.5</MenuItem>
-              <MenuItem value={1.8}>1.8</MenuItem>
-              <MenuItem value={2.0}>2.0</MenuItem>
+              <MenuItem value={1.2}>1.2배속</MenuItem>
+              <MenuItem value={1.2}>1.2배속</MenuItem>
+              <MenuItem value={1.5}>1.5배속</MenuItem>
+              <MenuItem value={1.8}>1.8배속</MenuItem>
+              <MenuItem value={2.0}>2.0배속</MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item lg={1} />
+        {/* 요약 */}
         <Grid item lg={1}>
           <FormControl className={classes.formControl}>
             <InputLabel variant="filled" color="primary" id="numCompress">
@@ -292,32 +414,26 @@ const RecordComponent = (props) => {
               open={openCompress}
               onOpen={() => setOpenCompress(true)}
               onClose={() => setOpenCompress(false)}
-              onChange={(e) => changeNumCompress(e)}
+              onClick={(e) => changeNumCompress(e)}
             >
-              <MenuItem value={3}> 3 </MenuItem>
-              <MenuItem value={5}> 5 </MenuItem>
-              <MenuItem value={7}> 7 </MenuItem>
+              <MenuItem value={3}> 3줄 </MenuItem>
+              <MenuItem value={5}> 5줄 </MenuItem>
+              <MenuItem value={7}> 7줄 </MenuItem>
             </Select>
           </FormControl>
         </Grid>
-        <Grid item lg={1} />
-        <Grid item lg={1}>
+        <Grid item lg={2} />
+        {/* 메모 & 태그 업데이트 */}
+        <Grid item lg={2} style={{ float: "right" }}>
           <Button
             color="primary"
             variant="contained"
-            onClick={() => onMemoUpdate()}
+            onClick={() => {
+              onMemoUpdate();
+              onTagUpdate();
+            }}
           >
-            메모 업데이트
-          </Button>
-        </Grid>
-        <Grid item lg={1} />
-        <Grid item lg={1}>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={() => onTagUpdate()}
-          >
-            태그 업데이트
+            메모 & 태그 업데이트
           </Button>
         </Grid>
       </Grid>
@@ -329,97 +445,103 @@ const RecordComponent = (props) => {
         spacing={0}
         style={{ border: "1px solid" }}
       >
+        {/* 메시지 블록  */}
         <Grid item xs={8} className={classes.middleElements}>
-          {data.recordById?.content.map((e) => (
-            <PopupState
-              key={`${id}${e.start}`}
-              variant="popover"
-              popupId={`play${id}${e.start}`}
-            >
-              {(popupState) => (
-                <>
-                  <MessageHolder
-                    id={e.id}
-                    content={e.content}
-                    isMine={e.isMine}
-                    start={secondsToTime(e.start)}
-                    isHighlighted={e.isHighlighted}
-                    bindHover={() => bindHover(popupState)}
-                  />
-                  <Popover
-                    // eslint-disable-next-line react/jsx-props-no-spreading
-                    {...bindPopover(popupState)}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: e.isMine ? "right" : "left",
-                    }}
-                    transformOrigin={{
-                      vertical: "center",
-                      horizontal: "right",
-                    }}
-                    disableRestoreFocus
-                  >
-                    <Button
-                      className={classes.popupButtons}
-                      variant="contained"
-                      color="primary"
-                      onClick={() => onPlayText(e.start)}
+          {data.recordById?.content.map((e, i) => (
+            <div key={e.id} ref={bookmarkRefs[i]}>
+              <PopupState
+                key={`${id}${e.start}`}
+                variant="popover"
+                popupId={`play${id}${e.start}`}
+              >
+                {(popupState) => (
+                  <>
+                    <MessageHolder
+                      id={e.id}
+                      content={e.content}
+                      isMine={e.isMine}
+                      start={secondsToTime(e.start)}
+                      isHighlighted={e.isHighlighted}
+                      bindHover={() => bindHover(popupState)}
+                    />
+                    <Popover
+                      // eslint-disable-next-line react/jsx-props-no-spreading
+                      {...bindPopover(popupState)}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: e.isMine ? "right" : "left",
+                      }}
+                      transformOrigin={{
+                        vertical: "center",
+                        horizontal: "right",
+                      }}
+                      disableRestoreFocus
                     >
-                      이 부분 재생
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className={classes.popupButtons}
-                      onClick={() => onEditOpen(e)}
-                    >
-                      텍스트 편집
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className={classes.popupButtons}
-                      onClick={() => onToggleLocation(e)}
-                    >
-                      {e.isMine ? "상대의 말로 표시" : "내 말로 표시"}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      style={{ margin: "3px" }}
-                      onClick={() => onAddBookmark(e)}
-                    >
-                      {e.isHighlighted ? "북마크 제거" : "북마크 추가"}
-                    </Button>
-                    <Dialog
-                      open={editOpen}
-                      onClose={() => onEditClose()}
-                      fullWidth
-                    >
-                      <DialogContent>
-                        <TextField
-                          multiline
-                          autoFocus
-                          margin="dense"
-                          label="수정할 텍스트 입력"
-                          value={editText}
-                          fullWidth
-                          onChange={(event) => {
-                            setEditText(event.target.value);
-                          }}
-                        />
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={() => onEditClose()}>취소</Button>
-                        <Button onClick={() => onEditTextBlock(e)}>확인</Button>
-                      </DialogActions>
-                    </Dialog>
-                  </Popover>
-                </>
-              )}
-            </PopupState>
+                      <Button
+                        className={classes.popupButtons}
+                        variant="contained"
+                        color="primary"
+                        onClick={() => onPlayText(e.start)}
+                      >
+                        이 부분 재생
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.popupButtons}
+                        onClick={() => onEditOpen(e)}
+                      >
+                        텍스트 편집
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.popupButtons}
+                        onClick={() => onToggleLocation(e)}
+                      >
+                        {e.isMine ? "상대의 말로 표시" : "내 말로 표시"}
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        style={{ margin: "3px" }}
+                        onClick={() => onAddBookmark(e)}
+                      >
+                        {e.isHighlighted ? "북마크 제거" : "북마크 추가"}
+                      </Button>
+                      <Dialog
+                        open={editOpen}
+                        onClose={() => onEditClose()}
+                        fullWidth
+                      >
+                        <DialogContent>
+                          <TextField
+                            multiline
+                            autoFocus
+                            margin="dense"
+                            label="수정할 텍스트 입력"
+                            value={editText}
+                            fullWidth
+                            onChange={(event) => {
+                              setEditText(event.target.value);
+                            }}
+                          />
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={() => onEditClose()}>취소</Button>
+                          <Button onClick={() => onEditTextBlock(e)}>
+                            확인
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                    </Popover>
+                  </>
+                )}
+              </PopupState>
+            </div>
           ))}
         </Grid>
+        {/* 메모, 태그 */}
         <Grid
           item
           xs={4}
@@ -452,15 +574,38 @@ const RecordComponent = (props) => {
           />
         </Grid>
       </Grid>
+      {/* 질문  */}
       <Grid container justify="center" alignItems="center" spacing={0}>
         <Grid item lg={12}>
           <MessageInput
+            style={{ width: "100vw" }}
             attachButton={false}
-            placeholder="여기에 질문을 입력해보세요"
+            placeholder="녹음에서 찾고 싶은 내용을 입력해 보세요."
             onSend={(e) => handleQuestion(e)}
           />
         </Grid>
       </Grid>
+      {/* Dialog  */}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle id="alert-dialog-title">{dialogContent.title}</DialogTitle>
+        <DialogContent>
+          {dialogContent.contents.map((e) => (
+            <DialogContentText key={e.id}> {e.content} </DialogContentText>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => dialogContent.onClose()} color="primary">
+            닫기
+          </Button>
+          {dialogContent && dialogContent.onConfirm ? (
+            <Button onClick={() => dialogContent.onConfirm()} color="primary">
+              들으러 가기
+            </Button>
+          ) : (
+            false
+          )}
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

@@ -98,7 +98,7 @@ const Preview = (props) => {
         InputProps={{ readOnly: true }}
       />
       <Grid container style={{ marginTop: "5px" }}>
-        <Grid item xs={4}>
+        <Grid item lg={4} md={4}>
           <Button
             style={pborder}
             size="large"
@@ -111,7 +111,7 @@ const Preview = (props) => {
             녹음 추가
           </Button>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item lg={4} md={4}>
           <Button
             style={pborder}
             size="large"
@@ -125,7 +125,7 @@ const Preview = (props) => {
             녹음 재생
           </Button>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item lg={4} md={4}>
           <Button
             style={pborder}
             size="large"
