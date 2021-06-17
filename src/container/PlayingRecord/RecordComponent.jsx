@@ -27,14 +27,15 @@ import PopupState, { bindHover, bindPopover } from "material-ui-popup-state";
 import Popover from "material-ui-popup-state/HoverPopover";
 import { useSnackbar } from "notistack";
 
-import { mutations, queries } from "api/gql/schema";
-
 import TextRank from "api/ai/summarization";
-import MessageHolder from "container/MessageHolder/MessageHolder";
+import { mutations, queries } from "api/gql/schema";
+import { answerQuestion } from "api/ai/answerQuestion";
+
 import { secondsToTime } from "component/Recorder/Util";
+
+import MessageHolder from "container/MessageHolder/MessageHolder";
 import Loading from "container/Loading/Loading";
 import MessageInput from "@chatscope/chat-ui-kit-react/dist/cjs/MessageInput";
-import { answerQuestion } from "api/ai/answerQuestion";
 
 const useStyles = makeStyles(() => ({
   topElements: {
@@ -46,7 +47,7 @@ const useStyles = makeStyles(() => ({
     marginRight: "5px",
   },
   middleElements: {
-    height: "500px",
+    height: "480px",
     overflow: "scroll",
   },
   popupButtons: {
