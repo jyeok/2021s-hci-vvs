@@ -152,13 +152,13 @@ const StreamRecord = () => {
         : [];
 
       const tagConcat = userTag.concat(tagList);
-      const finalTag = [...new Set(tagConcat)].join(" ").trim();
+      const finalTag = [...new Set(tagConcat)].slice(0, 10).join(" ").trim();
 
       const recordCreateInput = {
         path: inputState.title,
         title: inputState.title,
         size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
-        tag: finalTag.slice(0, 10),
+        tag: finalTag,
         memo: inputState.memo,
         content: textBlockCreateInput,
         voice,
