@@ -5,7 +5,6 @@ import { ApolloProvider } from "react-apollo";
 import { ApolloClient } from "@apollo/client";
 import { SnackbarProvider } from "notistack";
 
-import PlayingRecord from "container/PlayingRecord/PlayingRecord";
 import Explorer from "component/explorer/Explorer";
 import StreamRecord from "component/Recorder/StreamRecord";
 import PlayingLayout from "container/PlayingRecord/PlayingLayout";
@@ -19,7 +18,6 @@ function App(props) {
         <div className="App">
           <Switch>
             <Route path="/" exact component={Explorer} />
-            <Route path="/legacy/:id" exact component={PlayingRecord} />
             <Route path="/recording" exact component={StreamRecord} />
             <Route path="/playing/:id" exact component={PlayingLayout} />
             <Redirect path="*" to="/" />

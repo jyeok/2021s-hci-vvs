@@ -17,6 +17,8 @@ import Loading from "container/Loading/Loading";
 import { base64StringToBlob } from "blob-util";
 import RecordComponent from "./RecordComponent";
 
+import "react-h5-audio-player/lib/styles.css";
+
 const PlayingLayout = () => {
   const dataType = "data:audio/webm;";
   const codecs = "codecs=opus";
