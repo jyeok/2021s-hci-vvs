@@ -84,7 +84,7 @@ const Preview = (props) => {
         value={isLocked ? "잠금을 해제해 주세요." : tag}
         fullWidth
         margin="normal"
-        variant="outlined"
+        variant="filled"
         InputProps={{ readOnly: true }}
       />
       <TextField
@@ -92,7 +92,7 @@ const Preview = (props) => {
         value={isLocked ? "잠금을 해제해 주세요." : memo}
         fullWidth
         margin="normal"
-        variant="outlined"
+        variant="filled"
         multiline
         rows={5}
         InputProps={{ readOnly: true }}
