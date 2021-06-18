@@ -111,7 +111,7 @@ class TextRank {
   }
 
   getSummarizedText(n) {
-    return this._top(n + 1);
+    return this._top(n);
   }
 
   _initRanking() {
@@ -146,10 +146,9 @@ class TextRank {
 
     var returnString = "";
     for (var i = 0; i < n; i++) {
-      if (ranking[i] < n) {
-        returnString += this.ps.sentence[i] + "\n";
-      }
+      returnString += this.ps.sentence[i] + "\n";
     }
+
     return returnString;
   }
 }

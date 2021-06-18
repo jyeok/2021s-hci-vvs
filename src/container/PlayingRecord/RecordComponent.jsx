@@ -286,17 +286,24 @@ const RecordComponent = (props) => {
       );
 
       setDialogContent({
-        title: `질문: ${input}에 대해!`,
-        contents: [
-          { id: 0, content: `질문 ${input}에 대해 찾은 답변이에요` },
-          { id: 1, content: ans },
-          { id: 2, content: "이 부분의 음성을 자세히 들어보시겠어요?" },
-        ],
+        title: `질문: "${input}"에 대해!`,
+        contents: ans
+          ? [
+              { id: 0, content: `질문 ${input}에 대해 찾은 답변이에요.` },
+              { id: 1, content: ans },
+              { id: 2, content: "이 부분의 음성을 자세히 들어보시겠어요?" },
+            ]
+          : [
+              { id: 0, content: `질문 ${input}에 대한 답을 찾을 수 없어요.` },
+              { id: 1, content: "다른 검색어로 다시 시도해보시겠어요?" },
+            ],
         onClose: () => setDialogOpen(false),
-        onConfirm: () => {
-          onPlayText(Number.parseFloat(ansBlock[0].start, 10));
-          setDialogOpen(false);
-        },
+        onConfirm: ans
+          ? () => {
+              onPlayText(Number.parseFloat(ansBlock[0].start, 10));
+              setDialogOpen(false);
+            }
+          : () => setDialogOpen(false),
       });
 
       setDialogOpen(true);
@@ -598,7 +605,9 @@ const RecordComponent = (props) => {
           <Button onClick={() => dialogContent.onClose()} color="primary">
             닫기
           </Button>
-          {dialogContent && dialogContent.onConfirm ? (
+          {dialogContent &&
+          dialogContent.length >= 3 &&
+          dialogContent.onConfirm ? (
             <Button onClick={() => dialogContent.onConfirm()} color="primary">
               들으러 가기
             </Button>
