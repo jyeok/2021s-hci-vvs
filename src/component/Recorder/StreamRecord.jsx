@@ -158,7 +158,7 @@ const StreamRecord = () => {
         path: inputState.title,
         title: inputState.title,
         size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
-        tag: finalTag,
+        tag: finalTag.slice(0, 10),
         memo: inputState.memo,
         content: textBlockCreateInput,
         voice,
