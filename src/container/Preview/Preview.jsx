@@ -9,7 +9,9 @@ import { mutations } from "api/gql/schema";
 import { Box, Button, Grid, TextField } from "@material-ui/core";
 import { Lock, PlayArrow, RecordVoiceOver } from "@material-ui/icons";
 
+import { secondsToTime } from "component/Recorder/Util";
 import { TextBlock } from "proptypes/ModelPropTypes";
+
 import MessageHolder from "../MessageHolder/MessageHolder";
 
 const pborder = {
@@ -53,6 +55,7 @@ const Preview = (props) => {
       isHighlighted={e.isHighlighted}
       isModified={e.isModified}
       reliability={e.reliability}
+      start={secondsToTime(e.start)}
     />
   ));
 
@@ -145,6 +148,7 @@ const Preview = (props) => {
 export default Preview;
 
 const { id, end, ...messageTemplate } = TextBlock;
+
 Preview.propTypes = {
   id: PropTypes.number,
   memo: PropTypes.string,
