@@ -146,9 +146,10 @@ class TextRank {
 
     var returnString = "";
     for (var i = 0; i < n; i++) {
-      returnString += this.ps.sentence[i] + "\n";
+      if (ranking[i] < n) {
+        returnString += this.ps.sentence[i] + "\n";
+      }
     }
-
     return returnString;
   }
 }

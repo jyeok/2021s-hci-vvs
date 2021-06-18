@@ -145,9 +145,10 @@ const RecordComponent = (props) => {
 
     setNumCompress(currNumCompress);
     const result = textRank.getSummarizedText(currNumCompress);
+
     const resultSplited = result.split("\n").map((s, i) => ({
       id: i + 1,
-      content: s,
+      content: s === "undefined" ? "" : s,
     }));
 
     setDialogContent({
@@ -155,7 +156,13 @@ const RecordComponent = (props) => {
       contents: [
         { id: 0, content: `${currNumCompress}줄요약 결과는...` },
         ...resultSplited,
-        { id: resultSplited.length + 1, content: "재미로만 봐 주세요 :)" },
+        {
+          id: resultSplited.length + 1,
+          content:
+            resultSplited.length - 1 === currNumCompress
+              ? "재미로만 봐 주세요 :)"
+              : `결과가 ${currNumCompress}줄 이하인가요? 조금 더 긴 녹음으로 시도해 보세요.`,
+        },
       ],
       onClose: () => setDialogOpen(false),
       onConfirm: undefined,
