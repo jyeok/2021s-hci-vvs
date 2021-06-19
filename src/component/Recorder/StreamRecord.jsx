@@ -315,7 +315,8 @@ const StreamRecord = () => {
           <RecordingMessage
             contents={textBlockData}
             setContents={setTextBlockData}
-            listening={interimString}
+            listening={recording}
+            interimString={interimString}
           />
         </Grid>
         <Grid

@@ -10,8 +10,8 @@ import {
 import { CircularProgress } from "@material-ui/core";
 import { secondsToTime } from "component/Recorder/Util";
 
-const RecordingMessage = (prop) => {
-  const { contents, listening } = prop;
+const RecordingMessage = (props) => {
+  const { contents, listening, interimString } = props;
 
   const messages = contents.map((m, i) => {
     const model = {
@@ -44,7 +44,7 @@ const RecordingMessage = (prop) => {
                 <CircularProgress size={20} style={{ marginRight: "5px" }} />
                 듣는 중... <br />
                 <br />
-                {listening}
+                {interimString}
               </Message.CustomContent>
             </Message>
           )}
@@ -56,7 +56,7 @@ const RecordingMessage = (prop) => {
 
 export default RecordingMessage;
 
-RecordingMessage.PropType = {
+RecordingMessage.propTypes = {
   contents: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -69,8 +69,8 @@ RecordingMessage.PropType = {
       end: PropTypes.string.isRequired,
     })
   ),
-  setContents: PropTypes.func.isRequired,
-  listening: PropTypes.string.isRequired,
+  listening: PropTypes.bool.isRequired,
+  interimString: PropTypes.string.isRequired,
 };
 
 RecordingMessage.defaultProps = {
@@ -85,9 +85,4 @@ RecordingMessage.defaultProps = {
       end: "1.6",
     },
   ],
-  setContents: (data) => {
-    // eslint-disable-next-line no-console
-    console.log(data);
-  },
-  listening: "",
 };
