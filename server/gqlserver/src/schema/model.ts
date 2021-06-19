@@ -1,7 +1,6 @@
 import { objectType, asNexusMethod, enumType } from 'nexus'
 import { DateTimeResolver } from 'graphql-scalars'
 import { Context } from '../context'
-import { Input } from '@material-ui/core'
 
 export const DateTime = asNexusMethod(DateTimeResolver, 'date')
 

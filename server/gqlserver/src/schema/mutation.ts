@@ -317,8 +317,8 @@ export const Mutation = objectType({
         const sum = new TextRank(textBlockContents)
         const [excerpt, index] = sum.getSummarizedOneText()
 
-        const start = Math.max(0, index - 1)
-        const end = Math.min(index + 1, textBlockList.length - 1)
+        const start = Math.max(0, index - 2)
+        const end = Math.min(index + 2, textBlockList.length - 1)
         const connect = []
 
         for (let i = start; i < end + 1; i++) {
