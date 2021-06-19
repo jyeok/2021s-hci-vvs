@@ -10,7 +10,8 @@ const io = require("socket.io")(httpServer, { cors: { oriign: "*" } });
 const realtimePort = 3003;
 
 const { main } = require("./src/uploadFile");
-const speechToTextUtils = require("./SpeechToText");
+const speechToTextUtils = require("./src/SpeechToText");
+const streamingSTT = require("./src/streamingSTT");
 
 app.use(cors()).use(
   express.json({
@@ -31,7 +32,6 @@ app.post("/upload", async (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("New connection!");
-  io.emit("Hello!");
 
   socket.on("startGoogleCloudStream", (request) => {
     console.log("starting google cloud stream...");
@@ -48,8 +48,12 @@ io.on("connection", (socket) => {
     speechToTextUtils.stopRecognitionStream();
     console.log("end google cloud stream...");
   });
+
+  socket.on("startRecord", () => {
+    console.log("[index] Start record");
+    streamingSTT.main(io);
+  });
 });
 
 httpServer.listen(realtimePort);
-
 app.listen(port);

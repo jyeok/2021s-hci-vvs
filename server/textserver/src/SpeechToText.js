@@ -54,17 +54,21 @@ module.exports = {
         this.stopRecognitionStream();
       })
       .on("data", (data) => {
-        const refined_data = postProcessing(data.results[0].alternatives);
-        // eslint-disable-next-line no-console
-        console.log("[RecognizeStream]: Got data:>>", refined_data);
-        client.emit("speechData", refined_data);
-
         // if end of utterance, let's restart stream
         // this is a small hack. After 65 seconds of silence, the stream will still throw an error for speech length limit
         if (data.results[0] && data.results[0].isFinal) {
+          const refined_data = postProcessing(data.results[0].alternatives);
+          // eslint-disable-next-line no-console
+          console.log("[RecognizeStream]: Got data:>>", refined_data);
+          client.emit("speechData", refined_data);
           this.stopRecognitionStream();
           this.startRecognitionStream(client, request);
-          // console.log('restarted stream serverside');
+          console.log("restarted stream serverside");
+        } else if (data.results[0]) {
+          client.emit(
+            "interimData",
+            data.results[0].alternatives[0].transcript
+          );
         }
       });
   },

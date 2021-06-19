@@ -31,10 +31,10 @@ let AudioStreamer = {
    * @param {function} onData Callback to run on data each time it's received
    * @param {function} onError Callback to run on an error if one is emitted.
    */
-  initRecording: function (onData, onError) {
+  initRecording: function (onData, onError, onInterim) {
     socket.emit("startGoogleCloudStream", {
       config,
-      interimResults: false, // If you want interim results, set this to true
+      interimResults: true, // If you want interim results, set this to true
     }); //init socket Google Speech Connection
 
     AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -59,6 +59,12 @@ let AudioStreamer = {
     if (onData) {
       socket.on("speechData", (data) => {
         onData(data[0]);
+      });
+    }
+
+    if (onInterim) {
+      socket.on("interimData", (data) => {
+        onInterim(data);
       });
     }
 

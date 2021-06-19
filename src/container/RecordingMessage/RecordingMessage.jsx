@@ -17,7 +17,7 @@ const RecordingMessage = (prop) => {
     const model = {
       message: m.content,
       sentTime: m.start,
-      direction: m.isMine ? "incoming" : "outgoing",
+      direction: m.isMine ? "outgoing" : "incoming",
       position: "single",
     };
 
@@ -41,7 +41,10 @@ const RecordingMessage = (prop) => {
               }}
             >
               <Message.CustomContent>
-                <CircularProgress size={20} />
+                <CircularProgress size={20} style={{ marginRight: "5px" }} />
+                듣는 중... <br />
+                <br />
+                {listening}
               </Message.CustomContent>
             </Message>
           )}
@@ -67,7 +70,7 @@ RecordingMessage.PropType = {
     })
   ),
   setContents: PropTypes.func.isRequired,
-  listening: PropTypes.bool.isRequired,
+  listening: PropTypes.string.isRequired,
 };
 
 RecordingMessage.defaultProps = {
@@ -86,5 +89,5 @@ RecordingMessage.defaultProps = {
     // eslint-disable-next-line no-console
     console.log(data);
   },
-  listening: true,
+  listening: "",
 };

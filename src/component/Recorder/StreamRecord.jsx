@@ -45,6 +45,7 @@ const StreamRecord = () => {
   });
   const [newData, setNewData] = useState();
   const [textBlockData, setTextBlockData] = useState([]);
+  const [interimString, setInterimString] = useState("");
   const [voice, setVoice] = useState(undefined);
   const [status, setStatus] = useState("");
 
@@ -63,6 +64,7 @@ const StreamRecord = () => {
     AudioStreamer.initRecording(
       (data) => {
         setNewData(data);
+        setInterimString("");
       },
       () => {
         enqueueSnackbar("녹음 중 오류가 발생했습니다! 새로고침해 주세요.", {
@@ -70,6 +72,9 @@ const StreamRecord = () => {
         });
         setStatus("error");
         setRecording(false);
+      },
+      (data) => {
+        setInterimString(data);
       }
     );
 
@@ -310,7 +315,7 @@ const StreamRecord = () => {
           <RecordingMessage
             contents={textBlockData}
             setContents={setTextBlockData}
-            listening={recording}
+            listening={interimString}
           />
         </Grid>
         <Grid
