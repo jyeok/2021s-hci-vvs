@@ -6,67 +6,107 @@ const encoding = "LINEAR16";
 const sampleRateHertz = 16000;
 const languageCode = "ko-KR";
 const streamingLimit = 2900000; // ms - set to low number for demo purposes
+const chalk = require("chalk");
+const { Writable } = require("stream");
+const recorder = require("node-record-lpcm16");
+const speech = require("@google-cloud/speech").v1p1beta1;
 
-function main(client) {
-  const chalk = require("chalk");
-  const { Writable } = require("stream");
-  const recorder = require("node-record-lpcm16");
+const config = {
+  encoding,
+  sampleRateHertz,
+  languageCode,
+  enableAutomaticPunctuation: true,
+  enableWordTimeOffsets: true,
+  streamingLimit,
+};
 
-  const speech = require("@google-cloud/speech").v1p1beta1;
+const request = {
+  config,
+  interimResults: true,
+};
 
-  const config = {
-    encoding,
-    sampleRateHertz,
-    languageCode,
-    enableAutomaticPunctuation: true,
-    enableWordTimeOffsets: true,
-    streamingLimit,
-  };
+let recordStream = null;
+let recognizeStream = null;
+let restartCounter = 0;
+let audioInput = [];
+let lastAudioInput = [];
+let resultEndTime = 0;
+let isFinalEndTime = 0;
+let finalRequestEndTime = 0;
+let newStream = true;
+let bridgingOffset = 0;
+let lastTranscriptWasFinal = false;
 
-  const request = {
-    config,
-    interimResults: true,
-  };
+function postProcessing(results, endTime) {
+  const textBlockInputs = results.map((r) => {
+    const start = r.words[0].startTime.seconds;
+    const end = r.words[r.words.length - 1].endTime.seconds;
 
-  let recognizeStream = null;
-  let restartCounter = 0;
-  let audioInput = [];
-  let lastAudioInput = [];
-  let resultEndTime = 0;
-  let isFinalEndTime = 0;
-  let finalRequestEndTime = 0;
-  let newStream = true;
-  let bridgingOffset = 0;
-  let lastTranscriptWasFinal = false;
+    console.log(start, end);
+    const during = end - start;
 
-  function postProcessing(results) {
-    const textBlockInputs = results.map((r) => {
-      const start =
-        `${r.words[0].startTime.seconds}` +
-        "." +
-        r.words[0].startTime.nanos / 100000000;
+    const result = {
+      isHighlighted: 0,
+      isModified: 0,
+      reliability: r.confidence,
+      start: endTime / 1000 - during,
+      end: endTime / 1000,
+      isMine: 0,
+      content: r.transcript,
+    };
 
-      const end =
-        `${r.words[r.words.length - 1].endTime.seconds}` +
-        "." +
-        r.words[r.words.length - 1].endTime.nanos / 100000000;
+    return result;
+  });
 
-      const result = {
-        isHighlighted: 0,
-        isModified: 0,
-        reliability: r.confidence,
-        start: start,
-        end: end,
-        isMine: 0,
-        content: r.transcript,
-      };
+  return textBlockInputs;
+}
 
-      return result;
-    });
+const speechCallback = (stream, client) => {
+  // Convert API result end time from seconds + nanoseconds to milliseconds
+  resultEndTime =
+    stream.results[0].resultEndTime.seconds * 1000 +
+    Math.round(stream.results[0].resultEndTime.nanos / 1000000);
 
-    return textBlockInputs;
+  // Calculate correct time based on offset from audio sent twice
+  const correctedTime =
+    resultEndTime - bridgingOffset + streamingLimit * restartCounter;
+
+  process.stdout.clearLine();
+  process.stdout.cursorTo(0);
+  let stdoutText = "";
+  if (stream.results[0] && stream.results[0].alternatives[0]) {
+    stdoutText =
+      correctedTime + ": " + stream.results[0].alternatives[0].transcript;
   }
 
+  if (stream.results[0].isFinal) {
+    process.stdout.write(chalk.green(`${stdoutText}\n`));
+
+    isFinalEndTime = resultEndTime;
+    lastTranscriptWasFinal = true;
+
+    const textBlockData = postProcessing(
+      stream.results[0].alternatives,
+      correctedTime
+    );
+
+    console.log(textBlockData);
+
+    client.emit("speechData", textBlockData);
+  } else {
+    // Make sure transcript does not exceed console character length
+    if (stdoutText.length > process.stdout.columns) {
+      stdoutText = stdoutText.substring(0, process.stdout.columns - 4) + "...";
+    }
+    process.stdout.write(chalk.red(`${stdoutText}`));
+
+    client.emit("interimData", stream.results[0].alternatives[0].transcript);
+
+    lastTranscriptWasFinal = false;
+  }
+};
+
+function main(client) {
   function startStream(client) {
     const speechClient = new speech.SpeechClient();
     // Clear current audioInput
@@ -80,50 +120,13 @@ function main(client) {
             err && err.code ? `Code: ${err.code} ` : ""
           }${err && err.details ? err.details : ""}`
         );
-        client.emit("googleCloudStreamError", err);
+        client.emit("recordError", err);
       })
       .on("data", (data) => speechCallback(data, client));
 
     // Restart stream when streamingLimit expires
     setTimeout(restartStream, streamingLimit);
   }
-
-  const speechCallback = (stream, client) => {
-    // Convert API result end time from seconds + nanoseconds to milliseconds
-    resultEndTime =
-      stream.results[0].resultEndTime.seconds * 1000 +
-      Math.round(stream.results[0].resultEndTime.nanos / 1000000);
-
-    // Calculate correct time based on offset from audio sent twice
-    const correctedTime =
-      resultEndTime - bridgingOffset + streamingLimit * restartCounter;
-
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    let stdoutText = "";
-    if (stream.results[0] && stream.results[0].alternatives[0]) {
-      stdoutText =
-        correctedTime + ": " + stream.results[0].alternatives[0].transcript;
-    }
-
-    if (stream.results[0].isFinal) {
-      process.stdout.write(chalk.green(`${stdoutText}\n`));
-
-      isFinalEndTime = resultEndTime;
-      lastTranscriptWasFinal = true;
-
-      client.emit("speechData", postProcessing(stream.results[0].alternatives));
-    } else {
-      // Make sure transcript does not exceed console character length
-      if (stdoutText.length > process.stdout.columns) {
-        stdoutText =
-          stdoutText.substring(0, process.stdout.columns - 4) + "...";
-      }
-      process.stdout.write(chalk.red(`${stdoutText}`));
-
-      lastTranscriptWasFinal = false;
-    }
-  };
 
   const audioInputStreamTransform = new Writable({
     write(chunk, encoding, next) {
@@ -196,17 +199,20 @@ function main(client) {
   }
 
   // Start recording and send the microphone input to the Speech API
-  recorder
+  recordStream = recorder
     .record({
       sampleRateHertz: 16000,
       threshold: 0, // Silence threshold
-      silence: 200,
+      silence: 150,
       keepSilence: true,
       recordProgram: "sox", // Try also "arecord" or "sox"
     })
-    .stream()
+    .stream();
+
+  recordStream
     .on("error", (err) => {
       console.error("Audio recording error " + err);
+      client.emit("recordError", err);
     })
     .pipe(audioInputStreamTransform);
 
@@ -219,9 +225,32 @@ function main(client) {
   startStream(client);
 }
 
+function stopRecognitionStream() {
+  if (recognizeStream) {
+    recognizeStream.end();
+    recognizeStream.removeListener("data", speechCallback);
+  }
+
+  if (recordStream) {
+    recordStream.removeAllListeners();
+  }
+
+  recordStream = null;
+  recognizeStream = null;
+  restartCounter = 0;
+  audioInput = [];
+  lastAudioInput = [];
+  resultEndTime = 0;
+  isFinalEndTime = 0;
+  finalRequestEndTime = 0;
+  newStream = true;
+  bridgingOffset = 0;
+  lastTranscriptWasFinal = false;
+}
+
 process.on("unhandledRejection", (err) => {
   console.error(err.message);
   process.exitCode = 1;
 });
 
-module.exports = { main };
+module.exports = { main, stopRecognitionStream };
