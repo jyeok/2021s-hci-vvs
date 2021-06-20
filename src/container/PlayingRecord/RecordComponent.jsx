@@ -53,6 +53,9 @@ const useStyles = makeStyles(() => ({
   popupButtons: {
     margin: "3px",
   },
+  selected: {
+    backgroundColor: "#A9F1DF",
+  },
 }));
 
 const RecordComponent = (props) => {
@@ -112,7 +115,18 @@ const RecordComponent = (props) => {
             .id
       );
 
-      bookmarkRefs[realContentBookmark].current.scrollIntoView();
+      bookmarkRefs.forEach((e, i) => {
+        if (i === realContentBookmark) {
+          e.current.scrollIntoView();
+          e.current.className = classes.selected;
+        } else {
+          e.current.className = "";
+        }
+      });
+    } else if (currBookmark === undefined) {
+      bookmarkRefs.forEach((e) => {
+        e.current.className = "";
+      });
     }
   }, [currBookmark]);
 
