@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+require("dotenv").config();
 
 export const answerQuestion = (sampleParagraph, sampleQuestion) =>
   fetch("http://localhost:3001", {
@@ -7,7 +8,7 @@ export const answerQuestion = (sampleParagraph, sampleQuestion) =>
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      key: "69477979-4494-49c4-8533-d23d70d17872",
+      key: process.env.SALTLUX_API_KEY,
       serviceId: "01196851139",
       argument: {
         paragraph: sampleParagraph,
