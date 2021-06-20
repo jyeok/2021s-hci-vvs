@@ -8,7 +8,7 @@ export const compression = (input) =>
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      key: process.env.SALTLUX_API_KEY,
+      key: process.env.REACT_APP_SALTLUX_API_KEY,
       serviceId: "00116013830",
       argument: {
         question: input,
