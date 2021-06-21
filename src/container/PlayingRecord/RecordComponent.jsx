@@ -21,8 +21,14 @@ import {
   DialogTitle,
   DialogContentText,
   Typography,
+  Tooltip,
 } from "@material-ui/core";
-import { ArrowBack, ArrowBackIos, ArrowForwardIos } from "@material-ui/icons";
+import {
+  ArrowBack,
+  ArrowBackIos,
+  ArrowForwardIos,
+  Help,
+} from "@material-ui/icons";
 import PopupState, { bindHover, bindPopover } from "material-ui-popup-state";
 import Popover from "material-ui-popup-state/HoverPopover";
 import { useSnackbar } from "notistack";
@@ -83,6 +89,7 @@ const RecordComponent = (props) => {
 
   const [currBookmark, setCurrBookmark] = useState(undefined);
   const [bookmarkRefs, setBookmarkRefs] = useState([]);
+  const [openHelp, setOpenHelp] = useState(false);
 
   // Hooks
   const history = useHistory();
@@ -281,6 +288,17 @@ const RecordComponent = (props) => {
   };
 
   const onAddBookmark = (textBlock) => {
+    if (currBookmark !== undefined && textBlock.isHighlighted) {
+      if (allBookmarks[currBookmark].id === textBlock.id) {
+        bookmarkRefs.forEach((e, i) => {
+          e.current.className = "";
+        });
+
+        if (allBookmarks.length === 1) setCurrBookmark(undefined);
+        else setCurrBookmark(currBookmark - 1);
+      }
+    }
+
     updateTextBlockMutation({
       variables: {
         id: textBlock.id,
@@ -361,6 +379,25 @@ const RecordComponent = (props) => {
     setCurrBookmark(prev);
   };
 
+  const withHelp = (rest, msg) => (
+    <Tooltip
+      arrow
+      title={msg}
+      disableFocusListener
+      disableHoverListener
+      disableTouchListener
+      PopperProps={{
+        disablePortal: true,
+      }}
+      open={openHelp}
+      onClick={() => setOpenHelp(false)}
+      onClose={() => setOpenHelp(false)}
+      onOpen={() => setOpenHelp(true)}
+    >
+      {rest}
+    </Tooltip>
+  );
+
   return (
     <>
       <Grid
@@ -372,14 +409,17 @@ const RecordComponent = (props) => {
         style={{ border: "1px solid" }}
       >
         {/* 돌아가기 */}
-        <Grid item lg={1}>
-          <Button onClick={() => onBack()} startIcon={<ArrowBack />}>
-            돌아가기
-          </Button>
-        </Grid>
+        {withHelp(
+          <Grid item lg={1}>
+            <Button onClick={() => onBack()} startIcon={<ArrowBack />}>
+              돌아가기
+            </Button>
+          </Grid>,
+          "재생을 종료하고 돌아갑니다."
+        )}
         {/* 북마크 탐색 */}
         {allBookmarks.length === 0 ? (
-          <Grid item lg={4}>
+          <Grid item lg={3}>
             <Typography variant="caption">
               북마크가 없습니다. 텍스트를 클릭해 북마크를 추가해 보세요!
             </Typography>
@@ -388,11 +428,13 @@ const RecordComponent = (props) => {
           <>
             <Grid item lg={1}>
               <Button
-                disabled={currBookmark === undefined}
+                disabled={currBookmark === undefined || currBookmark < 0}
                 onClick={() => onBackward()}
                 endIcon={<ArrowBackIos />}
               >
-                {currBookmark === 0 ? "끝내기" : "이전 북마크"}
+                {currBookmark === 0 || currBookmark >= allBookmarks.length
+                  ? "끝내기"
+                  : "이전 북마크"}
               </Button>
             </Grid>
             <Grid item lg={1}>
@@ -404,9 +446,25 @@ const RecordComponent = (props) => {
                 {currBookmark === undefined ? "북마크 보기" : "다음 북마크"}
               </Button>
             </Grid>
-            <Grid item lg={2} />
+            <Grid item lg={1} />
           </>
         )}
+        <Grid item lg={1}>
+          <Tooltip
+            title={`도움말을 ${
+              openHelp ? "숨기려면 다시 " : "보려면"
+            } 클릭하세요.`}
+          >
+            <Button
+              onClick={() => {
+                setOpenHelp(!openHelp);
+              }}
+              startIcon={<Help fontSize="large" />}
+              size="40"
+            />
+          </Tooltip>
+        </Grid>
+        <Grid item lg={1} />
         {/* 재생 속도 */}
         <Grid item lg={1}>
           <FormControl className={classes.formControl}>
@@ -451,7 +509,7 @@ const RecordComponent = (props) => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item lg={2} />
+        <Grid item lg={1} />
         {/* 메모 & 태그 업데이트 */}
         <Grid item lg={2} style={{ float: "right" }}>
           <Button
