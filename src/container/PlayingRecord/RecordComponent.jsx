@@ -663,14 +663,17 @@ const RecordComponent = (props) => {
       </Grid>
       {/* 질문  */}
       <Grid container justify="center" alignItems="center" spacing={0}>
-        <Grid item lg={12}>
-          <MessageInput
-            style={{ width: "100vw" }}
-            attachButton={false}
-            placeholder="녹음에서 찾고 싶은 내용을 입력해 보세요."
-            onSend={(e) => handleQuestion(e)}
-          />
-        </Grid>
+        {withHelp(
+          <Grid item lg={12}>
+            <MessageInput
+              style={{ width: "100vw" }}
+              attachButton={false}
+              placeholder="녹음에서 찾고 싶은 내용을 입력해 보세요."
+              onSend={(e) => handleQuestion(e)}
+            />
+          </Grid>,
+          "입력이 일치하지 않아도 가장 비슷한 답을 찾아 보여줍니다."
+        )}
       </Grid>
       {/* Dialog  */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
