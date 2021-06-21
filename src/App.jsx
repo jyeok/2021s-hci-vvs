@@ -9,6 +9,8 @@ import Explorer from "component/explorer/Explorer";
 import PlayingLayout from "container/PlayingRecord/PlayingLayout";
 import RealtimeRecord from "component/Recorder/RealtimeRecord";
 
+import "./styles.css";
+
 function App(props) {
   const { client } = props;
 

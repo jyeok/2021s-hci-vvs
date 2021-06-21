@@ -1,0 +1,19 @@
+.very-low-reliability > .cs-message__content-wrapper > .cs-message__content {
+  background-color: #64dfdf !important;
+}
+
+.low-reliability > .cs-message__content-wrapper > .cs-message__content {
+  background-color: #56cfe1 !important;
+}
+
+.mid-reliability > .cs-message__content-wrapper > .cs-message__content {
+  background-color: #48bfe3 !important;
+}
+
+.high-reliability > .cs-message__content-wrapper > .cs-message__content {
+  background-color: #4ea8de !important;
+}
+
+.very-high-reliability > .cs-message__content-wrapper > .cs-message__content {
+  background-color: #5390d9 !important;
+}

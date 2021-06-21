@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from "react";
 import { PropTypes } from "prop-types";
 import { Message } from "@chatscope/chat-ui-kit-react";
@@ -8,8 +9,20 @@ const MessageHolder = (props) => {
 
   const cred = (100 * reliability).toFixed(2);
 
+  const reliabilityClass =
+    reliability <= 0.2
+      ? "very-low-reliability"
+      : reliability <= 0.4
+      ? "low-reliability"
+      : reliability <= 0.6
+      ? "mid-reliability"
+      : reliability <= 0.8
+      ? "high-reliability"
+      : "very-high-reliability";
+
   return (
     <Message
+      className={reliabilityClass}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...bindHover()}
       style={{ margin: "10px" }}
