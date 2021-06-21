@@ -5,8 +5,15 @@ import { useMutation } from "@apollo/client";
 import { useElapsedTime } from "use-elapsed-time";
 
 import { useSnackbar } from "notistack";
-import { Grid, TextField, Button, Typography } from "@material-ui/core";
-import { PlayArrow, Save, ArrowBack, Stop } from "@material-ui/icons";
+import {
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  // ClickAwayListener,
+  Tooltip,
+} from "@material-ui/core";
+import { PlayArrow, Save, ArrowBack, Stop, Help } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import { ReactMic } from "react-mic";
 
@@ -50,6 +57,7 @@ const RealtimeRecord = () => {
   const [interimString, setInterimString] = useState("");
   const [voice, setVoice] = useState(undefined);
   const [status, setStatus] = useState("");
+  const [openHelp, setOpenHelp] = useState(false);
 
   const [addRecordMutation] = useMutation(mutations.addRecord);
   const [generatePreviewMutation] = useMutation(mutations.generatePreview);
@@ -132,6 +140,10 @@ const RealtimeRecord = () => {
     socket.emit("endRecord");
     socket.offAny();
     setRecording(false);
+
+    enqueueSnackbar("녹음이 종료되었습니다.", {
+      variant: "success",
+    });
   };
 
   const onSaveVoice = (data) => {
@@ -214,9 +226,10 @@ const RealtimeRecord = () => {
           },
         });
 
-        enqueueSnackbar("녹음이 완료되었습니다.", {
+        enqueueSnackbar("녹음이 저장되었습니다.", {
           variant: "success",
         });
+
         goBackHandler();
       } catch (err) {
         if (err.message.includes("Unique constraint failed")) {
@@ -238,6 +251,25 @@ const RealtimeRecord = () => {
       }
     }
   };
+
+  const withHelp = (rest, msg) => (
+    <Tooltip
+      arrow
+      title={msg}
+      disableFocusListener
+      disableHoverListener
+      disableTouchListener
+      PopperProps={{
+        disablePortal: true,
+      }}
+      open={openHelp}
+      onClick={() => setOpenHelp(false)}
+      onClose={() => setOpenHelp(false)}
+      onOpen={() => setOpenHelp(true)}
+    >
+      {rest}
+    </Tooltip>
+  );
 
   return (
     <Grid container>
@@ -262,20 +294,41 @@ const RealtimeRecord = () => {
         }}
       >
         <Grid item lg={1}>
-          <Button
-            onClick={goBackHandler}
-            startIcon={<ArrowBack />}
-            disabled={recording}
-          >
-            돌아가기
-          </Button>
+          {withHelp(
+            <Button
+              onClick={goBackHandler}
+              startIcon={<ArrowBack />}
+              disabled={recording}
+            >
+              돌아가기
+            </Button>,
+            "녹음을 저장하지 않고 돌아갑니다."
+          )}
         </Grid>
         <Grid item lg={2}>
-          <Typography variant="h5">
-            녹음 시간: {secondsToTime(elapsedTime.toFixed(0))}
-          </Typography>
+          {withHelp(
+            <Typography variant="h5">
+              녹음 시간: {secondsToTime(elapsedTime.toFixed(0))}
+            </Typography>,
+            "현재 진행중인 녹음의 시간"
+          )}
         </Grid>
-        <Grid item lg={4} />
+        <Grid item lg={1}>
+          <Tooltip
+            title={`도움말을 ${
+              openHelp ? "숨기려면 다시 " : "보려면"
+            } 클릭하세요.`}
+          >
+            <Button
+              onClick={() => {
+                setOpenHelp(!openHelp);
+              }}
+              startIcon={<Help fontSize="large" />}
+              size="40"
+            />
+          </Tooltip>
+        </Grid>
+        <Grid item lg={3} />
         <Grid item lg={1} hidden>
           <ReactMic
             record={recording}
@@ -285,14 +338,17 @@ const RealtimeRecord = () => {
           />
         </Grid>
         <Grid item lg={2}>
-          <TextField
-            error={title === ""}
-            onChange={inputChangeHandler}
-            value={title}
-            name="title"
-            placeholder="녹음 제목"
-            variant="standard"
-          />
+          {withHelp(
+            <TextField
+              error={title === ""}
+              onChange={inputChangeHandler}
+              value={title}
+              name="title"
+              placeholder="녹음 제목"
+              variant="standard"
+            />,
+            "녹음의 제목을 입력합니다."
+          )}
         </Grid>
         <Grid item lg={1}>
           <Button
@@ -342,42 +398,48 @@ const RealtimeRecord = () => {
         </Grid>
       </Grid>
       <Grid container justify="center" alignItems="center" spacing={0}>
-        <Grid item xs={8} style={{ height: "600px", border: "1px solid" }}>
-          <RecordingMessage
-            contents={textBlockData}
-            setContents={setTextBlockData}
-            listening={recording}
-            interimString={interimString}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={4}
-          style={{ height: "600px", border: "1px solid", overflow: "scroll" }}
-        >
-          <TextField
-            label="메모"
-            name="memo"
-            value={memo}
-            multiline
-            rows={19}
-            placeholder="여기에 메모를 입력하세요."
-            fullWidth
-            onChange={inputChangeHandler}
-            style={{ marginTop: "5px" }}
-          />
-          <TextField
-            label="태그"
-            multiline
-            rows={9}
-            placeholder="녹음이 종료되면 키워드가 생성됩니다. 직접 추가할 수도 있습니다. 예시: #약속 #밥"
-            name="tag"
-            value={tag}
-            fullWidth
-            onChange={inputChangeHandler}
-            style={{ marginTop: "5px" }}
-          />
-        </Grid>
+        {withHelp(
+          <Grid item xs={8} style={{ height: "600px", border: "1px solid" }}>
+            <RecordingMessage
+              contents={textBlockData}
+              setContents={setTextBlockData}
+              listening={recording}
+              interimString={interimString}
+            />
+          </Grid>,
+          "녹음 중인 메시지가 실시간으로 나타납니다. 메시지가 잘못 저장된 경우 저장한 후 수정할 수 있습니다."
+        )}
+        {withHelp(
+          <Grid
+            item
+            xs={4}
+            style={{ height: "600px", border: "1px solid", overflow: "scroll" }}
+          >
+            <TextField
+              label="메모"
+              name="memo"
+              value={memo}
+              multiline
+              rows={19}
+              placeholder="여기에 메모를 입력하세요."
+              fullWidth
+              onChange={inputChangeHandler}
+              style={{ marginTop: "5px" }}
+            />
+            <TextField
+              label="태그"
+              multiline
+              rows={9}
+              placeholder="녹음이 종료되면 키워드가 생성됩니다. 직접 추가할 수도 있습니다. 예시: #약속 #밥"
+              name="tag"
+              value={tag}
+              fullWidth
+              onChange={inputChangeHandler}
+              style={{ marginTop: "5px" }}
+            />
+          </Grid>,
+          "메모와 키워드를 입력합니다. 이후에 수정/검색에 사용할 수 있습니다."
+        )}
       </Grid>
     </Grid>
   );
