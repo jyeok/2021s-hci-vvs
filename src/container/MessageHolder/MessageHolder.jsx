@@ -4,21 +4,29 @@ import { PropTypes } from "prop-types";
 import { Message } from "@chatscope/chat-ui-kit-react";
 
 const MessageHolder = (props) => {
-  const { content, isMine, start, isHighlighted, reliability, bindHover } =
-    props;
+  const {
+    content,
+    isMine,
+    start,
+    isHighlighted,
+    reliability,
+    bindHover,
+    isModified,
+  } = props;
 
   const cred = (100 * reliability).toFixed(2);
 
-  const reliabilityClass =
-    reliability <= 0.2
-      ? "very-low-reliability"
-      : reliability <= 0.4
-      ? "low-reliability"
-      : reliability <= 0.6
-      ? "mid-reliability"
-      : reliability <= 0.8
-      ? "high-reliability"
-      : "very-high-reliability";
+  const reliabilityClass = isModified
+    ? "very-high-reliability"
+    : reliability <= 0.2
+    ? "very-low-reliability"
+    : reliability <= 0.4
+    ? "low-reliability"
+    : reliability <= 0.6
+    ? "mid-reliability"
+    : reliability <= 0.8
+    ? "high-reliability"
+    : "very-high-reliability";
 
   return (
     <Message
@@ -55,6 +63,7 @@ MessageHolder.propTypes = {
   content: PropTypes.string.isRequired,
   isMine: PropTypes.number,
   isHighlighted: PropTypes.bool.isRequired,
+  isModified: PropTypes.bool.isRequired,
   reliability: PropTypes.number,
   start: PropTypes.string.isRequired,
   bindHover: PropTypes.func,

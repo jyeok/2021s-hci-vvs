@@ -202,10 +202,10 @@ function main(client) {
   recordStream = recorder
     .record({
       sampleRateHertz: 16000,
-      threshold: 0, // Silence threshold
-      silence: 150,
+      threshold: 0.5, // Silence threshold
+      silence: 50,
       keepSilence: true,
-      recordProgram: "sox", // Try also "arecord" or "sox"
+      recordProgram: "rec", // Try also "arecord" or "sox"
     })
     .stream();
 

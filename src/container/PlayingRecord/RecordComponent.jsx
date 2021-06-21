@@ -255,6 +255,7 @@ const RecordComponent = (props) => {
         id: textBlock.id,
         data: {
           content: editText,
+          reliability: 1,
         },
       },
     })
@@ -549,6 +550,7 @@ const RecordComponent = (props) => {
                       start={secondsToTime(e.start)}
                       isHighlighted={e.isHighlighted}
                       reliability={e.reliability}
+                      isModified={e.isModified}
                       bindHover={() => bindHover(popupState)}
                     />
                     <Popover
