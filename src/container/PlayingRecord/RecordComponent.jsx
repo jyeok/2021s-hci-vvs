@@ -320,30 +320,31 @@ const RecordComponent = (props) => {
 
   const handleQuestion = async (input) => {
     answerQuestion(contentsConcat, input).then((result) => {
-      const ans = result[0];
+      const ans = result[0] ? result[0].split("\n")[0] : undefined;
       const ansBlock = data.recordById.content.filter(
         (x) => x.content.indexOf(ans) !== -1
       );
 
       setDialogContent({
         title: `질문: "${input}"에 대해!`,
-        contents: ans
+        contents: ansBlock[0]
           ? [
               { id: 0, content: `질문 ${input}에 대해 찾은 답변이에요.` },
-              { id: 1, content: ans },
-              { id: 2, content: "이 부분의 음성을 자세히 들어보시겠어요?" },
+              { id: 1, content: `답: ${ans}` },
+              { id: 2, content: ansBlock[0].content },
+              { id: 3, content: "이 부분을 자세히 들어보시겠어요?" },
             ]
           : [
               { id: 0, content: `질문 ${input}에 대한 답을 찾을 수 없어요.` },
               { id: 1, content: "다른 검색어로 다시 시도해보시겠어요?" },
             ],
         onClose: () => setDialogOpen(false),
-        onConfirm: ans
+        onConfirm: ansBlock[0]
           ? () => {
               onPlayText(Number.parseFloat(ansBlock[0].start, 10));
               setDialogOpen(false);
             }
-          : () => setDialogOpen(false),
+          : undefined,
       });
 
       setDialogOpen(true);
@@ -689,9 +690,7 @@ const RecordComponent = (props) => {
           <Button onClick={() => dialogContent.onClose()} color="primary">
             닫기
           </Button>
-          {dialogContent &&
-          dialogContent.length >= 3 &&
-          dialogContent.onConfirm ? (
+          {dialogContent && dialogContent.onConfirm ? (
             <Button onClick={() => dialogContent.onConfirm()} color="primary">
               들으러 가기
             </Button>

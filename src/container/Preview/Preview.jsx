@@ -89,6 +89,7 @@ const Preview = (props) => {
         margin="normal"
         variant="filled"
         InputProps={{ readOnly: true }}
+        disabled
       />
       <TextField
         label="메모"
@@ -99,6 +100,7 @@ const Preview = (props) => {
         multiline
         rows={5}
         InputProps={{ readOnly: true }}
+        disabled
       />
       <Grid container style={{ marginTop: "5px" }}>
         <Grid item lg={4} md={4}>
