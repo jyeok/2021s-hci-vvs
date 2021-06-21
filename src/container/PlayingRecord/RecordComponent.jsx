@@ -524,7 +524,7 @@ const RecordComponent = (props) => {
           </Button>
         </Grid>
       </Grid>
-
+      {/* 메시지 블록  */}
       <Grid
         container
         justify="center"
@@ -532,7 +532,6 @@ const RecordComponent = (props) => {
         spacing={0}
         style={{ border: "1px solid" }}
       >
-        {/* 메시지 블록  */}
         <Grid item xs={8} className={classes.middleElements}>
           {data.recordById?.content.map((e, i) => (
             <div key={e.id} ref={bookmarkRefs[i]}>
@@ -549,6 +548,7 @@ const RecordComponent = (props) => {
                       isMine={e.isMine}
                       start={secondsToTime(e.start)}
                       isHighlighted={e.isHighlighted}
+                      reliability={e.reliability}
                       bindHover={() => bindHover(popupState)}
                     />
                     <Popover

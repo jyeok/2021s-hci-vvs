@@ -3,7 +3,10 @@ import { PropTypes } from "prop-types";
 import { Message } from "@chatscope/chat-ui-kit-react";
 
 const MessageHolder = (props) => {
-  const { content, isMine, start, isHighlighted, bindHover } = props;
+  const { content, isMine, start, isHighlighted, reliability, bindHover } =
+    props;
+
+  const cred = (100 * reliability).toFixed(2);
 
   return (
     <Message
@@ -12,13 +15,16 @@ const MessageHolder = (props) => {
       style={{ margin: "10px" }}
       model={{
         message: content,
+        sender: "123",
         sentTime: start,
         direction: isMine ? "outgoing" : "incoming",
         position: "single",
       }}
     >
       {isHighlighted ? <Message.Header>북마크</Message.Header> : false}
-      <Message.Footer sentTime={start} />
+      <Message.Footer>
+        {start}, {cred}%
+      </Message.Footer>
     </Message>
   );
 };
