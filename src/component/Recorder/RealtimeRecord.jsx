@@ -190,15 +190,7 @@ const RealtimeRecord = () => {
             .map((e) => (e.startsWith("#") ? e.trim() : `#${e.trim()}`))
         : [];
 
-      const getTags = await compression(allContents);
-
-      const tagList = getTags
-        ? getTags.return_object.keylists.map((e) =>
-            e.keyword.startsWith("#")
-              ? e.keyword.trim()
-              : `#${e.keyword.trim()}`
-          )
-        : [];
+      const tagList = await compression(allContents);
 
       const tagConcat = userTag.concat(tagList);
       const finalTag = [...new Set(tagConcat)].slice(0, 10).join(" ").trim();

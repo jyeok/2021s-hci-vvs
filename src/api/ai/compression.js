@@ -1,22 +1,17 @@
-const fetch = require("node-fetch");
-require("dotenv").config();
+const axios = require("axios");
 
-export const compression = (input) =>
-  fetch("http://localhost:3001", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      key: process.env.REACT_APP_SALTLUX_API_KEY,
-      serviceId: "00116013830",
-      argument: {
-        question: input,
-      },
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => data);
+export const compression = async (contents) => {
+  try {
+    const res = await axios.post("/api/compression", {
+      question: contents,
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
+};
 
 export default {
   compression,

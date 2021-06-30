@@ -14,61 +14,73 @@ const parser = require("koa-bodyparser");
 
 const logger = require("koa-logger");
 
-const port = process.env.PORT || 3005;
+const port = process.env.PORT || 3001;
 const mode = process.env.MODE || "dev";
 const origin = mode === "dev" ? "*" : process.env.FRONTEND_ORIGIN;
 
 router.post("MRC", "/api/question", async (ctx) => {
   const { paragraph, question } = ctx.request.body;
 
-  const config = {
-    method: "post",
-    url: "http://svc.saltlux.ai:31781",
-    data: {
-      key: process.env.SALTLUX_API_KEY,
-      serviceId: "01196851139",
-      argument: {
-        paragraph,
-        question,
-      },
+  const url = "http://svc.saltlux.ai:31781";
+  const data = {
+    key: process.env.SALTLUX_API_KEY,
+    serviceId: "01196851139",
+    argument: {
+      paragraph,
+      question,
     },
+  };
+  const config = {
     headers: {
       "Content-Type": "application/json",
     },
-    transformResponse: (data) => {
-      const response = JSON.parse(data);
-      const { answer } = response.result;
+    transformResponse: (res) => {
+      const parsed = JSON.parse(res);
+      const { answer } = parsed.result;
 
       return answer;
     },
   };
 
-  const res = await axios(config);
+  const res = await axios.post(url, data, config);
   ctx.body = res.data;
 });
 
-router.get("main", "/", (ctx) => {
-  ctx.body = "Hello!";
-});
+router.post("compression", "/api/compression", async (ctx) => {
+  const { question } = ctx.request.body;
 
-router.get("error", "/error", (ctx) => {
-  ctx.throw(500, "Internal Server Error");
-});
+  const url = "http://svc.saltlux.ai:31781";
 
-router.get("status", "/ok", (ctx) => {
-  ctx.status = 200;
-  ctx.body = "OK";
-});
+  const data = {
+    key: process.env.SALTLUX_API_KEY,
+    serviceId: "00116013830",
+    argument: {
+      question,
+    },
+  };
 
-app.use(async (ctx, next) => {
-  try {
-    await next();
-  } catch (err) {
-    console.log(`error ${err.status}: ${err.message}`);
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformResponse: (res) => {
+      const parsed = JSON.parse(res);
+      const keywords = parsed.return_object.keylists;
 
-    ctx.status = err.status || 500;
-    ctx.body = err.message;
-  }
+      const tags = keywords
+        ? keywords.map((e) =>
+            e.keyword.startsWith("#")
+              ? e.keyword.trim()
+              : `#${e.keyword.trim()}`
+          )
+        : [];
+
+      return tags;
+    },
+  };
+
+  const res = await axios.post(url, data, config);
+  ctx.body = res.data;
 });
 
 app
