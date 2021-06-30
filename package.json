@@ -16,6 +16,7 @@
     "apollo-boost": "^0.4.9",
     "apollo-client": "^2.6.10",
     "audio-react-recorder": "^1.0.4",
+    "axios": "^0.21.1",
     "blob-util": "^2.0.2",
     "chonky": "^2.1.0",
     "chonky-icon-fontawesome": "^2.1.0",
@@ -86,5 +87,6 @@
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
     "prettier": "2.3.0"
-  }
+  },
+  "proxy": "http://localhost:3005"
 }

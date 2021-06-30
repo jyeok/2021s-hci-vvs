@@ -320,7 +320,7 @@ const RecordComponent = (props) => {
 
   const handleQuestion = async (input) => {
     answerQuestion(contentsConcat, input).then((result) => {
-      const ans = result[0] ? result[0].split("\n")[0] : undefined;
+      const ans = result ? result.split("\n")[0] : undefined;
       const ansBlock = data.recordById.content.filter(
         (x) => x.content.indexOf(ans) !== -1
       );

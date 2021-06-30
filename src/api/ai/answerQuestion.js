@@ -1,30 +1,18 @@
-const fetch = require("node-fetch");
-require("dotenv").config();
+const axios = require("axios");
 
-export const answerQuestion = (sampleParagraph, sampleQuestion) =>
-  fetch("http://localhost:3001", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      key: process.env.REACT_APP_SALTLUX_API_KEY,
-      serviceId: "01196851139",
-      argument: {
-        paragraph: sampleParagraph,
-        question: sampleQuestion,
-      },
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      const { answer } = data.result;
-      const answerIndex = data.result.answer_index;
-      const answersToQuestion = [answer, answerIndex];
-      return answersToQuestion;
-    })
-    // eslint-disable-next-line no-console
-    .catch((error) => console.log("error: ", error));
+export const answerQuestion = async (contents, question) => {
+  try {
+    const res = await axios.post("/api/question", {
+      paragraph: contents,
+      question,
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
+};
 
 export default {
   answerQuestion,
