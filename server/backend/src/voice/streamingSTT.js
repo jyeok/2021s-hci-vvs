@@ -1,11 +1,9 @@
-/* eslint-disable */
-
-"use strict";
+/* eslint-disable no-console */
 
 const encoding = "LINEAR16";
 const sampleRateHertz = 16000;
 const languageCode = "ko-KR";
-const streamingLimit = 2900000; // ms - set to low number for demo purposes
+const streamingLimit = 290000; // ms - set to low number for demo purposes
 const chalk = require("chalk");
 const { Writable } = require("stream");
 const recorder = require("node-record-lpcm16");
@@ -37,12 +35,10 @@ let newStream = true;
 let bridgingOffset = 0;
 let lastTranscriptWasFinal = false;
 
-function postProcessing(results, endTime) {
+const postProcess = (results, endTime) => {
   const textBlockInputs = results.map((r) => {
     const start = r.words[0].startTime.seconds;
     const end = r.words[r.words.length - 1].endTime.seconds;
-
-    console.log(start, end);
     const during = end - start;
 
     const result = {
@@ -59,7 +55,7 @@ function postProcessing(results, endTime) {
   });
 
   return textBlockInputs;
-}
+};
 
 const speechCallback = (stream, client) => {
   // Convert API result end time from seconds + nanoseconds to milliseconds
@@ -75,8 +71,7 @@ const speechCallback = (stream, client) => {
   process.stdout.cursorTo(0);
   let stdoutText = "";
   if (stream.results[0] && stream.results[0].alternatives[0]) {
-    stdoutText =
-      correctedTime + ": " + stream.results[0].alternatives[0].transcript;
+    stdoutText = `${correctedTime}: ${stream.results[0].alternatives[0].transcript}`;
   }
 
   if (stream.results[0].isFinal) {
@@ -85,7 +80,7 @@ const speechCallback = (stream, client) => {
     isFinalEndTime = resultEndTime;
     lastTranscriptWasFinal = true;
 
-    const textBlockData = postProcessing(
+    const textBlockData = postProcess(
       stream.results[0].alternatives,
       correctedTime
     );
@@ -96,7 +91,7 @@ const speechCallback = (stream, client) => {
   } else {
     // Make sure transcript does not exceed console character length
     if (stdoutText.length > process.stdout.columns) {
-      stdoutText = stdoutText.substring(0, process.stdout.columns - 4) + "...";
+      stdoutText = `${stdoutText.substring(0, process.stdout.columns - 4)}...`;
     }
     process.stdout.write(chalk.red(`${stdoutText}`));
 
@@ -106,8 +101,8 @@ const speechCallback = (stream, client) => {
   }
 };
 
-function main(client) {
-  function startStream(client) {
+const main = (client) => {
+  function startStream() {
     const speechClient = new speech.SpeechClient();
     // Clear current audioInput
     audioInput = [];
@@ -125,11 +120,12 @@ function main(client) {
       .on("data", (data) => speechCallback(data, client));
 
     // Restart stream when streamingLimit expires
+    // eslint-disable-next-line no-use-before-define
     setTimeout(restartStream, streamingLimit);
   }
 
   const audioInputStreamTransform = new Writable({
-    write(chunk, encoding, next) {
+    write(chunk, _, next) {
       if (newStream && lastAudioInput.length !== 0) {
         // Approximate math to calculate time of chunks
         const chunkTime = streamingLimit / lastAudioInput.length;
@@ -147,7 +143,7 @@ function main(client) {
             (lastAudioInput.length - chunksFromMS) * chunkTime
           );
 
-          for (let i = chunksFromMS; i < lastAudioInput.length; i++) {
+          for (let i = chunksFromMS; i < lastAudioInput.length; i += 1) {
             recognizeStream.write(lastAudioInput[i]);
           }
         }
@@ -184,7 +180,7 @@ function main(client) {
     lastAudioInput = [];
     lastAudioInput = audioInput;
 
-    restartCounter++;
+    restartCounter += 1;
 
     if (!lastTranscriptWasFinal) {
       process.stdout.write("\n");
@@ -211,7 +207,7 @@ function main(client) {
 
   recordStream
     .on("error", (err) => {
-      console.error("Audio recording error " + err);
+      console.error(`Audio recording error ${err}`);
       client.emit("recordError", err);
     })
     .pipe(audioInputStreamTransform);
@@ -222,8 +218,8 @@ function main(client) {
   console.log("End (ms)       Transcript Results/Status");
   console.log("=========================================================");
 
-  startStream(client);
-}
+  startStream();
+};
 
 function stopRecognitionStream() {
   if (recognizeStream) {

@@ -1,5 +1,10 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
+
 require("dotenv").config();
+
+const http = require("http");
+const _io = require("socket.io");
 
 const Koa = require("koa");
 const Router = require("@koa/router");
@@ -8,6 +13,7 @@ const parser = require("koa-bodyparser");
 const logger = require("koa-logger");
 
 const { MRC, keyword } = require("./text");
+const streamingSTT = require("./voice/streamingSTT");
 
 const app = new Koa();
 const router = new Router();
@@ -30,4 +36,32 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 
-app.listen(port);
+const server = http.createServer(app.callback());
+const io = _io(server, { cors: { origin } });
+
+io.on("connection", (socket) => {
+  console.log(`New Client ${socket.id} Connected!`);
+
+  socket.on("startRecord", () => {
+    console.log("[Server] Record Started");
+    streamingSTT.main(io);
+  });
+
+  socket.on("endRecord", () => {
+    console.log("[Server] Record Ended");
+    streamingSTT.stopRecognitionStream();
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`[Server] Client ${socket.id} disconnected!`);
+    streamingSTT.stopRecognitionStream();
+  });
+});
+
+server.listen(port, () => {
+  console.log(
+    `🚀 Server is ready at: ${
+      process.env.FRONTEND_ORIGIN || `http://localhost:${port}`
+    }`
+  );
+});
