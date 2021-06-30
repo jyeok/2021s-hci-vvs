@@ -15,8 +15,8 @@ import { DropzoneDialogBase } from "material-ui-dropzone";
 import { useSnackbar } from "notistack";
 
 import { queries, mutations } from "api/gql/schema";
-import Preview from "container/Preview/Preview";
-import Loading from "container/Loading/Loading";
+import Preview from "explorer/Preview";
+import Loading from "common/Loading";
 
 import { onFileAction, extraActions, actionsToDisable } from "./ChonkyOptions";
 import { fileToFilemap, getFolderChain } from "./Util";

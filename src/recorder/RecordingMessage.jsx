@@ -8,7 +8,7 @@ import {
   ChatContainer,
 } from "@chatscope/chat-ui-kit-react";
 import { CircularProgress } from "@material-ui/core";
-import { secondsToTime } from "component/Recorder/Util";
+import { secondsToTime } from "recorder/Util";
 
 const RecordingMessage = (props) => {
   const { contents, listening, interimString } = props;

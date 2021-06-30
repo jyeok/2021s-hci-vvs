@@ -13,7 +13,7 @@ import H5AudioPlayer from "react-h5-audio-player";
 
 import { queries } from "api/gql/schema";
 
-import Loading from "container/Loading/Loading";
+import Loading from "common/Loading";
 import { base64StringToBlob } from "blob-util";
 import RecordComponent from "./RecordComponent";
 

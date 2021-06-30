@@ -37,10 +37,10 @@ import TextRank from "api/ai/summarization";
 import { mutations, queries } from "api/gql/schema";
 import { answerQuestion } from "api/ai/answerQuestion";
 
-import { secondsToTime } from "component/Recorder/Util";
+import { secondsToTime } from "recorder/Util";
 
-import MessageHolder from "container/MessageHolder/MessageHolder";
-import Loading from "container/Loading/Loading";
+import MessageHolder from "common/MessageHolder";
+import Loading from "common/Loading";
 import MessageInput from "@chatscope/chat-ui-kit-react/dist/cjs/MessageInput";
 
 const useStyles = makeStyles(() => ({

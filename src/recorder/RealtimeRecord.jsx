@@ -20,7 +20,7 @@ import { ReactMic } from "react-mic";
 import { keywords } from "api/ai/keywords";
 import { mutations } from "api/gql/schema";
 
-import RecordingMessage from "container/RecordingMessage/RecordingMessage";
+import RecordingMessage from "recorder/RecordingMessage";
 import { io } from "socket.io-client";
 import { secondsToTime, splitBase64String } from "./Util";
 

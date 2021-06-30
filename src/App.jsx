@@ -5,9 +5,9 @@ import { ApolloProvider } from "react-apollo";
 import { ApolloClient } from "@apollo/client";
 import { SnackbarProvider } from "notistack";
 
-import Explorer from "component/explorer/Explorer";
-import PlayingLayout from "container/PlayingRecord/PlayingLayout";
-import RealtimeRecord from "component/Recorder/RealtimeRecord";
+import Explorer from "explorer/Explorer";
+import PlayingLayout from "player/PlayingLayout";
+import RealtimeRecord from "recorder/RealtimeRecord";
 
 import "./styles.css";
 

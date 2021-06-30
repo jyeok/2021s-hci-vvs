@@ -9,10 +9,10 @@ import { mutations } from "api/gql/schema";
 import { Box, Button, Grid, TextField } from "@material-ui/core";
 import { Lock, PlayArrow, RecordVoiceOver } from "@material-ui/icons";
 
-import { secondsToTime } from "component/Recorder/Util";
-import { TextBlock } from "proptypes/ModelPropTypes";
+import { secondsToTime } from "recorder/Util";
+import { TextBlock } from "api/gql/ModelPropTypes";
 
-import MessageHolder from "../MessageHolder/MessageHolder";
+import MessageHolder from "../common/MessageHolder";
 
 const pborder = {
   border: "0.5px solid",
