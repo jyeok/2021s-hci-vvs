@@ -99,7 +99,7 @@ const RealtimeRecord = () => {
   };
 
   const onStart = () => {
-    socket = io("http://localhost:3003/", {
+    socket = io("http://localhost:3001/", {
       reconnection: false,
     });
 
