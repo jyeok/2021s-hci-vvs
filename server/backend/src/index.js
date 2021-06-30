@@ -7,7 +7,7 @@ const cors = require("@koa/cors");
 const parser = require("koa-bodyparser");
 const logger = require("koa-logger");
 
-const { MRC, keyword } = require("./api/text");
+const { MRC, keyword } = require("./text");
 
 const app = new Koa();
 const router = new Router();
