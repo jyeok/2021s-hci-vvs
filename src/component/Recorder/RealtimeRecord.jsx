@@ -17,7 +17,7 @@ import { PlayArrow, Save, ArrowBack, Stop, Help } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import { ReactMic } from "react-mic";
 
-import { compression } from "api/ai/compression";
+import { keywords } from "api/ai/keywords";
 import { mutations } from "api/gql/schema";
 
 import RecordingMessage from "container/RecordingMessage/RecordingMessage";
@@ -190,7 +190,7 @@ const RealtimeRecord = () => {
             .map((e) => (e.startsWith("#") ? e.trim() : `#${e.trim()}`))
         : [];
 
-      const tagList = await compression(allContents);
+      const tagList = await keywords(allContents);
 
       const tagConcat = userTag.concat(tagList);
       const finalTag = [...new Set(tagConcat)].slice(0, 10).join(" ").trim();

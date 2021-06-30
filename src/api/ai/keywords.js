@@ -1,8 +1,8 @@
 const axios = require("axios");
 
-export const compression = async (contents) => {
+export const keywords = async (contents) => {
   try {
-    const res = await axios.post("/api/compression", {
+    const res = await axios.post("/api/keywords", {
       question: contents,
     });
 
@@ -14,5 +14,5 @@ export const compression = async (contents) => {
 };
 
 export default {
-  compression,
+  keywords,
 };
