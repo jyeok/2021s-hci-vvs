@@ -8,7 +8,6 @@ export const keywords = async (contents) => {
 
     return res.data;
   } catch (error) {
-    console.error(error);
     return "";
   }
 };

@@ -9,7 +9,6 @@ export const answerQuestion = async (contents, question) => {
 
     return res.data;
   } catch (error) {
-    console.error(error);
     return "";
   }
 };
