@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 // Since SQlite doesn't support primitive array, we should serialize string to convert list of strings.
