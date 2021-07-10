@@ -13,6 +13,7 @@ const parser = require("koa-bodyparser");
 const logger = require("koa-logger");
 
 const { MRC, keyword } = require("./text");
+const { upload, files, remove, file } = require("./storage");
 const streamingSTT = require("./voice/streamingSTT");
 
 const app = new Koa();
@@ -24,6 +25,11 @@ const origin = mode === "dev" ? "*" : process.env.FRONTEND_ORIGIN;
 
 router.post("MRC", "/api/question", MRC);
 router.post("keywords", "/api/keywords", keyword);
+
+router.get("file", "/api/:user/file/:key", file);
+router.get("files", "/api/:user/files", files);
+router.post("upload", "/api/upload", upload);
+router.post("remove", "/api/remove", remove);
 
 app
   .use(logger())
