@@ -1,6 +1,6 @@
-const axios = require("axios");
+import axios from "axios";
 
-export const answerQuestion = async (contents, question) => {
+const answerQuestion = async (contents, question) => {
   try {
     const res = await axios.post("/api/question", {
       paragraph: contents,
@@ -13,6 +13,4 @@ export const answerQuestion = async (contents, question) => {
   }
 };
 
-export default {
-  answerQuestion,
-};
+export default answerQuestion;

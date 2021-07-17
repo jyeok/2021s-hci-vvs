@@ -33,9 +33,8 @@ import PopupState, { bindHover, bindPopover } from "material-ui-popup-state";
 import Popover from "material-ui-popup-state/HoverPopover";
 import { useSnackbar } from "notistack";
 
-import TextRank from "api/ai/summarization";
 import { mutations, queries } from "api/gql/schema";
-import { answerQuestion } from "api/ai/answerQuestion";
+import { answerQuestion, TextRank } from "api/ai";
 
 import { secondsToTime } from "recorder/Util";
 

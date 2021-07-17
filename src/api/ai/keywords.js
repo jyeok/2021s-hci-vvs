@@ -1,6 +1,6 @@
-const axios = require("axios");
+import axios from "axios";
 
-export const keywords = async (contents) => {
+const keywords = async (contents) => {
   try {
     const res = await axios.post("/api/keywords", {
       question: contents,
@@ -12,6 +12,4 @@ export const keywords = async (contents) => {
   }
 };
 
-export default {
-  keywords,
-};
+export default keywords;

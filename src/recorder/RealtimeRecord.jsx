@@ -10,18 +10,18 @@ import {
   TextField,
   Button,
   Typography,
-  // ClickAwayListener,
   Tooltip,
 } from "@material-ui/core";
 import { PlayArrow, Save, ArrowBack, Stop, Help } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import { ReactMic } from "react-mic";
 
-import { keywords } from "api/ai/keywords";
+import { keywords } from "api/ai";
 import { mutations } from "api/gql/schema";
 
 import RecordingMessage from "recorder/RecordingMessage";
 import { io } from "socket.io-client";
+import fileUpload from "api/ai/storage";
 import { secondsToTime, splitBase64String } from "./Util";
 
 let socket;
@@ -164,7 +164,7 @@ const RealtimeRecord = () => {
     if (newData) accumulateTextBlocks(newData);
   }, [newData]);
 
-  const onSave = async () => {
+  const onSave = async (userName = "root") => {
     if (!inputState.title) {
       enqueueSnackbar("녹음 제목을 입력해주세요.", {
         variant: "error",
@@ -179,6 +179,16 @@ const RealtimeRecord = () => {
         start: block.start,
         end: block.end,
       }));
+
+      // Upload to AWS S3 Bucket
+      const uploaded = await fileUpload(inputState.title, voice, userName);
+
+      if (!uploaded) {
+        enqueueSnackbar("음성 업로드에 실패하였습니다!", {
+          variant: "error",
+        });
+        return;
+      }
 
       const allContents = textBlockData
         .reduce((acc, cur) => `${acc} ${cur.content}`, "")
@@ -196,13 +206,13 @@ const RealtimeRecord = () => {
       const finalTag = [...new Set(tagConcat)].slice(0, 10).join(" ").trim();
 
       const recordCreateInput = {
-        path: inputState.title,
+        path: `records/${userName}/${inputState.title}`,
         title: inputState.title,
         size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
         tag: finalTag,
         memo: inputState.memo,
         content: textBlockCreateInput,
-        voice,
+        voice: uploaded,
       };
 
       try {
@@ -374,16 +384,7 @@ const RealtimeRecord = () => {
             startIcon={<Save />}
             color="primary"
             variant="contained"
-            onClick={() =>
-              onSave(
-                inputState,
-                textBlockData,
-                voice,
-                addRecordMutation,
-                generatePreviewMutation,
-                goBackHandler
-              )
-            }
+            onClick={() => onSave()}
           >
             녹음 저장
           </Button>

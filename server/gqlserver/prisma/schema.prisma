@@ -23,13 +23,13 @@ model Record {
 
   preview Preview?
 
-  voice   String // TODO: store path? base64-encoded data?
+  voice   String
   content TextBlock[] @relation("content")
 }
 
 model Preview {
   id      Int         @id @default(autoincrement())
-  voice   String // TODO: store path? base64-encoded data?
+  voice   String
   excerpt TextBlock[]
 
   record   Record? @relation(fields: [recordId], references: [id])

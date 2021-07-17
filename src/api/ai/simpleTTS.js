@@ -17,4 +17,4 @@ export const getTextBlocks = async (chunks, dataType, codecs, encoding) => {
   return data;
 };
 
-export default { getTextBlocks };
+export default getTextBlocks;

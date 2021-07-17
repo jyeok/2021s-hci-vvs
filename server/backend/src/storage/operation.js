@@ -48,7 +48,7 @@ const uploadFile = async (fileName, data, user = "root") => {
 
     console.log("[uploadFile] Success: ", res);
 
-    return res;
+    return `https://${Bucket}.s3.amazonaws.com/records/${user}/${fileName}`;
   } catch (err) {
     console.log("[uploadFile] Error: ", err);
 
