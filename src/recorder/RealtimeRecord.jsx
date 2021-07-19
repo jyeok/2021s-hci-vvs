@@ -22,7 +22,7 @@ import { mutations } from "api/gql/schema";
 import RecordingMessage from "recorder/RecordingMessage";
 import { io } from "socket.io-client";
 import fileUpload from "api/ai/storage";
-import { secondsToTime, splitBase64String } from "./Util";
+import { secondsToTime } from "./Util";
 
 let socket;
 
@@ -148,16 +148,8 @@ const RealtimeRecord = () => {
 
   const onSaveVoice = (data) => {
     const { blob } = data;
-    const reader = new FileReader();
-
-    reader.onloadend = async () => {
-      const base64Data = splitBase64String(reader.result);
-      const { data: voiceData } = base64Data;
-      setVoice(voiceData);
-      setStatus("ready");
-    };
-
-    reader.readAsDataURL(blob);
+    setVoice(blob);
+    setStatus("ready");
   };
 
   useEffect(() => {
@@ -181,7 +173,12 @@ const RealtimeRecord = () => {
       }));
 
       // Upload to AWS S3 Bucket
-      const uploaded = await fileUpload(inputState.title, voice, userName);
+      const formData = new FormData();
+      formData.append("title", inputState.title);
+      formData.append("data", voice);
+      formData.append("user", userName);
+
+      const uploaded = await fileUpload(formData);
 
       if (!uploaded) {
         enqueueSnackbar("음성 업로드에 실패하였습니다!", {
@@ -208,7 +205,7 @@ const RealtimeRecord = () => {
       const recordCreateInput = {
         path: `records/${userName}/${inputState.title}`,
         title: inputState.title,
-        size: Number.parseInt(Math.ceil((voice.length * 3) / 4 - 2), 10),
+        size: voice.size,
         tag: finalTag,
         memo: inputState.memo,
         content: textBlockCreateInput,

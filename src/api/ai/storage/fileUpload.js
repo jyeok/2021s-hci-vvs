@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const fileUpload = async (fileName, data, user = "root") => {
+const fileUpload = async (data) => {
   try {
-    const res = await axios.post("/api/upload", {
-      fileName,
+    const res = await axios({
+      method: "post",
+      url: "/api/upload",
       data,
-      user,
     });
     return res.data;
   } catch (error) {

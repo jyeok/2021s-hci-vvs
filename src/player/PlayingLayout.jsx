@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-// /* eslint-disable */
 
 import React, { useRef } from "react";
 import { useParams, useHistory } from "react-router";
@@ -14,14 +13,14 @@ import H5AudioPlayer from "react-h5-audio-player";
 import { queries } from "api/gql/schema";
 
 import Loading from "common/Loading";
-import { base64StringToBlob } from "blob-util";
+// import { base64StringToBlob } from "blob-util";
 import RecordComponent from "./RecordComponent";
 
 import "react-h5-audio-player/lib/styles.css";
 
 const PlayingLayout = () => {
-  const dataType = "data:audio/webm;";
-  const codecs = "codecs=opus";
+  // const dataType = "data:audio/webm;";
+  // const codecs = "codecs=opus";
 
   const history = useHistory();
   const audioRef = useRef();
@@ -48,10 +47,7 @@ const PlayingLayout = () => {
     onBack("올바르지 않은 접근입니다.", "warning");
   }
 
-  // Data Logic
-
-  const blob = base64StringToBlob(data.recordById.voice, dataType + codecs);
-  const blobUrl = URL.createObjectURL(blob);
+  const blobUrl = data.recordById.voice;
 
   return (
     <Grid container>
