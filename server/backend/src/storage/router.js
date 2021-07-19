@@ -20,9 +20,10 @@ const file = async (ctx) => {
 };
 
 const upload = async (ctx) => {
-  const { user, fileName, data } = ctx.request.body;
+  const { user, title } = ctx.request.body;
+  const data = ctx.request.files;
 
-  const res = await uploadFile(fileName, data, user);
+  const res = await uploadFile(title, data.data, user);
 
   ctx.body = res || "Failed";
 };

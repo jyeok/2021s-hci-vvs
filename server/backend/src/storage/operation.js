@@ -8,6 +8,8 @@ const {
   GetObjectCommand,
   DeleteObjectCommand,
 } = require("@aws-sdk/client-s3");
+const fs = require("fs");
+
 const { Bucket, Region: region } = require("./config");
 
 const client = new S3Client({
@@ -36,11 +38,14 @@ const getFileList = async (user = "root") => {
 };
 
 const uploadFile = async (fileName, data, user = "root") => {
+  const buf = fs.readFileSync(data.path);
   const putObjectParams = {
     Bucket,
-    // ContentType
     Key: `records/${user}/${fileName}`,
-    Body: data,
+    Body: buf,
+    ContentEncoding: "base64",
+    ContentType: "audio/webm;codecs=opus",
+    ACL: "public-read",
   };
 
   try {
@@ -96,7 +101,6 @@ if (process.argv.length >= 3) {
       getFileList();
       break;
     case "upload":
-      const fs = require("fs");
       const path = require("path");
 
       if (!process.argv[3]) {

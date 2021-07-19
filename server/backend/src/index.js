@@ -8,8 +8,9 @@ const _io = require("socket.io");
 
 const Koa = require("koa");
 const Router = require("@koa/router");
-const cors = require("@koa/cors");
+const formidable = require("koa2-formidable");
 const parser = require("koa-bodyparser");
+const cors = require("@koa/cors");
 const logger = require("koa-logger");
 
 const { MRC, keyword } = require("./text");
@@ -33,6 +34,7 @@ router.post("remove", "/api/remove", remove);
 
 app
   .use(logger())
+  .use(formidable())
   .use(parser())
   .use(
     cors({
