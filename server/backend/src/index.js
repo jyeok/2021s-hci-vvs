@@ -16,6 +16,7 @@ const logger = require("koa-logger");
 const { MRC, keyword } = require("./text");
 const { upload, files, remove, file } = require("./storage");
 const streamingSTT = require("./voice/streamingSTT");
+const transcript = require("./voice/transcript");
 
 const app = new Koa();
 const router = new Router();
@@ -63,6 +64,20 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`[Server] Client ${socket.id} disconnected!`);
     streamingSTT.stopRecognitionStream();
+  });
+
+  socket.on("recordStart", () => {
+    console.log("[Server] Record Start");
+    transcript.main(io);
+  });
+
+  socket.on("recordData", (data) => {
+    transcript.loadData(data);
+  });
+
+  socket.on("recordEnd", () => {
+    console.log("[Server] Record End");
+    transcript.stopRecognitionStream();
   });
 });
 

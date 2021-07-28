@@ -5,8 +5,7 @@ const sampleRateHertz = 16000;
 const languageCode = "ko-KR";
 const streamingLimit = 290000; // ms - set to low number for demo purposes
 const chalk = require("chalk");
-const { Writable } = require("stream");
-const recorder = require("node-record-lpcm16");
+const { Writable, Readable } = require("stream");
 const speech = require("@google-cloud/speech").v1p1beta1;
 
 const config = {
@@ -23,7 +22,7 @@ const request = {
   interimResults: true,
 };
 
-let recordStream = null;
+let recordStream = new Readable({ read: () => {} });
 let recognizeStream = null;
 let restartCounter = 0;
 let audioInput = [];
@@ -34,6 +33,48 @@ let finalRequestEndTime = 0;
 let newStream = true;
 let bridgingOffset = 0;
 let lastTranscriptWasFinal = false;
+
+const audioInputStreamTransform = new Writable({
+  write(chunk, _, next) {
+    if (newStream && lastAudioInput.length !== 0) {
+      // Approximate math to calculate time of chunks
+      const chunkTime = streamingLimit / lastAudioInput.length;
+      if (chunkTime !== 0) {
+        if (bridgingOffset < 0) {
+          bridgingOffset = 0;
+        }
+        if (bridgingOffset > finalRequestEndTime) {
+          bridgingOffset = finalRequestEndTime;
+        }
+        const chunksFromMS = Math.floor(
+          (finalRequestEndTime - bridgingOffset) / chunkTime
+        );
+        bridgingOffset = Math.floor(
+          (lastAudioInput.length - chunksFromMS) * chunkTime
+        );
+
+        for (let i = chunksFromMS; i < lastAudioInput.length; i += 1) {
+          recognizeStream.write(lastAudioInput[i]);
+        }
+      }
+      newStream = false;
+    }
+
+    audioInput.push(chunk);
+
+    if (recognizeStream) {
+      recognizeStream.write(chunk);
+    }
+
+    next();
+  },
+
+  final() {
+    if (recognizeStream) {
+      recognizeStream.end();
+    }
+  },
+});
 
 const postProcess = (results, endTime) => {
   const textBlockInputs = results.map((r) => {
@@ -124,49 +165,6 @@ const main = (client) => {
     setTimeout(restartStream, streamingLimit);
   }
 
-  const audioInputStreamTransform = new Writable({
-    write(chunk, _, next) {
-      console.log(typeof chunk, chunk.toString());
-      if (newStream && lastAudioInput.length !== 0) {
-        // Approximate math to calculate time of chunks
-        const chunkTime = streamingLimit / lastAudioInput.length;
-        if (chunkTime !== 0) {
-          if (bridgingOffset < 0) {
-            bridgingOffset = 0;
-          }
-          if (bridgingOffset > finalRequestEndTime) {
-            bridgingOffset = finalRequestEndTime;
-          }
-          const chunksFromMS = Math.floor(
-            (finalRequestEndTime - bridgingOffset) / chunkTime
-          );
-          bridgingOffset = Math.floor(
-            (lastAudioInput.length - chunksFromMS) * chunkTime
-          );
-
-          for (let i = chunksFromMS; i < lastAudioInput.length; i += 1) {
-            recognizeStream.write(lastAudioInput[i]);
-          }
-        }
-        newStream = false;
-      }
-
-      audioInput.push(chunk);
-
-      if (recognizeStream) {
-        recognizeStream.write(chunk);
-      }
-
-      next();
-    },
-
-    final() {
-      if (recognizeStream) {
-        recognizeStream.end();
-      }
-    },
-  });
-
   function restartStream() {
     if (recognizeStream) {
       recognizeStream.end();
@@ -195,16 +193,7 @@ const main = (client) => {
     startStream();
   }
 
-  // Start recording and send the microphone input to the Speech API
-  recordStream = recorder
-    .record({
-      sampleRateHertz: 16000,
-      threshold: 0.1, // Silence threshold
-      silence: 0.05,
-      keepSilence: true,
-      recordProgram: "sox", // Try also "arecord" or "sox"
-    })
-    .stream();
+  if (!recordStream) recordStream = new Readable({ read: () => {} });
 
   recordStream
     .on("error", (err) => {
@@ -222,14 +211,20 @@ const main = (client) => {
   startStream();
 };
 
-function stopRecognitionStream() {
+function loadData(data) {
+  if (recordStream) recordStream.push(data);
+}
+
+const stopRecognitionStream = () => {
   if (recognizeStream) {
     recognizeStream.end();
     recognizeStream.removeListener("data", speechCallback);
+    recognizeStream.destroy();
   }
 
   if (recordStream) {
     recordStream.removeAllListeners();
+    recordStream.destroy();
   }
 
   recordStream = null;
@@ -243,11 +238,11 @@ function stopRecognitionStream() {
   newStream = true;
   bridgingOffset = 0;
   lastTranscriptWasFinal = false;
-}
+};
 
 process.on("unhandledRejection", (err) => {
   console.error(err.message);
   process.exitCode = 1;
 });
 
-module.exports = { main, stopRecognitionStream };
+module.exports = { main, stopRecognitionStream, loadData };

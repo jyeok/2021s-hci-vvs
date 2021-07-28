@@ -10,6 +10,7 @@ import PlayingLayout from "player/PlayingLayout";
 import RealtimeRecord from "recorder/RealtimeRecord";
 
 import "./styles.css";
+import Recorder from "recorder/Recorder";
 
 function App(props) {
   const { client } = props;
@@ -22,6 +23,7 @@ function App(props) {
             <Route path="/" exact component={Explorer} />
             <Route path="/playing/:id" exact component={PlayingLayout} />
             <Route path="/recording" exact component={RealtimeRecord} />
+            <Route path="/test" exact component={Recorder} />
             <Redirect path="*" to="/" />
           </Switch>
         </div>
