@@ -126,7 +126,6 @@ const main = (client) => {
 
   const audioInputStreamTransform = new Writable({
     write(chunk, _, next) {
-      console.log(typeof chunk, chunk.toString());
       if (newStream && lastAudioInput.length !== 0) {
         // Approximate math to calculate time of chunks
         const chunkTime = streamingLimit / lastAudioInput.length;

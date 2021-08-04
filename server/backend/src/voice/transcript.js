@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 const encoding = "LINEAR16";
-const sampleRateHertz = 16000;
+const sampleRateHertz = 48000;
 const languageCode = "ko-KR";
 const streamingLimit = 290000; // ms - set to low number for demo purposes
 const chalk = require("chalk");
@@ -177,7 +177,6 @@ const main = (client) => {
     resultEndTime = 0;
 
     lastAudioInput = [];
-    lastAudioInput = audioInput;
 
     restartCounter += 1;
 
@@ -212,13 +211,15 @@ const main = (client) => {
 };
 
 function loadData(data) {
-  if (recordStream) recordStream.push(data);
+  if (recordStream) {
+    recordStream.push(data);
+  }
 }
 
 const stopRecognitionStream = () => {
   if (recognizeStream) {
     recognizeStream.end();
-    recognizeStream.removeListener("data", speechCallback);
+    recognizeStream.removeAllListeners();
     recognizeStream.destroy();
   }
 

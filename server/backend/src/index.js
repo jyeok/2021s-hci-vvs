@@ -64,6 +64,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`[Server] Client ${socket.id} disconnected!`);
     streamingSTT.stopRecognitionStream();
+    transcript.stopRecognitionStream();
   });
 
   socket.on("recordStart", () => {

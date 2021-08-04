@@ -25,6 +25,7 @@
     "koa-proxies": "^0.12.1",
     "koa2-formidable": "^1.0.3",
     "node-record-lpcm16": "^1.0.1",
+    "node-vad": "^1.1.4",
     "nodemon": "^2.0.8",
     "socket.io": "^4.1.2",
     "uuid": "^8.3.2"

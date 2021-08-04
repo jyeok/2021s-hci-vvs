@@ -25,8 +25,21 @@ export const secondsToTime = (seconds) => {
   return h === 0 ? `${m}분 ${s}초` : `${h}시 ${m}분 ${s}초`;
 };
 
+export const f32toi16 = (buffer) => {
+  let l = buffer.length - 1;
+  const buf = new Int16Array(l);
+
+  while (l) {
+    buf[l] = buffer[l] * 0xffff;
+    l -= 1;
+  }
+
+  return buf.buffer;
+};
+
 export default {
   generateTextBlock,
   splitBase64String,
   secondsToTime,
+  f32toi16,
 };
