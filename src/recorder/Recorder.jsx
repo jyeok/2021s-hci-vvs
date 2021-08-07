@@ -1,131 +1,115 @@
 /* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-bitwise */
 
 import React from "react";
 import { io } from "socket.io-client";
 
 import getUserMedia from "get-user-media-promise";
 import { Button } from "@material-ui/core";
+import { f32toi16 } from "./Util";
+import { SPEECH } from "./constants";
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
-const BUFFER_SIZE = 4096;
 const CONSTRAINTS = {
   audio: true,
   video: false,
 };
-const chunks = [];
+const AUDIO_ENCODING = "audio/webm;codecs=opus";
+const DATA_RECIEVER = "float-to-int-processor";
+const DATA_RECIEVER_URL = "/lib/float-to-int-processor.js";
+const recordData = [];
 
-let micRecord;
-let socket;
 let context;
-let processor;
-let input;
 let globalStream;
-
-const f32toi16 = (buffer) => {
-  let l = buffer.length - 1;
-  const buf = new Int16Array(l);
-
-  while (l) {
-    buf[l] = buffer[l] * 0xffff;
-    l -= 1;
-  }
-
-  return buf.buffer;
-};
+let micRecord;
+let input;
+let reciever;
+let socket;
 
 const onEnd = () => {
-  micRecord.stop();
-  socket.emit("recordEnd");
-  socket.offAny();
-
-  if (globalStream && globalStream.getTracks() && globalStream.getTracks()[0])
-    globalStream.getTracks()[0].stop();
-
-  if (processor) {
-    if (input) {
-      try {
-        input.disconnect(processor);
-        processor.disconnect(context.destination);
-      } catch (err) {
-        console.log(err);
-      }
-    }
+  if (micRecord) micRecord.stop();
+  if (socket) {
+    socket.emit("recordEnd");
+    socket.offAny();
   }
 
-  if (context) {
-    context.close().then(() => {
-      input = null;
-      processor = null;
+  if (globalStream) globalStream.getTracks().forEach((track) => track.stop());
+  if (input) input.disconnect();
+  if (reciever) reciever.disconnect();
+  if (context) context.close();
+
+  input = null;
+  reciever = null;
+  globalStream = null;
+  socket = null;
+  context = null;
+  micRecord = null;
+};
+
+const onData = (e) => {
+  const buffer = e.data;
+  const converted = f32toi16(buffer);
+
+  if (socket) socket.emit(SPEECH.AUDIO_DATA, converted);
+};
+
+const onTranscript = (e) => console.log(e);
+
+const onSpeechError = (err) => console.log(err);
+
+const onInterim = (e) => console.log(e);
+
+const initSocket = () => {
+  socket = io(SPEECH.URL, {
+    reconnection: false,
+  });
+
+  socket.on("connect", () => {
+    socket.emit(SPEECH.START);
+
+    socket.on(SPEECH.TRANSCRIPT_ERROR, onSpeechError);
+    socket.on(SPEECH.SPEECH_DATA, onTranscript);
+    socket.on(SPEECH.SPEECH_INTERIM_DATA, onInterim);
+  });
+
+  return socket;
+};
+
+const initRecorder = (stream) => {
+  micRecord = new MediaRecorder(stream);
+
+  micRecord.onstop = () => {
+    const blob = new Blob(recordData, {
+      type: AUDIO_ENCODING,
     });
-  }
+    const audioURL = URL.createObjectURL(blob);
+    console.log(audioURL);
+  };
+
+  micRecord.ondataavailable = (e) => {
+    recordData.push(e.data);
+  };
+
+  micRecord.start();
 };
 
 const onStart = async () => {
-  console.log("start");
-
+  if (globalStream) return;
   try {
-    context = new AudioContext();
-    await context.audioWorklet.addModule("/lib/float-to-int-processor.js");
-    const tempNode = new AudioWorkletNode(context, "float-to-int-processor");
-    processor = context.createScriptProcessor(BUFFER_SIZE, 1, 1);
-    processor.connect(context.destination);
-    context.resume();
-
     getUserMedia(CONSTRAINTS)
-      .then((stream) => {
-        socket = io("http://localhost:3001/", {
-          reconnection: false,
-        });
-
-        socket.on("connect", () => {
-          console.log("connection!");
-          socket.emit("recordStart");
-
-          socket.on("recordError", (error) => {
-            console.log(error);
-          });
-
-          socket.on("speechData", (data) => {
-            console.log(data);
-          });
-
-          socket.on("interimData", (data) => {
-            console.log(`interim:${data}`);
-          });
-        });
-
-        micRecord = new MediaRecorder(stream);
-
-        micRecord.onstop = () => {
-          const blob = new Blob(chunks, {
-            type: "audio/webm;codecs=opus",
-          });
-
-          const audioURL = URL.createObjectURL(blob);
-          console.log(audioURL);
-        };
-
-        micRecord.ondataavailable = (e) => {
-          chunks.push(e.data);
-          console.log("e: ", e);
-        };
-
-        micRecord.start();
-
+      .then(async (stream) => {
         globalStream = stream;
-
+        context = new AudioContext();
+        await context.audioWorklet.addModule(DATA_RECIEVER_URL);
+        reciever = new AudioWorkletNode(context, DATA_RECIEVER);
+        reciever.port.onmessage = onData;
         input = context.createMediaStreamSource(stream);
-        input.connect(processor);
+        context.resume();
 
-        processor.onaudioprocess = (e) => {
-          const raw = e.inputBuffer.getChannelData(0);
-          const converted = f32toi16(raw);
-          console.log(raw);
+        input.connect(reciever);
+        reciever.connect(context.destination);
 
-          socket.emit("recordData", converted);
-        };
+        initRecorder(stream);
+        initSocket();
       })
       .catch((err) => {
         console.log(err);

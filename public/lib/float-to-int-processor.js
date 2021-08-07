@@ -1,10 +1,6 @@
 class FloatToIntProcessor extends AudioWorkletProcessor {
-  constructor(options) {
-    super();
-    console.log(options);
-  }
-
-  process(inputs, outputs) {
+  process(inputs) {
+    this.port.postMessage(inputs[0][0]);
     return true;
   }
 }
