@@ -1,10 +1,8 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 
 require("dotenv").config();
 
 const http = require("http");
-// const _io = require("socket.io");
 
 const Koa = require("koa");
 const Router = require("@koa/router");
@@ -17,7 +15,6 @@ const { MRC, keyword } = require("./text");
 const { upload, files, remove, file } = require("./storage");
 
 const speechServer = require("./socket");
-// const streamingSTT = require("./voice/streamingSTT");
 
 const app = new Koa();
 const router = new Router();
@@ -47,34 +44,6 @@ app
   .use(router.allowedMethods());
 
 const server = http.createServer(app.callback());
-// const io = _io(server, { cors: { origin } });
-
-// io.on("connection", (socket) => {
-//   console.log(`New Client ${socket.id} Connected!`);
-
-//   socket.on("startRecord", () => {
-//     console.log("[Server] Record Started");
-//     streamingSTT.main(io);
-//   });
-
-//   socket.on("endRecord", () => {
-//     console.log("[Server] Record Ended");
-//     streamingSTT.stopRecognitionStream();
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log(`[Server] Client ${socket.id} disconnected!`);
-//     streamingSTT.stopRecognitionStream();
-//   });
-
-//   socket.on("recordStart", () => {
-//     console.log("[Server] Record Start");
-//   });
-
-//   socket.on("recordEnd", () => {
-//     console.log("[Server] Record End");
-//   });
-// });
 
 speechServer(server, { origin });
 
