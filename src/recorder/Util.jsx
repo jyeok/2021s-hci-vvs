@@ -26,6 +26,8 @@ export const secondsToTime = (seconds) => {
 };
 
 export const f32toi16 = (buffer) => {
+  if (!buffer) return buffer;
+
   let l = buffer.length - 1;
   const buf = new Int16Array(l);
 

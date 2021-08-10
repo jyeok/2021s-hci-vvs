@@ -1,3 +1,6 @@
+const CONNECT = "connection";
+const DISCONNECT = "disconnect";
+
 const SPEECH = {
   START: "recordStart",
   END: "recordEnd",
@@ -8,5 +11,7 @@ const SPEECH = {
 };
 
 module.exports = {
+  CONNECT,
+  DISCONNECT,
   SPEECH,
 };

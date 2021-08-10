@@ -4,7 +4,7 @@
 require("dotenv").config();
 
 const http = require("http");
-const _io = require("socket.io");
+// const _io = require("socket.io");
 
 const Koa = require("koa");
 const Router = require("@koa/router");
@@ -15,8 +15,9 @@ const logger = require("koa-logger");
 
 const { MRC, keyword } = require("./text");
 const { upload, files, remove, file } = require("./storage");
-const streamingSTT = require("./voice/streamingSTT");
-const transcript = require("./voice/transcript");
+
+const speechServer = require("./socket");
+// const streamingSTT = require("./voice/streamingSTT");
 
 const app = new Koa();
 const router = new Router();
@@ -46,41 +47,36 @@ app
   .use(router.allowedMethods());
 
 const server = http.createServer(app.callback());
-const io = _io(server, { cors: { origin } });
+// const io = _io(server, { cors: { origin } });
 
-io.on("connection", (socket) => {
-  console.log(`New Client ${socket.id} Connected!`);
+// io.on("connection", (socket) => {
+//   console.log(`New Client ${socket.id} Connected!`);
 
-  socket.on("startRecord", () => {
-    console.log("[Server] Record Started");
-    streamingSTT.main(io);
-  });
+//   socket.on("startRecord", () => {
+//     console.log("[Server] Record Started");
+//     streamingSTT.main(io);
+//   });
 
-  socket.on("endRecord", () => {
-    console.log("[Server] Record Ended");
-    streamingSTT.stopRecognitionStream();
-  });
+//   socket.on("endRecord", () => {
+//     console.log("[Server] Record Ended");
+//     streamingSTT.stopRecognitionStream();
+//   });
 
-  socket.on("disconnect", () => {
-    console.log(`[Server] Client ${socket.id} disconnected!`);
-    streamingSTT.stopRecognitionStream();
-    transcript.stopRecognitionStream();
-  });
+//   socket.on("disconnect", () => {
+//     console.log(`[Server] Client ${socket.id} disconnected!`);
+//     streamingSTT.stopRecognitionStream();
+//   });
 
-  socket.on("recordStart", () => {
-    console.log("[Server] Record Start");
-    transcript.main(io);
-  });
+//   socket.on("recordStart", () => {
+//     console.log("[Server] Record Start");
+//   });
 
-  socket.on("recordData", (data) => {
-    transcript.loadData(data);
-  });
+//   socket.on("recordEnd", () => {
+//     console.log("[Server] Record End");
+//   });
+// });
 
-  socket.on("recordEnd", () => {
-    console.log("[Server] Record End");
-    transcript.stopRecognitionStream();
-  });
-});
+speechServer(server, { origin });
 
 server.listen(port, () => {
   console.log(
