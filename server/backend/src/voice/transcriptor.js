@@ -7,8 +7,12 @@ const speech = require("@google-cloud/speech").v1p1beta1;
 const { postProcess } = require("./util");
 const { SPEECH } = require("./constants");
 
+const DEBUG = true;
+
 class Transcriptor {
   constructor(client) {
+    if (DEBUG) console.log("Constructor");
+
     this.client = client;
 
     this.transformWrite = this.transformWrite.bind(this);
@@ -60,13 +64,13 @@ class Transcriptor {
       }),
     };
 
-    this.startStream();
-
     console.log("");
     console.log("Listening, press Ctrl+C to stop.");
     console.log("");
     console.log("End (ms)       Transcript Results/Status");
     console.log("=========================================================");
+
+    if (DEBUG) console.log("Constructor End");
   }
 
   transformWrite(chunk, _, next) {
@@ -107,10 +111,12 @@ class Transcriptor {
   }
 
   transformEnd() {
+    if (DEBUG) console.log("end");
     if (this.streams.speechStream) this.streams.speechStream.end();
   }
 
   speechCallback(stream) {
+    if (DEBUG) console.log("callback");
     let stdoutText = "";
 
     this.times.resultEndTime =
@@ -126,7 +132,7 @@ class Transcriptor {
     process.stdout.cursorTo(0);
 
     if (stream.results[0] && stream.results[0].alternatives[0]) {
-      stdoutText = `${correctedTime}: ${stream.results[0].alternatives[0]}.transcript`;
+      stdoutText = `${correctedTime}: ${stream.results[0].alternatives[0].transcript}`;
     }
 
     if (stream.results[0].isFinal) {
@@ -136,7 +142,7 @@ class Transcriptor {
       );
 
       process.stdout.write(chalk.green(`${stdoutText}\n`));
-      process.stdout.write(chalk.white(textBlockData));
+      process.stdout.write(textBlockData);
       process.stdout.write("\n");
 
       this.flags.lastTranscriptWasFinal = true;
@@ -154,6 +160,7 @@ class Transcriptor {
       process.stdout.write(chalk.red(stdoutText));
       this.client.emit(SPEECH.SPEECH_INTERIM_DATA, stdoutText);
       this.flags.lastTranscriptWasFinal = false;
+      if (DEBUG) console.log("callback end");
     }
   }
 
@@ -162,6 +169,7 @@ class Transcriptor {
   }
 
   restartStream() {
+    if (DEBUG) console.log("restart");
     this.streams.speechStream.removeAllListeners();
     this.streams.speechStream.end(); // Destroy?
 
@@ -188,9 +196,12 @@ class Transcriptor {
 
     this.flags.newStream = true;
     this.startStream();
+
+    if (DEBUG) console.log("restart end");
   }
 
   endStream() {
+    if (DEBUG) console.log("stream end");
     this.streams.speechStream.removeAllListeners();
     this.streams.speechStream.destroy();
 
@@ -199,9 +210,12 @@ class Transcriptor {
 
     this.streams.transform.removeAllListeners();
     this.streams.transform.destroy();
+
+    if (DEBUG) console.log("stream end of end");
   }
 
   startStream() {
+    if (DEBUG) console.log("start");
     const speechClient = new speech.SpeechClient();
     setTimeout(this.restartStream, this.config.streamingLimit);
 
@@ -222,6 +236,8 @@ class Transcriptor {
         this.client.emit(SPEECH.TRANSCRIPT_ERROR, err);
       })
       .pipe(this.streams.transform);
+
+    if (DEBUG) console.log("start end");
   }
 }
 
