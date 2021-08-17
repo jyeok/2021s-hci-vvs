@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-
+/* eslint-disable */
 const { Writable, Readable } = require("stream");
 const chalk = require("chalk");
 const speech = require("@google-cloud/speech").v1p1beta1;
@@ -7,7 +7,7 @@ const speech = require("@google-cloud/speech").v1p1beta1;
 const { postProcess } = require("./util");
 const { SPEECH } = require("./constants");
 
-const DEBUG = true;
+const DEBUG = false;
 
 class Transcriptor {
   constructor(client) {
@@ -56,8 +56,10 @@ class Transcriptor {
     };
 
     this.streams = {
+      voiceStream: new Readable({
+        read() {},
+      }),
       speechStream: null,
-      voiceStream: new Readable({ read: () => {} }),
       transform: new Writable({
         write: this.transformWrite,
         final: this.transformEnd,
@@ -140,14 +142,12 @@ class Transcriptor {
         stream.results[0].alternatives,
         correctedTime
       );
-
       process.stdout.write(chalk.green(`${stdoutText}\n`));
-      process.stdout.write(textBlockData);
       process.stdout.write("\n");
+      console.log(textBlockData);
 
-      this.flags.lastTranscriptWasFinal = true;
       this.times.isFinalEndTime = this.times.resultEndTime;
-
+      this.flags.lastTranscriptWasFinal = true;
       this.client.emit(SPEECH.SPEECH_DATA, textBlockData);
     } else {
       if (stdoutText.length > process.stdout.columns) {
@@ -160,6 +160,7 @@ class Transcriptor {
       process.stdout.write(chalk.red(stdoutText));
       this.client.emit(SPEECH.SPEECH_INTERIM_DATA, stdoutText);
       this.flags.lastTranscriptWasFinal = false;
+
       if (DEBUG) console.log("callback end");
     }
   }
@@ -170,6 +171,8 @@ class Transcriptor {
 
   restartStream() {
     if (DEBUG) console.log("restart");
+    this.streams.voiceStream.unpipe();
+
     this.streams.speechStream.removeAllListeners();
     this.streams.speechStream.end(); // Destroy?
 
@@ -202,14 +205,15 @@ class Transcriptor {
 
   endStream() {
     if (DEBUG) console.log("stream end");
-    this.streams.speechStream.removeAllListeners();
-    this.streams.speechStream.destroy();
 
     this.streams.voiceStream.removeAllListeners();
     this.streams.voiceStream.destroy();
 
     this.streams.transform.removeAllListeners();
     this.streams.transform.destroy();
+
+    this.streams.speechStream.removeAllListeners();
+    this.streams.speechStream.destroy();
 
     if (DEBUG) console.log("stream end of end");
   }
@@ -219,6 +223,9 @@ class Transcriptor {
     const speechClient = new speech.SpeechClient();
     setTimeout(this.restartStream, this.config.streamingLimit);
 
+    this.streams.voiceStream.pipe(this.streams.transform);
+    this.streams.voiceStream.resume();
+
     this.streams.speechStream = speechClient.streamingRecognize(this.request);
 
     this.streams.speechStream
@@ -226,16 +233,9 @@ class Transcriptor {
         console.error(err);
         this.client.emit(SPEECH.TRANSCRIPT_ERROR, err);
       })
-      .on("data", (data) => this.speechCallback(data));
-
-    this.streams.voiceStream = new Readable({ read: () => {} });
-
-    this.streams.voiceStream
-      .on("error", (err) => {
-        console.error(err);
-        this.client.emit(SPEECH.TRANSCRIPT_ERROR, err);
-      })
-      .pipe(this.streams.transform);
+      .on("data", (data) => {
+        this.speechCallback(data);
+      });
 
     if (DEBUG) console.log("start end");
   }

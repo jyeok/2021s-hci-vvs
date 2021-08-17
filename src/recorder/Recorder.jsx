@@ -1,12 +1,15 @@
 /* eslint-disable no-console */
 
-import React from "react";
+import React, { useState } from "react";
 import { io } from "socket.io-client";
 
 import getUserMedia from "get-user-media-promise";
-import { Button } from "@material-ui/core";
+import { Button, Grid } from "@material-ui/core";
+import H5AudioPlayer from "react-h5-audio-player";
 import { f32toi16 } from "./Util";
 import { SPEECH } from "./constants";
+
+import "react-h5-audio-player/lib/styles.css";
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const CONSTRAINTS = {
@@ -74,7 +77,7 @@ const initSocket = () => {
   return socket;
 };
 
-const initRecorder = (stream) => {
+const initRecorder = (stream, setAudioSrc) => {
   micRecord = new MediaRecorder(stream);
 
   micRecord.onstop = () => {
@@ -82,6 +85,7 @@ const initRecorder = (stream) => {
       type: AUDIO_ENCODING,
     });
     const audioURL = URL.createObjectURL(blob);
+    setAudioSrc(audioURL);
     console.log(audioURL);
   };
 
@@ -92,7 +96,7 @@ const initRecorder = (stream) => {
   micRecord.start();
 };
 
-const onStart = async () => {
+const onStart = async (setAudioSrc) => {
   if (globalStream) return;
   try {
     getUserMedia(CONSTRAINTS)
@@ -108,7 +112,7 @@ const onStart = async () => {
         input.connect(reciever);
         reciever.connect(context.destination);
 
-        initRecorder(stream);
+        initRecorder(stream, setAudioSrc);
         initSocket();
       })
       .catch((err) => {
@@ -119,11 +123,26 @@ const onStart = async () => {
   }
 };
 
-const Recorder = () => (
-  <div>
-    <Button onClick={() => onStart()}> 시작 </Button>
-    <Button onClick={() => onEnd()}> 끝 </Button>
-  </div>
-);
+const Recorder = () => {
+  const [audioSrc, setAudioSrc] = useState();
+
+  return (
+    <Grid container>
+      <Grid lg={10}>
+        <H5AudioPlayer src={audioSrc}> </H5AudioPlayer>
+      </Grid>
+      <Grid lg={1}>
+        <Button variant="outlined" onClick={() => onStart(setAudioSrc)}>
+          시작
+        </Button>
+      </Grid>
+      <Grid lg={1}>
+        <Button variant="outlined" onClick={onEnd}>
+          끝
+        </Button>
+      </Grid>
+    </Grid>
+  );
+};
 
 export default Recorder;
