@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-/* eslint-disable */
+
 const { Writable, Readable } = require("stream");
 const chalk = require("chalk");
 const speech = require("@google-cloud/speech").v1p1beta1;
