@@ -52,7 +52,7 @@ const RecordTopPanel = (props) => {
 export default RecordTopPanel;
 
 RecordTopPanel.propTypes = {
-  recordStatus: propTypes.arrayOf(propTypes.object).isRequired,
+  recordStatus: propTypes.arrayOf(propTypes.any).isRequired,
   speechHandler: propTypes.shape({
     onTranscript: propTypes.func,
     onSpeechError: propTypes.func,

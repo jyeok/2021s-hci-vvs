@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React from "react";
 import propTypes from "prop-types";
 
@@ -16,7 +18,7 @@ const textBlockToMessage = (textBlocks) =>
       message: blk.content,
       sentTime: blk.start,
       direction: blk.isMine ? "outgoing" : "incoming",
-      position: "single",
+      position: "single"
     };
 
     return (
@@ -29,6 +31,7 @@ const textBlockToMessage = (textBlocks) =>
 const RecorderContent = (props) => {
   const { textData, recording, interimString } = props;
   const messages = textBlockToMessage(textData);
+  console.log(textData, recording, interimString);
 
   return (
     <Grid
@@ -38,7 +41,7 @@ const RecorderContent = (props) => {
         height: "600px",
         border: "1px solid",
         borderTop: "0px",
-        overflow: "scroll",
+        overflow: "scroll"
       }}
     >
       <ChatContainer style={({ position: "relative" }, { height: "550px" })}>
@@ -47,15 +50,10 @@ const RecorderContent = (props) => {
           {recording === RECORD_STATUS.RECORDING && (
             <Message
               model={{
-                type: "custom",
                 direction: "outgoing",
+                message: "듣는 중..."
               }}
-            >
-              <Message.CustomContent>
-                <Typography variant="body2"> 듣는 중... </Typography>
-                <Typography variant="body1"> {interimString} </Typography>
-              </Message.CustomContent>
-            </Message>
+            />
           )}
         </MessageList>
       </ChatContainer>
@@ -75,11 +73,11 @@ RecorderContent.propTypes = {
       isModified: propTypes.bool,
       reliability: propTypes.number,
       start: propTypes.string.isRequired,
-      end: propTypes.string.isRequired,
+      end: propTypes.string.isRequired
     })
   ),
-  recording: propTypes.bool.isRequired,
-  interimString: propTypes.string.isRequired,
+  recording: propTypes.number.isRequired,
+  interimString: propTypes.string.isRequired
 };
 
 RecorderContent.defaultProps = {
@@ -91,7 +89,7 @@ RecorderContent.defaultProps = {
       isModified: 0,
       reliability: 0.82,
       start: "1.2",
-      end: "1.6",
-    },
-  ],
+      end: "1.6"
+    }
+  ]
 };

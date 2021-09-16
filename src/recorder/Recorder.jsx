@@ -154,7 +154,7 @@ const Recorder = (props) => {
         <Button
           onClick={onStart}
           startIcon={<PlayArrow />}
-          disabled={status === RECORD_STATUS.RECORDING || audioSrc}
+          disabled={status === RECORD_STATUS.RECORDING || !!audioSrc}
         >
           <Typography variant="button">녹음 시작</Typography>
         </Button>
@@ -163,7 +163,7 @@ const Recorder = (props) => {
         <Button
           startIcon={<Stop />}
           onClick={onRecordEnd}
-          disabled={status !== RECORD_STATUS.RECORDING || audioSrc}
+          disabled={status !== RECORD_STATUS.RECORDING || !!audioSrc}
         >
           <Typography variant="button">녹음 중지</Typography>
         </Button>
@@ -191,5 +191,5 @@ Recorder.propTypes = {
     onSaveVoice: propTypes.func.isRequired,
     onSaveRecord: propTypes.func.isRequired,
   }).isRequired,
-  recordStatus: propTypes.arrayOf(propTypes.object).isRequired,
+  recordStatus: propTypes.arrayOf(propTypes.any).isRequired,
 };

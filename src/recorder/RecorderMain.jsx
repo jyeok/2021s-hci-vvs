@@ -16,7 +16,11 @@ import { uploadVoice } from "./Util";
 import { RECORD_STATUS } from "./constants";
 
 const useVoiceRecord = () => {
-  const inputHandler = useState({});
+  const inputHandler = useState({
+    title:"",
+    memo:"",
+    tag:""
+  });
   const recordStatus = useState(RECORD_STATUS.WAITING);
   const dataHandler = useState([]);
   const interimHandler = useState("");

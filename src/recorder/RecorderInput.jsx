@@ -70,5 +70,5 @@ const RecorderInput = (props) => {
 export default RecorderInput;
 
 RecorderInput.propTypes = {
-  inputHandler: propTypes.arrayOf(propTypes.object).isRequired,
+  inputHandler: propTypes.arrayOf(propTypes.any).isRequired,
 };
