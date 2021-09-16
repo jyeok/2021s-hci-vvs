@@ -461,7 +461,7 @@ const RecordComponent = (props) => {
                 setOpenHelp(!openHelp);
               }}
               startIcon={<Help fontSize="large" />}
-              size="40"
+              size="large"
             />
           </Tooltip>
         </Grid>
@@ -528,7 +528,7 @@ const RecordComponent = (props) => {
       {/* 메시지 블록  */}
       <Grid
         container
-        justify="center"
+        justifyContent="center"
         alignItems="center"
         spacing={0}
         style={{ border: "1px solid" }}
@@ -664,7 +664,7 @@ const RecordComponent = (props) => {
         </Grid>
       </Grid>
       {/* 질문  */}
-      <Grid container justify="center" alignItems="center" spacing={0}>
+      <Grid container justifyContent="center" alignItems="center" spacing={0}>
         {withHelp(
           <Grid item lg={12}>
             <MessageInput

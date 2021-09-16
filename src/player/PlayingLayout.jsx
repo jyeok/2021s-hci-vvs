@@ -52,7 +52,7 @@ const PlayingLayout = () => {
   return (
     <Grid container>
       <RecordComponent id={recordId} audioRef={audioRef} />
-      <Grid container justify="center" alignItems="center" spacing={0}>
+      <Grid container justifyContent="center" alignItems="center" spacing={0}>
         <H5AudioPlayer
           autoPlay
           src={blobUrl}
