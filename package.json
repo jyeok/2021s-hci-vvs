@@ -27,6 +27,7 @@
     "graphql": "^15.5.0",
     "graphql-tag": "^2.12.4",
     "korean-text-analytics": "^0.0.7",
+    "material-ui-audio-player": "^1.6.6",
     "material-ui-dropzone": "^3.5.0",
     "material-ui-popup-state": "^1.8.3",
     "microphone-stream": "^6.0.1",

@@ -7,10 +7,9 @@ import { SnackbarProvider } from "notistack";
 
 import Explorer from "explorer/Explorer";
 import PlayingLayout from "player/PlayingLayout";
-import RealtimeRecord from "recorder/RealtimeRecord";
+import RecorderMain from "recorder/RecorderMain";
 
 import "./styles.css";
-import Recorder from "recorder/Recorder";
 
 function App(props) {
   const { client } = props;
@@ -22,8 +21,8 @@ function App(props) {
           <Switch>
             <Route path="/" exact component={Explorer} />
             <Route path="/playing/:id" exact component={PlayingLayout} />
-            <Route path="/recording" exact component={RealtimeRecord} />
-            <Route path="/test" exact component={Recorder} />
+            <Route path="/recording" exact component={RecorderMain} />
+            <Route path="/record" exact component={RecorderMain} />
             <Redirect path="*" to="/" />
           </Switch>
         </div>

@@ -14,6 +14,7 @@ class Transcriptor {
     if (DEBUG) console.log("Constructor");
 
     this.client = client;
+    this.sid = null;
 
     this.transformWrite = this.transformWrite.bind(this);
     this.transformEnd = this.transformEnd.bind(this);
@@ -158,7 +159,10 @@ class Transcriptor {
       }
 
       process.stdout.write(chalk.red(stdoutText));
-      this.client.emit(SPEECH.SPEECH_INTERIM_DATA, stdoutText);
+      this.client.emit(
+        SPEECH.SPEECH_INTERIM_DATA,
+        stream.results[0].alternatives[0].transcript
+      );
       this.flags.lastTranscriptWasFinal = false;
 
       if (DEBUG) console.log("callback end");
@@ -198,6 +202,7 @@ class Transcriptor {
     );
 
     this.flags.newStream = true;
+    clearTimeout(this.sid);
     this.startStream();
 
     if (DEBUG) console.log("restart end");
@@ -215,13 +220,15 @@ class Transcriptor {
     this.streams.speechStream.removeAllListeners();
     this.streams.speechStream.destroy();
 
+    clearTimeout(this.sid);
+
     if (DEBUG) console.log("stream end of end");
   }
 
   startStream() {
     if (DEBUG) console.log("start");
     const speechClient = new speech.SpeechClient();
-    setTimeout(this.restartStream, this.config.streamingLimit);
+    this.sid = setTimeout(this.restartStream, this.config.streamingLimit);
 
     this.streams.voiceStream.pipe(this.streams.transform);
     this.streams.voiceStream.resume();

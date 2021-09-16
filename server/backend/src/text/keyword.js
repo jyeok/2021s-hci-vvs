@@ -19,6 +19,8 @@ const keyword = async (ctx) => {
     },
     transformResponse: (res) => {
       const parsed = JSON.parse(res);
+      if (!parsed) return [];
+
       const keywords = parsed.return_object.keylists;
 
       const tags = keywords

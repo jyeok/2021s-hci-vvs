@@ -8,6 +8,14 @@ export const SPEECH = {
   SPEECH_INTERIM_DATA: "interimData",
 };
 
+export const RECORD_STATUS = {
+  ERROR: -1,
+  WAITING: 0,
+  RECORDING: 1,
+  READY: 2,
+};
+
 export default {
   SPEECH,
+  RECORD_STATUS,
 };

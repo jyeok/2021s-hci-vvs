@@ -8,8 +8,8 @@ const postProcess = (results, endTime) => {
       isHighlighted: 0,
       isModified: 0,
       reliability: r.confidence,
-      start: endTime / 1000 - during,
-      end: endTime / 1000,
+      start: Number.parseFloat((endTime / 1000 - during).toFixed(2)),
+      end: Number.parseFloat((endTime / 1000).toFixed(2)),
       isMine: 0,
       content: r.transcript,
     };
@@ -17,7 +17,7 @@ const postProcess = (results, endTime) => {
     return result;
   });
 
-  return textBlockInputs;
+  return textBlockInputs[0];
 };
 
 module.exports = {
